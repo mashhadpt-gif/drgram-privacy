@@ -4,8 +4,9 @@ name: DrGram APK Build (CI/CD)
 # - Manual run (workflow_dispatch) with a build-type selector.
 # - Automatic release APK on every version tag (v*).
 #
-# Signed with TMessagesProj/config/release.keystore (credentials in gradle.properties).
-# Output artifact: DrGram-<version>-afat-<type>.apk
+# Signed in CI with the rotated keystore delivered via Actions secrets
+# (RELEASE_KEYSTORE_B64); local builds fall back to the committed keystore.
+# Output artifacts: DrGram-<version>-afat-<type>.apk + DrGram-<version>-play-release.aab
 
 on:
   workflow_dispatch:
@@ -41,9 +42,18 @@ permissions:
 
 jobs:
   build-apk:
-    name: Build DrGram APK
+    name: Build DrGram APK + Play AAB
     runs-on: ubuntu-latest
     timeout-minutes: 300
+
+    # DrGram Fix 63: rotated signing key — the committed keystore burned when the
+    # repo was briefly public. RELEASE_KEYSTORE_B64 = base64 of the new keystore;
+    # falls back to the committed keystore when the secrets are absent.
+    env:
+      RELEASE_KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+      RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+      RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+      RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
 
     steps:
       - name: Checkout source (with native submodules)
@@ -140,9 +150,13 @@ jobs:
           find TMessagesProj -name "*.obj" -type f -delete || true
           df -h / | tail -1
 
-      - name: Build APK (phase 2/2 — dex, package, sign)
+      - name: Build APK + Play AAB (phase 2/2 — dex, package, sign)
         run: |
-          ./gradlew :TMessagesProj_App:${{ steps.params.outputs.task }} \
+          TASKS=":TMessagesProj_App:${{ steps.params.outputs.task }}"
+          if [ "${{ steps.params.outputs.build_type }}" = "release" ]; then
+            TASKS="$TASKS :TMessagesProj_App:bundleBundleAfatRelease"
+          fi
+          ./gradlew $TASKS \
             -PAPP_ABIS="${{ steps.params.outputs.abis }}" \
             --no-configuration-cache \
             --stacktrace
@@ -162,6 +176,30 @@ jobs:
           SIZE_MB=$(du -m "$DEST" | cut -f1)
           echo "size_mb=$SIZE_MB" >> "$GITHUB_OUTPUT"
           echo "DrGram APK ready: $DEST (${SIZE_MB} MB)"
+
+      - name: Collect Play AAB (bundleAfat)
+        if: steps.params.outputs.build_type == 'release'
+        id: aab
+        run: |
+          set -e
+          SRC="TMessagesProj_App/build/outputs/bundle/bundleAfatRelease/app.aab"
+          if [ ! -f "$SRC" ]; then
+            echo "AAB not found at $SRC — searching build outputs..."
+            SRC=$(find TMessagesProj_App/build/outputs/bundle -name "*.aab" | head -n 1)
+          fi
+          DEST="DrGram-v${{ steps.params.outputs.version_name }}-play-release.aab"
+          cp "$SRC" "$DEST"
+          echo "file=$DEST" >> "$GITHUB_OUTPUT"
+          SIZE_MB=$(du -m "$DEST" | cut -f1)
+          echo "size_mb=$SIZE_MB" >> "$GITHUB_OUTPUT"
+          echo "DrGram Play AAB ready: $DEST (${SIZE_MB} MB)"
+
+      - name: Verify 16KB ELF alignment (Play hard requirement)
+        if: steps.params.outputs.build_type == 'release'
+        run: |
+          python3 TMessagesProj/config/check_16k.py \
+            "${{ steps.apk.outputs.file }}" \
+            "${{ steps.aab.outputs.file }}"
 
       - name: Verify FileProvider paths are restricted
         shell: bash
@@ -208,6 +246,15 @@ jobs:
           if-no-files-found: error
           compression-level: 0
 
+      - name: Upload Play AAB artifact
+        if: steps.params.outputs.build_type == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DrGram-v${{ steps.params.outputs.version_name }}-play-release
+          path: ${{ steps.aab.outputs.file }}
+          if-no-files-found: error
+          compression-level: 0
+
       - name: Attach APK to GitHub Release
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -233,5 +280,7 @@ jobs:
             - Save to Gallery in the media viewer with auto-download
             - Alternate app icons (Black Gold / Black Red / Onyx / Royal / Crimson / Eclipse)
             - English + full Persian localization core
-          files: ${{ steps.apk.outputs.file }}
+          files: |
+            ${{ steps.apk.outputs.file }}
+            ${{ steps.aab.outputs.file }}
           fail_on_unmatched_files: true

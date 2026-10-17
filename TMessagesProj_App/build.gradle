@@ -4,6 +4,15 @@ apply plugin: 'org.telegram.build-app-plugin'
 // DrGram Fix 6: ABI set is configurable via -PAPP_ABIS (comma-separated). Default: all four.
 def GRAM_ABIS = (project.findProperty('APP_ABIS') ?: 'armeabi-v7a,arm64-v8a,x86,x86_64').split(',').collect { it.trim() }
 
+// DrGram Fix 63: keystore rotation. The committed release.keystore burned when the
+// repository was briefly public, so CI now signs with a rotated key delivered via
+// GitHub Actions secrets (RELEASE_KEYSTORE_B64 = base64 of the new keystore file).
+// Local builds without those env vars keep using the committed keystore.
+def CI_KEYSTORE_B64 = System.getenv('RELEASE_KEYSTORE_B64')
+def CI_STORE_PASS   = System.getenv('RELEASE_STORE_PASSWORD')
+def CI_KEY_ALIAS    = System.getenv('RELEASE_KEY_ALIAS')
+def CI_KEY_PASS     = System.getenv('RELEASE_KEY_PASSWORD')
+
 repositories {
     mavenCentral()
     google()
@@ -59,10 +68,21 @@ android {
         }
 
         release {
-            storeFile file("../TMessagesProj/config/release.keystore")
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+            if (CI_KEYSTORE_B64) {
+                // DrGram Fix 63: rotated CI signing key (never committed to git)
+                def ciKs = new File(buildDir, "ci-drgram-release.keystore")
+                ciKs.parentFile.mkdirs()
+                ciKs.bytes = CI_KEYSTORE_B64.decodeBase64()
+                storeFile ciKs
+                storePassword CI_STORE_PASS
+                keyAlias CI_KEY_ALIAS
+                keyPassword CI_KEY_PASS
+            } else {
+                storeFile file("../TMessagesProj/config/release.keystore")
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
         }
     }
 
@@ -123,6 +143,9 @@ android {
 
     productFlavors {
         bundleAfat {
+            // DrGram Fix 63: Play distribution -> anti-delete and similar
+            // policy-sensitive features are runtime-disabled (see drgram_play_mode)
+            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [drgramPlayMode: 'true']
             ndk {
                 GRAM_ABIS.each { abiFilters(it) }
             }
@@ -132,6 +155,7 @@ android {
             buildConfigField "boolean", "BUNDLE", "true"
         }
         bundleAfat_SDK23 {
+            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [drgramPlayMode: 'true']
             ndk {
                 GRAM_ABIS.each { abiFilters(it) }
             }
@@ -148,6 +172,7 @@ android {
             buildConfigField "boolean", "BUNDLE", "true"
         }
         afat {
+            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [drgramPlayMode: 'false']
             ndk {
                 GRAM_ABIS.each { abiFilters(it) }
             }

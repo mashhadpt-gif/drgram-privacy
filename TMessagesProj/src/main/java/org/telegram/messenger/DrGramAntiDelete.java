@@ -76,7 +76,40 @@ public class DrGramAntiDelete {
 
     //region settings
 
+    private static volatile Boolean playModeCached;
+
+    /**
+     * DrGram Fix 63: true when this build ships through Google Play (the
+     * bundleAfat flavors inject the drgram_play_mode manifest meta-data).
+     * Read once, then cached — the value can never change at runtime.
+     */
+    private static boolean isPlayMode() {
+        Boolean cached = playModeCached;
+        if (cached != null) {
+            return cached;
+        }
+        boolean value = false;
+        try {
+            android.content.Context appCtx = ApplicationLoader.applicationContext;
+            android.content.pm.ApplicationInfo ai = appCtx.getPackageManager()
+                    .getApplicationInfo(appCtx.getPackageName(), android.content.pm.PackageManager.GET_META_DATA);
+            value = ai.metaData != null && ai.metaData.getBoolean("drgram_play_mode", false);
+        } catch (Exception ignore) {
+        }
+        playModeCached = value;
+        return value;
+    }
+
+    /** DrGram Fix 63: false in Google Play builds — UI rows must hide. */
+    public static boolean featureAvailable() {
+        return !isPlayMode();
+    }
+
     public boolean isEnabled() {
+        if (isPlayMode()) {
+            // DrGram Fix 63: anti-delete is disabled in Google Play builds
+            return false;
+        }
         return preferences.getBoolean("enabled", false);
     }
 

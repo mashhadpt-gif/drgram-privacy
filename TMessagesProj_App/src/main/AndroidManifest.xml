@@ -18,6 +18,13 @@
     <uses-sdk tools:overrideLibrary="com.google.mediapipe.tasks.vision,com.google.mediapipe.tasks.core" />
 
     <application android:name="org.telegram.messenger.ApplicationLoaderImpl" tools:replace="name">
+
+        <!-- DrGram Fix 63: Play-flavor runtime gate. bundleAfat* flavors (Google Play
+             AAB) resolve drgramPlayMode=true and disable the anti-delete feature at
+             runtime; direct-distribution afat builds keep it (false). -->
+        <meta-data
+            android:name="drgram_play_mode"
+            android:value="${drgramPlayMode}" />
         <service
             android:name="org.telegram.messenger.GoogleVoiceClientService"
             android:exported="true"

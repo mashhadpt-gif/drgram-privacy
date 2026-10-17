@@ -405,6 +405,9 @@ public class DrGramToolsActivity extends BaseFragment {
     //region Fix 36: anti-delete + encrypted backup + profile card
 
     private void buildAntiDeleteSection(Context context) {
+        if (!DrGramAntiDelete.featureAvailable()) {
+            return; // DrGram Fix 63: anti-delete never ships in Google Play builds
+        }
         addHeader(context, LocaleController.getString(R.string.DrGramAntiDeleteSectionTitle),
                 LocaleController.getString(R.string.DrGramAntiDeleteSectionHint));
         addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramAntiDeleteOpen), v ->
