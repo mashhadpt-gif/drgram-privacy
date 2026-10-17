@@ -34,24 +34,24 @@ public class BuildVars {
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
     public static String BUILD_VERSION_STRING = BuildConfig.BUILD_VERSION_STRING;
 
-    // DrGram Fix 64 — ACCOUNT-SAFETY CRITICAL ================================
-    // This pair (2040 / b18441a1…) is Telegram DESKTOP's official public
-    // credential. Running an Android fork on a public/leaked pair is the
-    // #1 trigger of Telegram's anti-abuse ban waves: the server sees Android
-    // deviceModel/appVersion patterns on a desktop api_id and flags every
-    // account that logs in from such a client (historically the Persian-mod
-    // mass "account deleted" events). The ONLY durable fix is a dedicated
-    // api_id registered for DrGram:
+    // DrGram Fix 64/65 — ACCOUNT-SAFETY ================================
+    // Fix 65 (v5.34): the app now ships a DEDICATED REGISTERED pair
+    // (api_id 17064702) provided by the DrGram owner — no longer the public
+    // Telegram Desktop placeholder (2040 / b18441a1…). Android-fork behavior
+    // on a private registered pair does not match the leaked-credential
+    // fingerprint that drives Telegram's client-detection ban waves.
+    // Rotation procedure (if this pair ever needs replacing):
     //   1. my.telegram.org → API development tools → create an app
     //   2. put the new api_id into APP_ID and the hash into APP_HASH
-    //   3. flip CREDENTIAL_IS_PUBLIC_PLACEHOLDER to false
-    // Until then isLeakedCredentialPair() drives the in-app Tools warning.
-    public static int APP_ID = 2040; // TODO(DrGram): replace with the registered DrGram api_id
+    //   3. keep CREDENTIAL_IS_PUBLIC_PLACEHOLDER = false
+    // Reserve pairs (owner-supplied, held OUT of the repo for minimal
+    // exposure — see sandbox scripts/.gh_reserve_credentials): 5 more.
+    public static int APP_ID = 17064702; // DrGram Fix 65: dedicated registered pair
 
-    public static String APP_HASH = "b18441a1ff607e10a989891a5462e627"; // TODO(DrGram): replace with the registered DrGram api_hash
+    public static String APP_HASH = "f65880b9eededbee85346f874819bbc5"; // DrGram Fix 65
 
-    /** DrGram Fix 64: true while the shipped pair is the known-public placeholder. */
-    public static boolean CREDENTIAL_IS_PUBLIC_PLACEHOLDER = true;
+    /** DrGram Fix 65: the public placeholder no longer ships. */
+    public static boolean CREDENTIAL_IS_PUBLIC_PLACEHOLDER = false;
 
     /**
      * DrGram Fix 64: honest self-knowledge for the Tools → Account Safety card.
