@@ -61,6 +61,11 @@ public class DrGramAutoProxy {
             "https://api.telegramvpn.org/proxies?per=16&sort=ping&status=active",
             // Iran-focused t.me/proxy?...&secret=... line list, refreshed every 12h
             "https://raw.githubusercontent.com/SoliSpirit/mtproto/master/all_proxies.txt",
+            // Fix 66: jsDelivr CDN mirror of the same Iran-focused list —
+            // raw.githubusercontent.com is often unreachable INSIDE Iran, and
+            // pre-login is exactly when no proxy exists yet (chicken-and-egg);
+            // jsDelivr is a global CDN that stays reachable from Iranian ISPs.
+            "https://cdn.jsdelivr.net/gh/SoliSpirit/mtproto@master/all_proxies.txt",
             // classic [{host,port,secret}] array (may be Cloudflare-blocked — harmless)
             "https://mtpro.xyz/api/?type=mtproto"
     };

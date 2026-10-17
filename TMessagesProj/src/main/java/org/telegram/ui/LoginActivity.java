@@ -8797,15 +8797,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         final boolean proxyEnabled = preferences.getBoolean("proxy_enabled", false) && !TextUtils.isEmpty(proxyAddress);
         final boolean connected = currentConnectionState == ConnectionsManager.ConnectionStateConnected || currentConnectionState == ConnectionsManager.ConnectionStateUpdating;
         final boolean connecting = currentConnectionState == ConnectionsManager.ConnectionStateConnecting || currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork || currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy;
-        if (proxyEnabled) {
-            proxyDrawable.setConnected(true, connected, animated);
-            showProxyButton(true, animated);
-        } else if (getMessagesController().blockedCountry && !SharedConfig.proxyList.isEmpty() || connecting) {
-            proxyDrawable.setConnected(true, connected, animated);
-            showProxyButtonDelayed();
-        } else {
-            showProxyButton(false, animated);
-        }
+        // DrGram Fix 66: the proxy button is ALWAYS visible on the login screen.
+        // In Iran the connection is down exactly when the user needs it, and the
+        // old show-conditions (a "connecting" flicker or the server-reported
+        // blockedCountry flag — which stays false when the NETWORK blocks
+        // Telegram, not Telegram blocking the country) left users with no way
+        // to open the proxy list before logging in. Now it is permanently there.
+        proxyDrawable.setConnected(proxyEnabled || connecting, connected, animated);
+        showProxyButton(true, animated);
     }
     
     private boolean proxyButtonVisible;
