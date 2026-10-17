@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DrGramAntiDelete;
+import org.telegram.messenger.DrGramAccountSafety; // DrGram Fix 64
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
@@ -135,6 +136,7 @@ public class DrGramToolsActivity extends BaseFragment {
             // DrGram Fix 14 (hardening): decoration must never crash the page.
             FileLog.e(t);
         }
+        buildAccountSafetySection(context); // DrGram Fix 64
         buildSettingsCenterSection(context);
         buildSecretarySection(context);
         buildSmartReplySection(context); // DrGram Fix 35
@@ -333,6 +335,82 @@ public class DrGramToolsActivity extends BaseFragment {
     //endregion
 
     //region Secretary
+
+    // DrGram Fix 64 — Account Safety card: a local, network-free self-audit
+    // of everything in this client that affects Telegram's anti-abuse view of
+    // the logged-in account (credential pair, auto-responder caps, passive
+    // modules). One row opens the full findings dialog.
+    private void buildAccountSafetySection(Context context) {
+        addHeader(context, LocaleController.getString(R.string.DrGramSafetySectionTitle),
+                LocaleController.getString(R.string.DrGramSafetySectionHint));
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramSafetyOpen), v ->
+                showAccountSafetyDialog()));
+    }
+
+    private void showAccountSafetyDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        java.util.List<DrGramAccountSafety.Item> items = DrGramAccountSafety.collect(currentAccount);
+
+        LinearLayout list = new LinearLayout(context);
+        list.setOrientation(LinearLayout.VERTICAL);
+        int pad = AndroidUtilities.dp(24);
+        list.setPadding(pad, AndroidUtilities.dp(8), pad, 0);
+
+        for (int i = 0; i < items.size(); i++) {
+            DrGramAccountSafety.Item item = items.get(i);
+            int bulletColor;
+            if (item.level == DrGramAccountSafety.LEVEL_WARN) {
+                bulletColor = 0xFFE63B52; // red — needs action
+            } else if (item.level == DrGramAccountSafety.LEVEL_INFO) {
+                bulletColor = 0xFFF4D27A; // gold — awareness
+            } else {
+                bulletColor = 0xFF7BD88A; // green — healthy
+            }
+
+            LinearLayout itemRow = new LinearLayout(context);
+            itemRow.setOrientation(LinearLayout.HORIZONTAL);
+            itemRow.setPadding(0, AndroidUtilities.dp(10), 0, AndroidUtilities.dp(4));
+
+            android.widget.TextView bullet = new android.widget.TextView(context);
+            bullet.setText("●");
+            bullet.setTextColor(bulletColor);
+            bullet.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+            bullet.setPadding(0, AndroidUtilities.dp(3), AndroidUtilities.dp(10), 0);
+            itemRow.addView(bullet, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            LinearLayout textCol = new LinearLayout(context);
+            textCol.setOrientation(LinearLayout.VERTICAL);
+
+            android.widget.TextView title = new android.widget.TextView(context);
+            title.setText(item.title);
+            title.setTextColor(0xFFF7F0DF);
+            title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            textCol.addView(title);
+
+            android.widget.TextView detail = new android.widget.TextView(context);
+            detail.setText(item.detail);
+            detail.setTextColor(0xB3D8CBB0);
+            detail.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+            detail.setLineSpacing(AndroidUtilities.dp(2), 1f);
+            textCol.addView(detail);
+
+            itemRow.addView(textCol, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            list.addView(itemRow);
+        }
+
+        android.widget.ScrollView scroller = new android.widget.ScrollView(context);
+        scroller.addView(list, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramSafetyDialogTitle));
+        builder.setView(scroller);
+        builder.setPositiveButton(LocaleController.getString(R.string.OK), null);
+        builder.show();
+    }
 
     private void buildSecretarySection(Context context) {
         addHeader(context, LocaleController.getString(R.string.DrGramSecretaryTitle),

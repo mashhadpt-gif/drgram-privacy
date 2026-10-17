@@ -34,9 +34,37 @@ public class BuildVars {
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
     public static String BUILD_VERSION_STRING = BuildConfig.BUILD_VERSION_STRING;
 
-    public static int APP_ID = 2040; // DrGram Fix 11: stable api credentials (official Android pair)
-    
-    public static String APP_HASH = "b18441a1ff607e10a989891a5462e627"; // DrGram Fix 11
+    // DrGram Fix 64 — ACCOUNT-SAFETY CRITICAL ================================
+    // This pair (2040 / b18441a1…) is Telegram DESKTOP's official public
+    // credential. Running an Android fork on a public/leaked pair is the
+    // #1 trigger of Telegram's anti-abuse ban waves: the server sees Android
+    // deviceModel/appVersion patterns on a desktop api_id and flags every
+    // account that logs in from such a client (historically the Persian-mod
+    // mass "account deleted" events). The ONLY durable fix is a dedicated
+    // api_id registered for DrGram:
+    //   1. my.telegram.org → API development tools → create an app
+    //   2. put the new api_id into APP_ID and the hash into APP_HASH
+    //   3. flip CREDENTIAL_IS_PUBLIC_PLACEHOLDER to false
+    // Until then isLeakedCredentialPair() drives the in-app Tools warning.
+    public static int APP_ID = 2040; // TODO(DrGram): replace with the registered DrGram api_id
+
+    public static String APP_HASH = "b18441a1ff607e10a989891a5462e627"; // TODO(DrGram): replace with the registered DrGram api_hash
+
+    /** DrGram Fix 64: true while the shipped pair is the known-public placeholder. */
+    public static boolean CREDENTIAL_IS_PUBLIC_PLACEHOLDER = true;
+
+    /**
+     * DrGram Fix 64: honest self-knowledge for the Tools → Account Safety card.
+     * Purely local (no network): true iff the app still runs on the known
+     * public pair. Accounts logging in from this state carry the highest
+     * client-detection ban risk and the UI says so.
+     */
+    public static boolean isLeakedCredentialPair() {
+        return CREDENTIAL_IS_PUBLIC_PLACEHOLDER
+                && APP_ID == 2040
+                && "b18441a1ff607e10a989891a5462e627".equals(APP_HASH);
+    }
+    // ======================== end DrGram Fix 64 block =======================
 
     // DrGram Fix 10: SafetyNet DISABLED. Its Google attestation is bound to the
     // official Telegram package+signature and ALWAYS fails for forks, which triggered

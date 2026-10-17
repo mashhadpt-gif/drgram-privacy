@@ -832,4 +832,25 @@
     <string name="DrGramFxPixel">🔲 پیکسلی</string>
     <string name="DrGramFxMirror">🪞 آینه</string>
     <string name="DrGramFxCartoon">🎨 کارتونی</string>
+
+    <!-- DrGram Fix 64 — Account Safety card -->
+    <string name="DrGramSafetySectionTitle">امنیت اکانت</string>
+    <string name="DrGramSafetySectionHint">بازبینی محلیِ همه‌چیزهایی که در برنامه می‌تواند بر وضعیت اکانت تلگرام شما اثر بگذارد. هیچ داده‌ای جایی ارسال نمی‌شود.</string>
+    <string name="DrGramSafetyOpen">مشاهده وضعیت امنیت</string>
+    <string name="DrGramSafetyDialogTitle">امنیت اکانت</string>
+    <string name="DrGramSafetyCredTitle">اعتبارنامه برنامه (api_id)</string>
+    <string name="DrGramSafetyCredWarn">این نسخه هنوز با جفت اعتبارنامه عمومیِ لوخورده اجرا می‌شود. تلگرام قادر است کلاینت‌های مودیفای‌شده روی api_id های عمومی را تشخیص دهد و این اصلی‌ترین عامل محدودشدن یا حذف اکانت‌هاست. از توسعه‌دهنده بخواهید در بیلد بعدی api_id اختصاصی ثبت‌شده را قرار دهد. تا آن زمان رفتار اسپم‌گونه نداشته باشید و برای اکانت اصلی‌تان احتیاط کنید.</string>
+    <string name="DrGramSafetyCredOk">این نسخه با جفت اعتبارنامه اختصاصیِ ثبت‌شده اجرا می‌شود. عالی است.</string>
+    <string name="DrGramSafetySecretaryTitle">منشی (پاسخگوی خودکار)</string>
+    <string name="DrGramSafetySecretaryOn">فعال است. برای محافظت از شما سقف سخت دارد: حداکثر ۱۰ پاسخ خودکار در ساعت و ۴۰ در روز در کل چت‌ها (مصرف فعلی: %1$d در ساعت، %2$d در روز). تلگرام اکانت‌هایی را که پیام خودکار انبوه می‌فرستند فلگ می‌کند؛ این سقف شما را امن نگه می‌دارد.</string>
+    <string name="DrGramSafetySecretaryOff">غیرفعال است — برنامه هیچ‌چیز را به‌صورت خودکار نمی‌فرستد.</string>
+    <string name="DrGramSafetySmartReplyTitle">پاسخ هوشمند (دستورها)</string>
+    <string name="DrGramSafetySmartReplyDetail">فقط وقتی جواب می‌دهد که کسی عمداً یکی از دستورهای ثبت‌شده شما را تایپ کند. هیچ‌چیز خودبه‌خود اجرا نمی‌شود.</string>
+    <string name="DrGramSafetyAntiDeleteTitle">حافظه آنتی‌دلیت</string>
+    <string name="DrGramSafetyAntiDeleteDetail">کاملاً غیرفعال (Passive): فقط متن پیام‌هایی را که قبلاً دریافت کرده‌اید نگه می‌دارد اگر فرستنده حذفشان کند. هیچ درخواست اضافه‌ای به تلگرام نمی‌زند؛ سرور چیزی غیرعادی نمی‌بیند. در بیلدهای پلی‌استور هم غیرفعال است.</string>
+    <string name="DrGramSafetyAntiDeleteOff">در این نسخه موجود نیست.</string>
+    <string name="DrGramSafetyIdentityTitle">هویت کلاینت</string>
+    <string name="DrGramSafetyIdentityDetail">برنامه مدل واقعی دستگاه، نسخه واقعی اندروید و نسخه خودش را صادقانه گزارش می‌کند. هیچ جعل‌سازی‌ای که فینگرپرینت تلگرام را تحریک کند وجود ندارد.</string>
+    <string name="DrGramSafetyBulkTitle">ابزارهای ارسال انبوه</string>
+    <string name="DrGramSafetyBulkDetail">این برنامه هیچ ابزار فوروارد همگانی، اسکرپ ممبر یا بمباران دعوت ندارد — ابزارهایی که بیشترین حذف اکانت را به‌دنبال دارند. هیچ‌چیز اینجا مثل ربات اسپم رفتار نمی‌کند.</string>
 </resources>

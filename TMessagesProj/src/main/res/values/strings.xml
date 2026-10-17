@@ -11817,4 +11817,25 @@
     <string name="DrGramFxOcean">Ocean</string>
     <string name="DrGramFxPeach">Peach</string>
     <string name="DrGramFxGlam">Glam</string>
+
+    <!-- DrGram Fix 64 — Account Safety card -->
+    <string name="DrGramSafetySectionTitle">Account Safety</string>
+    <string name="DrGramSafetySectionHint">A local self-audit of everything in the app that can affect your Telegram account standing. Nothing is sent anywhere.</string>
+    <string name="DrGramSafetyOpen">Review safety status</string>
+    <string name="DrGramSafetyDialogTitle">Account Safety</string>
+    <string name="DrGramSafetyCredTitle">App credentials (api_id)</string>
+    <string name="DrGramSafetyCredWarn">This build still runs on a public placeholder credential pair. Telegram can detect modified clients on public api_id pairs and this is the main reason accounts get limited or deleted. Ask the developer for the next build with a dedicated registered api_id — until then, avoid spam-like behaviour and consider using your main account with the official app too.</string>
+    <string name="DrGramSafetyCredOk">This build runs on a dedicated registered credential pair. Good.</string>
+    <string name="DrGramSafetySecretaryTitle">Secretary (auto-responder)</string>
+    <string name="DrGramSafetySecretaryOn">Enabled. Hard-capped for your protection: at most 10 automatic replies per hour and 40 per day across all chats (used now: %1$d/hour, %2$d/day). Telegram flags accounts that flood automated messages, so the cap keeps you safe.</string>
+    <string name="DrGramSafetySecretaryOff">Disabled — the app never sends anything automatically.</string>
+    <string name="DrGramSafetySmartReplyTitle">Smart Reply (commands)</string>
+    <string name="DrGramSafetySmartReplyDetail">Only answers when someone deliberately types one of your registered commands. Nothing fires on its own.</string>
+    <string name="DrGramSafetyAntiDeleteTitle">Anti-Delete cache</string>
+    <string name="DrGramSafetyAntiDeleteDetail">Purely passive: keeps texts you already received if the sender deletes them. It makes zero extra requests to Telegram, so the server sees nothing unusual. Disabled in Play-store builds.</string>
+    <string name="DrGramSafetyAntiDeleteOff">Not available in this build.</string>
+    <string name="DrGramSafetyIdentityTitle">Client identity</string>
+    <string name="DrGramSafetyIdentityDetail">The app reports your real device model, real Android version and its own version honestly. No spoofing that could trip Telegram\u2019s client fingerprinting.</string>
+    <string name="DrGramSafetyBulkTitle">Bulk-messaging tools</string>
+    <string name="DrGramSafetyBulkDetail">This app ships no mass-forward, member-scraper or invite-bombing features — the tools most often punished with account deletion. Nothing here behaves like a spam bot.</string>
 </resources>
