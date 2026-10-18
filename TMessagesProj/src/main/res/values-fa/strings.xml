@@ -5214,4 +5214,12 @@
     <string name="Page4Title">امن</string>
     <string name="Page5Title">قدرتمند</string>
     <string name="Page6Title">ابری</string>
+
+    <!-- DrGram Fix 68: official channel invitation -->
+    <string name="DrGramChannelPromoTitle">کانال رسمی DrGram</string>
+    <string name="DrGramChannelPromoText">جهت دریافت آپدیت و جزئیات آپدیت‌های اخیر، به کانال رسمی ما مراجعه کنید.</string>
+    <string name="DrGramChannelPromoJoin">عضویت در کانال</string>
+    <string name="DrGramChannelPromoLater">بعداً</string>
+    <string name="DrGramChannelPromoJoined">به کانال رسمی خوش آمدید!</string>
+    <string name="DrGramChannelPromoFail">عضویت انجام نشد؛ کمی بعد دوباره تلاش کنید.</string>
 </resources>

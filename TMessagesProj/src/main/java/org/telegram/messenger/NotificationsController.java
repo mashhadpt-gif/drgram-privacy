@@ -4498,12 +4498,19 @@ public class NotificationsController extends BaseController implements Notificat
                 isDefault = false;
             }
             // DrGram Fix 37: luxury brand chime (gold bell / love glass-harp) when
-            // the user has not picked a personal sound — custom choices always win
+            // the user has not picked a personal sound — custom choices always win.
+            // DrGram Fix 68: the internal-file flag must follow the actual path
+            // kind. It was hardcoded false, so a CUSTOM chime (an app-private
+            // cache file) hit the raw Uri.parse() branch; SystemUI cannot read
+            // another app's private path, every pick fell back to the same
+            // default sound and the feature looked broken ("همه یک‌جورند").
+            // Resource URIs (android.resource://) stay non-internal — they play
+            // fine as-is; cache files are served through FileProvider + grant.
             if (soundPath != null && (soundPath.equalsIgnoreCase("Default") || soundPath.equals(defaultPath))) {
                 String luxPath = DrGramLuxSounds.channelSound();
                 if (luxPath != null) {
                     soundPath = luxPath;
-                    isInternalSoundFile = false;
+                    isInternalSoundFile = !luxPath.startsWith("android.resource://");
                 }
             }
             if (customImportance != 3 && importance != customImportance) {

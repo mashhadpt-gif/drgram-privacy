@@ -11838,4 +11838,12 @@
     <string name="DrGramSafetyIdentityDetail">The app reports your real device model, real Android version and its own version honestly. No spoofing that could trip Telegram\u2019s client fingerprinting.</string>
     <string name="DrGramSafetyBulkTitle">Bulk-messaging tools</string>
     <string name="DrGramSafetyBulkDetail">This app ships no mass-forward, member-scraper or invite-bombing features — the tools most often punished with account deletion. Nothing here behaves like a spam bot.</string>
+
+    <!-- DrGram Fix 68: official channel invitation -->
+    <string name="DrGramChannelPromoTitle">DrGram official channel</string>
+    <string name="DrGramChannelPromoText">جهت دریافت آپدیت و جزئیات آپدیت‌های اخیر، به کانال رسمی ما مراجعه کنید.</string>
+    <string name="DrGramChannelPromoJoin">عضویت در کانال</string>
+    <string name="DrGramChannelPromoLater">بعداً</string>
+    <string name="DrGramChannelPromoJoined">Welcome to the channel!</string>
+    <string name="DrGramChannelPromoFail">Could not join right now — try again later.</string>
 </resources>

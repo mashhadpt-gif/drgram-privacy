@@ -7,6 +7,9 @@
     <external-media-path name="telegram_public_media" path="Telegram/" />
     <!-- MediaController/FileLoader cache is app-specific and is shared one URI at a time. -->
     <external-cache-path name="app_cache" path="." />
+    <!-- DrGram Fix 68: imported luxury notification chimes live in the internal
+         cache dir (drgram_sounds/) and are served to SystemUI as channel sounds. -->
+    <cache-path name="internal_cache" path="." />
     <!-- Only app-owned internal directories; paths stay relative to the files root. -->
     <files-path name="logs" path="logs/" />
     <files-path name="files_cache" path="cache/" />
