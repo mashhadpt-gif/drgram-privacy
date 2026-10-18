@@ -5222,4 +5222,22 @@
     <string name="DrGramChannelPromoLater">بعداً</string>
     <string name="DrGramChannelPromoJoined">به کانال رسمی خوش آمدید!</string>
     <string name="DrGramChannelPromoFail">عضویت انجام نشد؛ کمی بعد دوباره تلاش کنید.</string>
+
+    <!-- DrGram Fix 69: dating / people nearby cards -->
+    <string name="DrGramDatingTitle">دوستیابی</string>
+    <string name="DrGramDatingPerm">برای نمایش اطرافیان، لوکس گرام به مجوز موقعیت مکانی نیاز دارد. این مجوز فقط یک‌بار برای یافتن افراد نزدیک استفاده می‌شود و هیچ چیزی ذخیره نمی‌شود.</string>
+    <string name="DrGramDatingPermBtn">اجازه دسترسی به موقعیت</string>
+    <string name="DrGramDatingConsent">با ادامه دادن، موقعیت شما برای مدتی کوتاه (حدود یک ساعت) با تلگرام به اشتراک گذاشته می‌شود تا اطرافیان هم شما را ببینند. هر زمان بخواهید می‌توانید با خاموش کردن موقعیت، متوقفش کنید.</string>
+    <string name="DrGramDatingOpen">نمایش اطرافیان</string>
+    <string name="DrGramDatingLoading">در حال جستجوی اطرافیان…</string>
+    <string name="DrGramDatingEmpty">فعلاً کسی نزدیک شما نیست. کمی بعد دوباره امتحان کنید.</string>
+    <string name="DrGramDatingRetry">تلاش دوباره</string>
+    <string name="DrGramDatingNoLocation">موقعیت در دسترس نیست — GPS را روشن کنید و دوباره تلاش کنید.</string>
+    <string name="DrGramDatingFail">جستجو ناموفق بود؛ دوباره تلاش کنید.</string>
+    <string name="DrGramDatingFound">%d نفر نزدیک شما</string>
+    <string name="DrGramDatingAge">سن</string>
+    <string name="DrGramDatingYears">%d ساله</string>
+    <string name="DrGramDatingSeen">آخرین بازدید</string>
+    <string name="DrGramDatingBio">بیوگرافی</string>
+    <string name="DrGramDatingMessage">پیام دادن</string>
 </resources>

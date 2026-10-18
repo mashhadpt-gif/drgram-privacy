@@ -52525,6 +52525,28 @@ public class TLRPC {
         }
     }
 
+    // DrGram Fix 69: request class for the People Nearby revival (دوستیابی).
+    // The response is Updates whose update vector contains TL_updatePeerLocated
+    // entries (peer + distance) and whose users vector carries the User objects.
+    public static class TL_contacts_getLocated extends TLMethod<TLRPC.Updates> {
+        public static final int constructor = 0xd348bcba;
+
+        public int flags;
+        public boolean background;
+        public InputGeoPoint self_geo_point;
+
+        public TLRPC.Updates deserializeResponseT(InputSerializedData stream, int constructor, boolean exception) {
+            return TLRPC.Updates.TLdeserialize(stream, constructor, exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            flags = setFlag(flags, FLAG_1, background);
+            stream.writeInt32(flags);
+            self_geo_point.serializeToStream(stream);
+        }
+    }
+
     public static class TL_contacts_resolveUsername extends TLObject {
         public static final int constructor = 0x725afbbc;
 

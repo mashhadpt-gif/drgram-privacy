@@ -1697,6 +1697,12 @@ public class ChatActivity extends BaseFragment implements
     private final static int charge_fee = 72;
     private final static int drgramAdvForward = 73; // DrGram Fix 27: star-badged Advanced Forward
 
+    // DrGram Fix 69: true while the destination picker opened by forward-menu
+    // option 1 (فوروارد بدون نام فرستنده) is on screen; consumed once in
+    // didSelectDialogs — messages are then re-sent WITHOUT the "Forwarded from"
+    // header so no sender or channel name ever appears.
+    private boolean drgramCleanForwardPending;
+
     private final static int chat_menu_topic_create = 73;
 
     private final static int id_chat_compose_panel = 1000;
@@ -12436,6 +12442,15 @@ public class ChatActivity extends BaseFragment implements
         return drgramFwd;
     }
 
+    // DrGram Fix 69: option 1 — «فوروارد» بدون نقل قول: the user asked for a
+    // plain forward where the name of the person or channel NEVER appears.
+    // The native picker is reused; didSelectDialogs re-sends the collected
+    // messages with forwardFromMyName=true which strips the fwd header.
+    private void drgramForwardSelectionClean(boolean fromActionBar) {
+        drgramCleanForwardPending = true;
+        openForward(fromActionBar);
+    }
+
     // DrGram Fix 33: "forward with quote" — opens the advanced editor in quote mode,
     // which sends the message from the user's own name with a quote header of the source.
     private void drgramForwardSelectionQuoted() {
@@ -12466,7 +12481,7 @@ public class ChatActivity extends BaseFragment implements
         }
         try {
             ItemOptions.makeOptions(ChatActivity.this, anchor)
-                    .add(R.drawable.msg_forward, LocaleController.getString(R.string.Forward), () -> openForward(fromActionBar))
+                    .add(R.drawable.msg_forward, LocaleController.getString(R.string.Forward), () -> drgramForwardSelectionClean(fromActionBar))
                     .add(R.drawable.menu_reply, LocaleController.getString(R.string.DrGramFwdWithQuote), this::drgramForwardSelectionQuoted)
                     .add(R.drawable.drgram_ic_forward_star, LocaleController.getString(R.string.DrGramAdvFwdTitle), this::drgramForwardSelectionAdvanced)
                     .setDrawScrim(false)
@@ -34856,6 +34871,11 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public boolean didSelectDialogs(DialogsActivity fragment, ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
+        // DrGram Fix 69: consume the clean-forward flag once, before any early
+        // return — a forward-menu option 1 pick re-sends messages WITHOUT the
+        // "Forwarded from" header in every path below.
+        final boolean drgramCleanForward = drgramCleanForwardPending;
+        drgramCleanForwardPending = false;
         if ((messagePreviewParams == null && (!fragment.isQuote || replyingMessageObject == null) || fragment.isQuote && replyingMessageObject == null) && forwardingMessage == null && selectedMessagesIds[0].size() == 0 && selectedMessagesIds[1].size() == 0) {
             return false;
         }
@@ -34928,7 +34948,7 @@ public class ChatActivity extends BaseFragment implements
                         params.suggestionParams = messageSuggestionParams;
                         getSendMessagesHelper().sendMessage(params);
                     }
-                    getSendMessagesHelper().sendMessage(fmessages, did, false, false, notify, scheduleDate, scheduleRepeatPeriod, null, -1, price == null ? 0 : price, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
+                    getSendMessagesHelper().sendMessage(fmessages, did, drgramCleanForward, false, notify, scheduleDate, scheduleRepeatPeriod, null, -1, price == null ? 0 : price, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
                 }
                 fragment.finishFragment();
                 createUndoView();
@@ -34955,6 +34975,20 @@ public class ChatActivity extends BaseFragment implements
                 hideActionMode();
                 updatePinnedMessageView(true);
                 updateVisibleRows();
+            }
+
+            // DrGram Fix 69: clean forward to a single destination — send
+            // immediately WITHOUT the "Forwarded from" header, skipping the
+            // preview panel whose default flow would re-attach the header.
+            if (drgramCleanForward) {
+                final long cleanDid = dids.get(0).dialogId;
+                getSendMessagesHelper().sendMessage(fmessages, cleanDid, true, false, true, 0, 0, null, -1, 0, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
+                fragment.finishFragment();
+                createUndoView();
+                if (undoView != null) {
+                    undoView.showWithAction(cleanDid, UndoView.ACTION_FWD_MESSAGES, fmessages.size());
+                }
+                return true;
             }
 
             MessagesStorage.TopicKey topicKey = dids.get(0);

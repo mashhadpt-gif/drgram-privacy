@@ -11846,4 +11846,22 @@
     <string name="DrGramChannelPromoLater">بعداً</string>
     <string name="DrGramChannelPromoJoined">Welcome to the channel!</string>
     <string name="DrGramChannelPromoFail">Could not join right now — try again later.</string>
+
+    <!-- DrGram Fix 69: dating / people nearby cards -->
+    <string name="DrGramDatingTitle">Dating</string>
+    <string name="DrGramDatingPerm">To show people around you, DrGram needs the location permission. It is used once to ask Telegram for nearby peers and nothing is stored.</string>
+    <string name="DrGramDatingPermBtn">Allow location</string>
+    <string name="DrGramDatingConsent">By continuing, your position is shared with Telegram for a short window (about an hour) so nearby people can see you too. You can stop any time by disabling location.</string>
+    <string name="DrGramDatingOpen">Show people nearby</string>
+    <string name="DrGramDatingLoading">Searching nearby…</string>
+    <string name="DrGramDatingEmpty">No one nearby right now. Try again later.</string>
+    <string name="DrGramDatingRetry">Try again</string>
+    <string name="DrGramDatingNoLocation">Location not available — turn GPS on and try again.</string>
+    <string name="DrGramDatingFail">Search failed, please try again.</string>
+    <string name="DrGramDatingFound">%d people nearby</string>
+    <string name="DrGramDatingAge">Age</string>
+    <string name="DrGramDatingYears">%d years old</string>
+    <string name="DrGramDatingSeen">Last seen</string>
+    <string name="DrGramDatingBio">Bio</string>
+    <string name="DrGramDatingMessage">Message</string>
 </resources>

@@ -13860,6 +13860,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         });
         io.addGap();
         io.add(R.drawable.drgram_explore, getString(R.string.Explore), () -> presentFragment(new DrGramExploreActivity()));
+        io.add(R.drawable.map_pin3, getString(R.string.DrGramDatingTitle), () -> presentFragment(new DrGramDatingActivity())); // DrGram Fix 69: people nearby, card design
         io.add(R.drawable.msg_secret, getString(R.string.DrGramToolsDrawer), () -> presentFragment(new DrGramToolsActivity()));
         io.add(R.drawable.outline_groups_24, getString(R.string.NewGroup), () -> {
             Bundle args = new Bundle();
