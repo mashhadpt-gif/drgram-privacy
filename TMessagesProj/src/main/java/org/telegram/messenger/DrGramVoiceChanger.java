@@ -410,8 +410,8 @@ public class DrGramVoiceChanger {
             this.sampleRate = sampleRate;
             this.ratio = preset.ratio;
             this.shift = Math.abs(ratio - 1f) > 0.01f;
-            w = Math.max(256, Math.round(sampleRate * 0.048f));
-            h = Math.max(128, w / 2);
+            int w0 = Math.max(256, Math.round(sampleRate * 0.048f));
+            h = Math.max(128, w0 / 2);
             w = h * 2; // keep exact power-of-two-of-hop relation
             tauMax = Math.max(16, Math.round(h * 0.40f));
             tauStep = Math.max(8, tauMax / 6);
