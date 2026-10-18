@@ -88,7 +88,11 @@ public class DrGramZabanavis {
         }
     }
 
-    /** Shows the style picker — every row renders a LIVE PREVIEW of the style. */
+    /**
+     * Shows the style picker — every row renders a LIVE PREVIEW of the style.
+     * DrGram Fix 73: apply-on-tap (single tap saves + closes; the radio circle
+     * no longer swallows taps, and there is no OK step to confirm twice).
+     */
     public static void showPicker(BaseFragment fragment, final int styleInUse, final Listener listener) {
         if (fragment == null || fragment.getParentActivity() == null) {
             return;
@@ -106,8 +110,8 @@ public class DrGramZabanavis {
         android.widget.LinearLayout list = new android.widget.LinearLayout(ctx);
         list.setOrientation(android.widget.LinearLayout.VERTICAL);
         scroll.addView(list);
-        final int[] pickedHolder = {-1};
         int accent = accentColor();
+        final AlertDialog[] dialogHolder = new AlertDialog[1];
         final java.util.ArrayList<android.widget.RadioButton> radios = new java.util.ArrayList<>();
         for (int i = 0; i < ids.length; i++) {
             final int style = ids[i];
@@ -121,6 +125,8 @@ public class DrGramZabanavis {
             android.widget.RadioButton rb = new android.widget.RadioButton(ctx);
             rb.setChecked(ids[i] == styleInUse);
             rb.setHighlightColor(0x00000000);
+            rb.setClickable(false); // Fix 73: the circle must not eat the row tap
+            rb.setFocusable(false);
             try {
                 android.content.res.ColorStateList csl = new android.content.res.ColorStateList(
                         new int[][]{{android.R.attr.state_checked}, {}},
@@ -155,7 +161,12 @@ public class DrGramZabanavis {
                 for (int r = 0; r < radios.size(); r++) {
                     radios.get(r).setChecked(radios.get(r) == rb);
                 }
-                pickedHolder[0] = style;
+                if (listener != null) { // Fix 73: save IMMEDIATELY, then close
+                    listener.onStylePicked(style);
+                }
+                if (dialogHolder[0] != null) {
+                    dialogHolder[0].dismiss();
+                }
             });
             list.addView(row, new android.widget.LinearLayout.LayoutParams(
                     android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -163,13 +174,9 @@ public class DrGramZabanavis {
         AlertDialog dialog = new AlertDialog.Builder(ctx, fragment.getResourceProvider())
                 .setTitle(LocaleController.getString(R.string.DrGramZabanavisTitle))
                 .setView(scroll)
-                .setPositiveButton(LocaleController.getString(R.string.OK), (d, w) -> {
-                    if (listener != null && pickedHolder[0] >= 0) {
-                        listener.onStylePicked(pickedHolder[0]);
-                    }
-                })
-                .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                .setNegativeButton(LocaleController.getString(R.string.Close), null)
                 .create();
+        dialogHolder[0] = dialog;
         dialog.show();
     }
 
@@ -281,6 +288,13 @@ public class DrGramZabanavis {
      * DrGram Fix 72: auto-style picker with an EXPLICIT on/off switch so the
      * user always sees whether automatic beautification is active. Picking any
      * real style turns the auto mode on; «معمولی» or the switch turns it off.
+     * <p>
+     * DrGram Fix 73: apply-on-tap. Previously a tap landing on the RadioButton
+     * circle was consumed by the button itself (the row listener never fired,
+     * the pick was lost), the switch row saved immediately while style rows
+     * waited for OK, and cancelling still kept the switch change — together
+     * these made an active auto mode "register the wrong style". Now every tap
+     * saves the exact tapped state, closes the dialog and reports it.
      */
     public static void showAutoPicker(BaseFragment fragment, Runnable onDone) {
         if (fragment == null || fragment.getParentActivity() == null) {
@@ -295,7 +309,7 @@ public class DrGramZabanavis {
         android.widget.LinearLayout list = new android.widget.LinearLayout(ctx);
         list.setOrientation(android.widget.LinearLayout.VERTICAL);
         scroll.addView(list);
-        final int[] pickedHolder = {-1};
+        final AlertDialog[] dialogHolder = new AlertDialog[1];
         final java.util.ArrayList<android.widget.RadioButton> radios = new java.util.ArrayList<>();
 
         // header switch row — the explicit auto mode state
@@ -319,6 +333,7 @@ public class DrGramZabanavis {
         autoRow.addView(autoCol, new android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         org.telegram.ui.Components.Switch autoSwitch = new org.telegram.ui.Components.Switch(ctx, fragment.getResourceProvider());
         autoSwitch.setChecked(getAutoStyle() != STYLE_NORMAL, false);
+        autoSwitch.setClickable(false); // Fix 73: the row handles the toggle
         autoRow.addView(autoSwitch);
         list.addView(autoRow, new android.widget.LinearLayout.LayoutParams(
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -333,6 +348,8 @@ public class DrGramZabanavis {
             android.widget.RadioButton rb = new android.widget.RadioButton(ctx);
             rb.setChecked(ids[i] == getAutoStyle());
             rb.setHighlightColor(0x00000000);
+            rb.setClickable(false); // Fix 73: the circle must not eat the row tap
+            rb.setFocusable(false);
             try {
                 android.content.res.ColorStateList csl = new android.content.res.ColorStateList(
                         new int[][]{{android.R.attr.state_checked}, {}},
@@ -363,11 +380,13 @@ public class DrGramZabanavis {
                 for (int r = 0; r < radios.size(); r++) {
                     radios.get(r).setChecked(radios.get(r) == rb);
                 }
-                pickedHolder[0] = style;
-                if (style != STYLE_NORMAL) {
-                    autoSwitch.setChecked(true, false);
-                } else {
-                    autoSwitch.setChecked(false, false);
+                autoSwitch.setChecked(style != STYLE_NORMAL, false);
+                setAutoStyle(style); // Fix 73: save IMMEDIATELY, then close
+                if (dialogHolder[0] != null) {
+                    dialogHolder[0].dismiss();
+                }
+                if (onDone != null) {
+                    onDone.run();
                 }
             });
             list.addView(row, new android.widget.LinearLayout.LayoutParams(
@@ -379,26 +398,24 @@ public class DrGramZabanavis {
             boolean on = !autoSwitch.isChecked();
             autoSwitch.setChecked(on, false);
             int newStyle = on ? (getAutoStyle() != STYLE_NORMAL ? getAutoStyle() : STYLE_ORN_1) : STYLE_NORMAL;
-            setAutoStyle(newStyle);
-            pickedHolder[0] = newStyle;
             for (int r = 0; r < radios.size(); r++) {
                 radios.get(r).setChecked(ids[r] == newStyle);
+            }
+            setAutoStyle(newStyle); // Fix 73: one tap = saved + closed
+            if (dialogHolder[0] != null) {
+                dialogHolder[0].dismiss();
+            }
+            if (onDone != null) {
+                onDone.run();
             }
         });
 
         AlertDialog dialog = new AlertDialog.Builder(ctx, fragment.getResourceProvider())
                 .setTitle(LocaleController.getString(R.string.DrGramAutoStyleMenu))
                 .setView(scroll)
-                .setPositiveButton(LocaleController.getString(R.string.OK), (d, w) -> {
-                    if (pickedHolder[0] >= 0) {
-                        setAutoStyle(pickedHolder[0]);
-                    }
-                    if (onDone != null) {
-                        onDone.run();
-                    }
-                })
-                .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                .setNegativeButton(LocaleController.getString(R.string.Close), null)
                 .create();
+        dialogHolder[0] = dialog;
         dialog.show();
     }
 

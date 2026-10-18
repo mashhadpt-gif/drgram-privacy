@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -129,7 +128,8 @@ public class DrGramAutoProxy {
                 return;
             }
             if (SharedConfig.drgramAutoProxyVpnOff && isVpnActive()) {
-                AndroidUtilities.runOnUIThread(DrGramAutoProxy::toastVpnActive);
+                // DrGram Fix 73: silent — the auto proxy works without popups;
+                // its state stays visible in DrGram settings only
                 return;
             }
             startCycle();
@@ -137,16 +137,6 @@ public class DrGramAutoProxy {
             running = false;
             FileLog.e(t);
         }
-    }
-
-    private static void toastVpnActive() {
-        toast("DrGramProxyVpnActive");
-    }
-
-    private static void toast(String key) {
-        try {
-            Toast.makeText(ApplicationLoader.applicationContext, LocaleController.getString(key, org.telegram.messenger.R.string.DrGramProxyVpnActive), Toast.LENGTH_SHORT).show();
-        } catch (Throwable ignore) {}
     }
 
     /**
@@ -189,7 +179,7 @@ public class DrGramAutoProxy {
                                 preferences.edit().putBoolean("proxy_enabled", false).commit();
                                 ConnectionsManager.setProxySettings(false, null);
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.proxySettingsChanged);
-                                toast("DrGramProxyVpnProxyOff");
+                                // DrGram Fix 73: silent
                             } catch (Throwable t) {
                                 FileLog.e(t);
                             }
@@ -323,15 +313,11 @@ public class DrGramAutoProxy {
                 AndroidUtilities.runOnUIThread(() -> {
                     if (candidates.isEmpty()) {
                         // every source failed (offline / filtered) — the watchdog
-                        // will retry while the connection stays down
-                        toast("DrGramProxyEmpty");
+                        // will retry while the connection stays down.
+                        // DrGram Fix 73: silent, no popup spam while retrying.
                         finish();
                     } else {
-                        try {
-                            Toast.makeText(ApplicationLoader.applicationContext,
-                                    LocaleController.formatString("DrGramProxyTesting", org.telegram.messenger.R.string.DrGramProxyTesting, candidates.size()),
-                                    Toast.LENGTH_SHORT).show();
-                        } catch (Throwable ignore) {}
+                        // DrGram Fix 73: silent testing — popups removed
                         testChain(candidates, 0);
                     }
                 });
@@ -545,13 +531,9 @@ public class DrGramAutoProxy {
 
             String label = info.settings.getAddress() + " · " + ping + " ms";
             lastStatus = label; // Fix 62: shown in DrGram settings
-            AndroidUtilities.runOnUIThread(() -> {
-                try {
-                    Toast.makeText(ApplicationLoader.applicationContext,
-                            LocaleController.formatString("DrGramAutoProxyOn", org.telegram.messenger.R.string.DrGramAutoProxyOn, label),
-                            Toast.LENGTH_LONG).show();
-                } catch (Throwable ignore) {}
-            });
+            // DrGram Fix 73: the "proxy connected" toast is REMOVED — the user
+            // explicitly asked for silent auto-proxy. The header proxy icon and
+            // the DrGram settings row remain the only indicators.
         } catch (Throwable t) {
             FileLog.e(t);
         }

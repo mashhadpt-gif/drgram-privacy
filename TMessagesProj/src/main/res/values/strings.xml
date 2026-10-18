@@ -11862,6 +11862,8 @@
     <string name="DrGramDatingNoLocation">Location not available — turn GPS on and try again.</string>
     <string name="DrGramDatingFail">Search failed, please try again.</string>
     <string name="DrGramDatingRejected">Telegram server rejected the location request. Turn on device location, open a maps app once so your position refreshes, then try again.</string>
+    <string name="DrGramDatingNeedPhoto">Telegram requires a profile photo for People Nearby. Set a profile photo on your account, then try again.</string>
+    <string name="DrGramDatingPhotoPrivacy">Your profile photo privacy blocks People Nearby. Open Settings → Privacy and Security → Profile Photo and set it to Everybody, then try again.</string>
     <string name="DrGramDatingFound">%d people nearby</string>
     <string name="DrGramDatingAge">Age</string>
     <string name="DrGramDatingYears">%d years old</string>

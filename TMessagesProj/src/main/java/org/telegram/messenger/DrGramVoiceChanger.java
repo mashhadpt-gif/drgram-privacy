@@ -195,6 +195,13 @@ public class DrGramVoiceChanger {
 
     // ======================= professional picker =======================
 
+    /**
+     * DrGram Fix 73: apply-on-tap — a single tap on a preset row SAVES it,
+     * closes the dialog and fires the bulletin. The old version needed the OK
+     * button, and a tap landing on the RadioButton circle was swallowed by the
+     * button itself (never reached the row), so the pick "did not take" and
+     * users had to confirm twice.
+     */
     public static void showPresetPicker(BaseFragment fragment, Runnable onDone) {
         if (fragment == null || fragment.getParentActivity() == null) {
             return;
@@ -207,7 +214,7 @@ public class DrGramVoiceChanger {
         android.widget.LinearLayout list = new android.widget.LinearLayout(ctx);
         list.setOrientation(android.widget.LinearLayout.VERTICAL);
         scroll.addView(list);
-        final int[] picked = {current};
+        final AlertDialog[] dialogHolder = new AlertDialog[1];
         java.util.ArrayList<android.widget.RadioButton> radios = new java.util.ArrayList<>();
         for (int i = 0; i < PRESETS.length; i++) {
             final int id = i;
@@ -222,6 +229,8 @@ public class DrGramVoiceChanger {
             android.widget.RadioButton rb = new android.widget.RadioButton(ctx);
             rb.setChecked(i == current);
             rb.setHighlightColor(0x00000000);
+            rb.setClickable(false); // Fix 73: the circle must not eat the row tap
+            rb.setFocusable(false);
             try {
                 android.content.res.ColorStateList csl = new android.content.res.ColorStateList(
                         new int[][]{{android.R.attr.state_checked}, {}},
@@ -270,7 +279,13 @@ public class DrGramVoiceChanger {
                 for (int r = 0; r < radios.size(); r++) {
                     radios.get(r).setChecked(radios.get(r) == rb);
                 }
-                picked[0] = id;
+                setPreset(id); // Fix 73: save IMMEDIATELY, then close
+                if (dialogHolder[0] != null) {
+                    dialogHolder[0].dismiss();
+                }
+                if (onDone != null) {
+                    onDone.run();
+                }
             });
             list.addView(row, new android.widget.LinearLayout.LayoutParams(
                     android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -278,14 +293,9 @@ public class DrGramVoiceChanger {
         AlertDialog dialog = new AlertDialog.Builder(ctx, fragment.getResourceProvider())
                 .setTitle("تغییر صدا")
                 .setView(scroll)
-                .setPositiveButton(LocaleController.getString(R.string.OK), (d, w) -> {
-                    setPreset(picked[0]);
-                    if (onDone != null) {
-                        onDone.run();
-                    }
-                })
-                .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                .setNegativeButton(LocaleController.getString(R.string.Close), null)
                 .create();
+        dialogHolder[0] = dialog;
         dialog.show();
     }
 
@@ -423,7 +433,7 @@ public class DrGramVoiceChanger {
             acc = new float[2 * h];
             inCap = 4 * w + 8192;
             inRing = new float[inCap];
-            pendCap = 8 * h;
+            pendCap = 16 * h; // Fix 73: headroom for large recorder buffers
             pend = new float[pendCap];
             // post FX coefficients
             aTilt = coef(Math.abs(preset.tilt) > 0.01f ? (preset.tilt > 0 ? 1500f : 2400f) : 1500f, sampleRate);
@@ -496,8 +506,20 @@ public class DrGramVoiceChanger {
         private boolean tryBuildGrain() {
             long p = grains * (long) h;             // nominal input start of this grain
             long need = p + tauMax + (long) (w * ratio) + h + 8;
-            if (inW < need || p < tauMax) {
-                return false;                        // not enough history yet
+            // DrGram Fix 73: the old `p < tauMax` guard blocked grain #0 forever
+            // (p = 0 until the first grain builds, so the pipeline emitted pure
+            // silence for the WHOLE recording — "records but never plays").
+            // The first grain has no template and never looks backwards, so the
+            // guard must apply to later grains only. Fix 73 also PRIMES one extra
+            // hop of lead before grain #0: the invariant d + pending = C then
+            // holds permanently, so the steady state can never starve.
+            if (grains == 0) {
+                need += h;
+            } else if (p < tauMax) {
+                return false;                        // not enough history yet (later grains)
+            }
+            if (inW < need) {
+                return false;
             }
             // WSOLA alignment: pick the offset whose next h input samples best
             // continue the last emitted hop (search stride 4 for speed)

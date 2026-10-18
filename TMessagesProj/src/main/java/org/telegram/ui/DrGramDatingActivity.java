@@ -277,9 +277,20 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
                     }
                 } else if (error != null) {
                     String drgramErr = error.text == null ? "" : error.text;
-                    if (drgramErr.startsWith("INPUT_METHOD_INVALID") || drgramErr.startsWith("POINT_INVALID") || drgramErr.startsWith("LOCATION_INVALID")) {
+                    // DrGram Fix 73: map the OFFICIAL documented errors of
+                    // contacts.getLocated (core.telegram.org) to human guidance.
+                    // The official list is: GEO_POINT_INVALID,
+                    // USERPIC_UPLOAD_REQUIRED, USERPIC_PRIVACY_REQUIRED,
+                    // BUSINESS_ADDRESS_ACTIVE. The raw code is always appended
+                    // so any further report is instantly diagnosable.
+                    if (drgramErr.startsWith("USERPIC_UPLOAD_REQUIRED")) {
+                        statusText = LocaleController.getString(R.string.DrGramDatingNeedPhoto) + " (" + drgramErr + ")";
+                    } else if (drgramErr.startsWith("USERPIC_PRIVACY_REQUIRED")) {
+                        statusText = LocaleController.getString(R.string.DrGramDatingPhotoPrivacy) + " (" + drgramErr + ")";
+                    } else if (drgramErr.startsWith("INPUT_METHOD_INVALID") || drgramErr.startsWith("POINT_INVALID")
+                            || drgramErr.startsWith("LOCATION_INVALID") || drgramErr.startsWith("GEO_POINT_INVALID")) {
                         // DrGram Fix 72: human explanation instead of the raw code
-                        statusText = LocaleController.getString(R.string.DrGramDatingRejected);
+                        statusText = LocaleController.getString(R.string.DrGramDatingRejected) + " (" + drgramErr + ")";
                     } else {
                         statusText = LocaleController.getString(R.string.DrGramDatingFail) + " (" + drgramErr + ")";
                     }

@@ -5238,6 +5238,8 @@
     <string name="DrGramDatingNoLocation">موقعیت در دسترس نیست — GPS را روشن کنید و دوباره تلاش کنید.</string>
     <string name="DrGramDatingFail">جستجو ناموفق بود؛ دوباره تلاش کنید.</string>
     <string name="DrGramDatingRejected">سرور تلگرام درخواست موقعیت را نپذیرفت. لوکیشن گوشی را روشن کنید، یک‌بار برنامه نقشه را باز کنید تا موقعیت به‌روز شود، سپس دوباره تلاش کنید.</string>
+    <string name="DrGramDatingNeedPhoto">برای دوستیابی، تلگرام عکس پروفایل لازم دارد. یک عکس برای پروفایل حساب خود بگذارید و دوباره امتحان کنید.</string>
+    <string name="DrGramDatingPhotoPrivacy">حریم خصوصی عکس پروفایل شما دوستیابی را مسدود کرده است. در تنظیمات ← حریم خصوصی و امنیت ← عکس پروفایل، آن را روی «همه» بگذارید و دوباره امتحان کنید.</string>
     <string name="DrGramDatingFound">%d نفر نزدیک شما</string>
     <string name="DrGramDatingAge">سن</string>
     <string name="DrGramDatingYears">%d ساله</string>
