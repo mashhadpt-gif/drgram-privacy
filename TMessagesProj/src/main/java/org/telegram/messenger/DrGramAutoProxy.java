@@ -212,8 +212,15 @@ public class DrGramAutoProxy {
             if (running || !SharedConfig.drgramAutoProxy) {
                 return;
             }
-            if (SharedConfig.drgramAutoProxyVpnOff && isVpnActive()) {
-                return; // VPN is handling connectivity — leave the proxy alone
+            if (SharedConfig.drgramAutoProxyVpnOff && isVpnActive()
+                    && ConnectionsManager.getInstance(UserConfig.selectedAccount).getConnectionState() == ConnectionsManager.ConnectionStateConnected) {
+                // DrGram Fix 40: a VPN that genuinely WORKS (the connection is up
+                // through it) keeps the auto proxy away. DrGram Fix 67: a VPN that
+                // is merely UP — its TUN adapter registered while no Telegram
+                // traffic passes, the usual story behind Iranian DPI and exactly
+                // on the login screen — must NOT silence the rescue proxy anymore;
+                // only skip while the connection is actually connected.
+                return;
             }
             if (SharedConfig.isProxyEnabled() && SharedConfig.currentProxy != null
                     && !isDrgramAutoProxy(SharedConfig.currentProxy)) {
@@ -264,10 +271,17 @@ public class DrGramAutoProxy {
     private static void watchdogTick() {
         try {
             if (SharedConfig.drgramAutoProxy && !running) {
-                boolean vpnBlock = SharedConfig.drgramAutoProxyVpnOff && isVpnActive();
+                // DrGram Fix 67: the old vpnBlock (Fix 40) silenced the whole
+                // watchdog whenever ANY TRANSPORT_VPN network was present —
+                // including VPN apps that keep their TUN interface up but carry
+                // no Telegram traffic. Such users sat on the login screen with
+                // no proxy and no retries, forever. A VPN that really works
+                // shows ConnectionStateConnected below and the watchdog then
+                // idles (Fix 40 preserved); a dead one no longer blocks the
+                // rescue cycle.
                 boolean manualBlock = SharedConfig.isProxyEnabled() && SharedConfig.currentProxy != null
                         && !isDrgramAutoProxy(SharedConfig.currentProxy);
-                if (!vpnBlock && !manualBlock) {
+                if (!manualBlock) {
                     int state = ConnectionsManager.getInstance(UserConfig.selectedAccount).getConnectionState();
                     if (state == ConnectionsManager.ConnectionStateConnected) {
                         downTicks = 0;

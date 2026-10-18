@@ -602,6 +602,24 @@ public class LocaleController {
         languages.add(localeInfo);
         languagesDict.put(localeInfo.shortName, localeInfo);
 
+        // DrGram Fix 67: ship Persian as a BUILT-IN language. It used to be
+        // absent from this hardcoded list — the only list that exists offline —
+        // so on a fresh install the constructor's getLanguageFromDict("fa")
+        // returned null, the app started in English, and no language picker
+        // (intro, Settings) ever offered فارسی, because every other language
+        // arrives from a server langpack request that cannot succeed before
+        // login behind Iranian DPI. pathToFile stays null so strings are served
+        // straight from the bundled values-fa resources — fully offline.
+        LocaleInfo faLocaleInfo = new LocaleInfo();
+        faLocaleInfo.name = "فارسی";
+        faLocaleInfo.nameEnglish = "Persian";
+        faLocaleInfo.shortName = faLocaleInfo.pluralLangCode = "fa";
+        faLocaleInfo.pathToFile = null;
+        faLocaleInfo.builtIn = true;
+        faLocaleInfo.isRtl = true;
+        languages.add(faLocaleInfo);
+        languagesDict.put(faLocaleInfo.shortName, faLocaleInfo);
+
         localeInfo = new LocaleInfo();
         localeInfo.name = "Italiano";
         localeInfo.nameEnglish = "Italian";

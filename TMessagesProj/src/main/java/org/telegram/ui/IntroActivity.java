@@ -520,6 +520,11 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         }
         req.keys.add("ContinueOnThisLanguage");
         String finalSystemLang = systemLang;
+        // DrGram Fix 67: before login there is no connectivity behind Iranian
+        // DPI, so the langpack request below can stay unanswered forever and
+        // the language-switch button used to stay blank. Show a local label
+        // immediately; the server response, when it ever arrives, refines it.
+        switchLanguageTextView.setText(buildOfflineSwitchLabel(localeInfo));
         ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
             if (response instanceof Vector) {
                 Vector vector = (Vector) response;
@@ -538,6 +543,29 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 }
             }
         }, ConnectionsManager.RequestFlagWithoutLogin);
+    }
+
+    /**
+     * DrGram Fix 67: offline label for the intro language-switch button.
+     * The official text comes from a server langpack request that cannot be
+     * answered before login, so a Persian user used to see an empty button
+     * with no way to reach فارسی. The fa label is hand-written here and the
+     * generic one is composed from the target language's own name.
+     */
+    private static String buildOfflineSwitchLabel(LocaleController.LocaleInfo info) {
+        try {
+            if (info != null) {
+                if ("fa".equals(info.shortName)) {
+                    return "ادامه به زبان فارسی";
+                }
+                if ("en".equals(info.shortName)) {
+                    return "Continue in English";
+                }
+                String name = info.nameEnglish != null && info.nameEnglish.length() > 0 ? info.nameEnglish : info.name;
+                return "Continue in " + name;
+            }
+        } catch (Exception ignore) {}
+        return "Continue in English";
     }
 
     @Override
