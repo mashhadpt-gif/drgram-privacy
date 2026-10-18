@@ -19269,13 +19269,13 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    /** DrGram Fix 71: pick the auto style applied to EVERY outgoing message. */
+    /** DrGram Fix 72: explicit auto-style picker (switch + live previews). */
     private void drgramShowAutoStylePicker() {
-        org.telegram.messenger.DrGramZabanavis.showPicker(this, org.telegram.messenger.DrGramZabanavis.getAutoStyle(), style -> {
-            org.telegram.messenger.DrGramZabanavis.setAutoStyle(style);
+        org.telegram.messenger.DrGramZabanavis.showAutoPicker(this, () -> {
             if (getParentActivity() == null) {
                 return;
             }
+            int style = org.telegram.messenger.DrGramZabanavis.getAutoStyle();
             String text;
             if (style == org.telegram.messenger.DrGramZabanavis.STYLE_NORMAL) {
                 text = LocaleController.getString(R.string.DrGramAutoStyleOff);
@@ -19286,48 +19286,21 @@ public class ChatActivity extends BaseFragment implements
         });
     }
 
-    /** DrGram Fix 71: voice changer quick picker (mode + intensity entry). */
+    /** DrGram Fix 72: professional voice preset picker (16 voices, all effects). */
     private void drgramShowVoiceFxPicker() {
-        if (getParentActivity() == null) {
-            return;
-        }
-        String[] drgramFxItems = {
-            LocaleController.getString(R.string.DrGramVoiceChangeOff),
-            LocaleController.getString(R.string.DrGramVoiceM2F),
-            LocaleController.getString(R.string.DrGramVoiceF2M),
-            LocaleController.getString(R.string.DrGramVoiceIntensity)
-        };
-        new AlertDialog.Builder(getParentActivity(), getResourceProvider())
-            .setTitle(LocaleController.getString(R.string.DrGramVoiceChange))
-            .setItems(drgramFxItems, (dialog, which) -> {
-                if (which == 3) {
-                    drgramShowVoiceIntensityPicker();
-                } else {
-                    org.telegram.messenger.DrGramVoiceChanger.setMode(which);
-                    if (getParentActivity() != null) {
-                        BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.contact_check,
-                            LocaleController.getString(R.string.DrGramVoiceChange) + ": " + drgramFxItems[which]).show();
-                    }
-                }
-            })
-            .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
-            .show();
-    }
-
-    private void drgramShowVoiceIntensityPicker() {
-        if (getParentActivity() == null) {
-            return;
-        }
-        String[] drgramFxLevels = {
-            LocaleController.getString(R.string.DrGramBeautifyLight),
-            LocaleController.getString(R.string.DrGramBeautifyMedium),
-            LocaleController.getString(R.string.DrGramBeautifyStrong)
-        };
-        new AlertDialog.Builder(getParentActivity(), getResourceProvider())
-            .setTitle(LocaleController.getString(R.string.DrGramVoiceIntensity))
-            .setItems(drgramFxLevels, (dialog, which) -> org.telegram.messenger.DrGramVoiceChanger.setIntensity(which))
-            .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
-            .show();
+        org.telegram.messenger.DrGramVoiceChanger.showPresetPicker(this, () -> {
+            if (getParentActivity() == null) {
+                return;
+            }
+            int preset = org.telegram.messenger.DrGramVoiceChanger.getPreset();
+            String text;
+            if (preset == 0) {
+                text = LocaleController.getString(R.string.DrGramVoiceChange) + ": " + LocaleController.getString(R.string.DrGramVoiceChangeOff);
+            } else {
+                text = LocaleController.getString(R.string.DrGramVoiceChange) + ": " + org.telegram.messenger.DrGramVoiceChanger.presetName(preset);
+            }
+            BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.contact_check, text).show();
+        });
     }
 
     private void drgramShowQuickReplies() {

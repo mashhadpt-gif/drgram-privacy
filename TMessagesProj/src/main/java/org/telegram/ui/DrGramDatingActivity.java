@@ -213,9 +213,26 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
                 return;
             }
             TLRPC.TL_contacts_getLocated req = new TLRPC.TL_contacts_getLocated();
+            double dLat = AndroidUtilities.fixLocationCoord(location.getLatitude());
+            double dLon = AndroidUtilities.fixLocationCoord(location.getLongitude());
+            // DrGram Fix 72: reject null-island / non-finite points — the server
+            // answers INPUT_METHOD_INVALID for them
+            if (Double.isNaN(dLat) || Double.isNaN(dLon) || Double.isInfinite(dLat) || Double.isInfinite(dLon)
+                    || (Math.abs(dLat) < 0.001 && Math.abs(dLon) < 0.001)) {
+                loading = false;
+                statusText = LocaleController.getString(R.string.DrGramDatingNoLocation);
+                render();
+                return;
+            }
             TLRPC.TL_inputGeoPoint geo = new TLRPC.TL_inputGeoPoint();
-            geo.lat = location.getLatitude();
-            geo._long = location.getLongitude();
+            geo.lat = dLat;
+            geo._long = dLon;
+            // DrGram Fix 72: exactly what the official People Nearby sends —
+            // accuracy radius present whenever the fix has one
+            if (location.hasAccuracy()) {
+                geo.accuracy_radius = Math.max(1, Math.min(1000, (int) location.getAccuracy()));
+                geo.flags |= 1;
+            }
             req.self_geo_point = geo;
             ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
                 loading = false;
@@ -256,10 +273,16 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
                         loadFullUser(user);
                     }
                     if (items.isEmpty()) {
-                        statusText = null;
+                        statusText = LocaleController.getString(R.string.DrGramDatingEmpty);
                     }
                 } else if (error != null) {
-                    statusText = LocaleController.getString(R.string.DrGramDatingFail) + " (" + error.text + ")";
+                    String drgramErr = error.text == null ? "" : error.text;
+                    if (drgramErr.startsWith("INPUT_METHOD_INVALID") || drgramErr.startsWith("POINT_INVALID") || drgramErr.startsWith("LOCATION_INVALID")) {
+                        // DrGram Fix 72: human explanation instead of the raw code
+                        statusText = LocaleController.getString(R.string.DrGramDatingRejected);
+                    } else {
+                        statusText = LocaleController.getString(R.string.DrGramDatingFail) + " (" + drgramErr + ")";
+                    }
                 }
                 render();
             }), ConnectionsManager.RequestFlagFailOnServerErrors);

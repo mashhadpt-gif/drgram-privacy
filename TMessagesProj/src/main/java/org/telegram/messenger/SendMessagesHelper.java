@@ -4257,6 +4257,19 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     }
 
     public void sendMessage(SendMessageParams sendMessageParams) {
+        // DrGram Fix 72: auto-beautify EVERY outgoing text message (Zabanavis
+        // auto style) — single choke point for all typed-text sends.
+        try {
+            if (sendMessageParams.message != null && sendMessageParams.caption == null
+                    && (sendMessageParams.entities == null || sendMessageParams.entities.isEmpty())) {
+                DrGramZabanavis.Result drgramAuto = DrGramZabanavis.autoApply(sendMessageParams.message);
+                if (drgramAuto != null) {
+                    sendMessageParams.message = drgramAuto.text;
+                    sendMessageParams.entities = drgramAuto.entities;
+                }
+            }
+        } catch (Throwable ignore) {
+        }
         // DrGram Fix 35: smart-reply group commands are executed here and the
         // command text itself is never posted to the chat.
         try {

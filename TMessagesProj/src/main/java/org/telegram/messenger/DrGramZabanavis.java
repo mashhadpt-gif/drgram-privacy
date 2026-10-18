@@ -278,6 +278,131 @@ public class DrGramZabanavis {
     }
 
     /**
+     * DrGram Fix 72: auto-style picker with an EXPLICIT on/off switch so the
+     * user always sees whether automatic beautification is active. Picking any
+     * real style turns the auto mode on; «معمولی» or the switch turns it off.
+     */
+    public static void showAutoPicker(BaseFragment fragment, Runnable onDone) {
+        if (fragment == null || fragment.getParentActivity() == null) {
+            return;
+        }
+        Context ctx = fragment.getParentActivity();
+        String[] names = styleNames();
+        final int[] ids = styleIds();
+        int accent = accentColor();
+
+        android.widget.ScrollView scroll = new android.widget.ScrollView(ctx);
+        android.widget.LinearLayout list = new android.widget.LinearLayout(ctx);
+        list.setOrientation(android.widget.LinearLayout.VERTICAL);
+        scroll.addView(list);
+        final int[] pickedHolder = {-1};
+        final java.util.ArrayList<android.widget.RadioButton> radios = new java.util.ArrayList<>();
+
+        // header switch row — the explicit auto mode state
+        android.widget.LinearLayout autoRow = new android.widget.LinearLayout(ctx);
+        autoRow.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        autoRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        autoRow.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(6));
+        android.widget.LinearLayout autoCol = new android.widget.LinearLayout(ctx);
+        autoCol.setOrientation(android.widget.LinearLayout.VERTICAL);
+        android.widget.TextView autoTitle = new android.widget.TextView(ctx);
+        autoTitle.setText("زیباسازی خودکار پیام");
+        autoTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 15);
+        autoTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        autoTitle.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, fragment.getResourceProvider()));
+        autoCol.addView(autoTitle);
+        android.widget.TextView autoDesc = new android.widget.TextView(ctx);
+        autoDesc.setText("هر پیامی بفرستید، خودکار با استایل انتخابی زیبا می‌شود");
+        autoDesc.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 12);
+        autoDesc.setTextColor(Theme.getColor(Theme.key_dialogTextGray2, fragment.getResourceProvider()));
+        autoCol.addView(autoDesc);
+        autoRow.addView(autoCol, new android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        org.telegram.ui.Components.Switch autoSwitch = new org.telegram.ui.Components.Switch(ctx, fragment.getResourceProvider());
+        autoSwitch.setChecked(getAutoStyle() != STYLE_NORMAL, false);
+        autoRow.addView(autoSwitch);
+        list.addView(autoRow, new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        for (int i = 0; i < ids.length; i++) {
+            final int style = ids[i];
+            android.widget.LinearLayout row = new android.widget.LinearLayout(ctx);
+            row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(9), AndroidUtilities.dp(16), AndroidUtilities.dp(9));
+            row.setBackground(Theme.getSelectorDrawable(false));
+            android.widget.RadioButton rb = new android.widget.RadioButton(ctx);
+            rb.setChecked(ids[i] == getAutoStyle());
+            rb.setHighlightColor(0x00000000);
+            try {
+                android.content.res.ColorStateList csl = new android.content.res.ColorStateList(
+                        new int[][]{{android.R.attr.state_checked}, {}},
+                        new int[]{accent, 0x66888888});
+                rb.setButtonTintList(csl);
+            } catch (Throwable ignore) {}
+            row.addView(rb, new android.widget.LinearLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+            android.widget.LinearLayout col = new android.widget.LinearLayout(ctx);
+            col.setOrientation(android.widget.LinearLayout.VERTICAL);
+            android.widget.TextView nameView = new android.widget.TextView(ctx);
+            nameView.setText(names[i]);
+            nameView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 13);
+            nameView.setTextColor(Theme.getColor(Theme.key_dialogTextGray2, fragment.getResourceProvider()));
+            nameView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            col.addView(nameView);
+            android.widget.TextView previewView = new android.widget.TextView(ctx);
+            previewView.setText(previewText(style, fragment.getResourceProvider()));
+            previewView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 17);
+            previewView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, fragment.getResourceProvider()));
+            previewView.setLineSpacing(AndroidUtilities.dp(1), 1f);
+            col.addView(previewView);
+            row.addView(col, new android.widget.LinearLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+            radios.add(rb);
+            row.setOnClickListener(v -> {
+                DrGramHaptics.tick(v);
+                for (int r = 0; r < radios.size(); r++) {
+                    radios.get(r).setChecked(radios.get(r) == rb);
+                }
+                pickedHolder[0] = style;
+                if (style != STYLE_NORMAL) {
+                    autoSwitch.setChecked(true, false);
+                } else {
+                    autoSwitch.setChecked(false, false);
+                }
+            });
+            list.addView(row, new android.widget.LinearLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+
+        autoRow.setOnClickListener(v -> {
+            DrGramHaptics.tick(v);
+            boolean on = !autoSwitch.isChecked();
+            autoSwitch.setChecked(on, false);
+            int newStyle = on ? (getAutoStyle() != STYLE_NORMAL ? getAutoStyle() : STYLE_ORN_1) : STYLE_NORMAL;
+            setAutoStyle(newStyle);
+            pickedHolder[0] = newStyle;
+            for (int r = 0; r < radios.size(); r++) {
+                radios.get(r).setChecked(ids[r] == newStyle);
+            }
+        });
+
+        AlertDialog dialog = new AlertDialog.Builder(ctx, fragment.getResourceProvider())
+                .setTitle(LocaleController.getString(R.string.DrGramAutoStyleMenu))
+                .setView(scroll)
+                .setPositiveButton(LocaleController.getString(R.string.OK), (d, w) -> {
+                    if (pickedHolder[0] >= 0) {
+                        setAutoStyle(pickedHolder[0]);
+                    }
+                    if (onDone != null) {
+                        onDone.run();
+                    }
+                })
+                .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                .create();
+        dialog.show();
+    }
+
+    /**
      * Applies a style to the raw message text.
      *
      * @param raw      the plain message text (messageOwner.message)
@@ -383,9 +508,12 @@ public class DrGramZabanavis {
         }
     }
 
-    /** Theme-aware accent for the picker preview chips, kept simple. */
+    /** DrGram Fix 72: fixed brand gold for ornament previews — always visible
+     *  on BOTH light and dark dialog backgrounds (the old theme accent was
+     *  sometimes the same color as the dialog background, making the flower
+     *  previews invisible). */
     public static int accentColor() {
-        return Theme.getColor(Theme.key_chats_actionBackground);
+        return 0xFFF5B90D;
     }
 
     // ==================== DrGram Fix 71: automatic message beautification ====================

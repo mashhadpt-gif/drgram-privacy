@@ -7846,14 +7846,6 @@ public class ChatActivityEnterView extends FrameLayout implements
                 }
                 CharSequence[] message = new CharSequence[]{ part };
                 ArrayList<TLRPC.MessageEntity> entities = MediaDataController.getInstance(currentAccount).getEntities(message, supportsNewEntities);
-                // DrGram Fix 71: auto-beautify EVERY outgoing typed message (Zabanavis auto style)
-                if (parentFragment != null && !delegate.hasForwardingMessages()) {
-                    org.telegram.messenger.DrGramZabanavis.Result drgramAuto = org.telegram.messenger.DrGramZabanavis.autoApply(message[0].toString());
-                    if (drgramAuto != null) {
-                        message[0] = drgramAuto.text;
-                        entities = drgramAuto.entities;
-                    }
-                }
                 MessageObject.SendAnimationData sendAnimationData = null;
 
                 if (!delegate.hasForwardingMessages()) {

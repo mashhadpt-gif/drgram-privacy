@@ -11861,6 +11861,7 @@
     <string name="DrGramDatingRetry">Try again</string>
     <string name="DrGramDatingNoLocation">Location not available — turn GPS on and try again.</string>
     <string name="DrGramDatingFail">Search failed, please try again.</string>
+    <string name="DrGramDatingRejected">Telegram server rejected the location request. Turn on device location, open a maps app once so your position refreshes, then try again.</string>
     <string name="DrGramDatingFound">%d people nearby</string>
     <string name="DrGramDatingAge">Age</string>
     <string name="DrGramDatingYears">%d years old</string>

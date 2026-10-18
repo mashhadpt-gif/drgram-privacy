@@ -863,57 +863,11 @@ public class DrGramToolsActivity extends BaseFragment {
         addHeader(context, LocaleController.getString(R.string.DrGramMediaSection),
                 LocaleController.getString(R.string.DrGramMediaHint));
 
-        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramVoiceEffect), v -> showVoiceFxDialog(), "media_voice_fx"));
-
-        // DrGram Fix 37: send-side voice changer — the recipient hears it
-        addSectionRow(makeActionRow(context, voiceChangeRowTitle(), v -> showVoiceChangeDialog(), "media_voice_change"));
-
-        // DrGram Fix 41: voice change intensity
-        addSectionRow(makeActionRow(context, voiceIntensityRowTitle(), v -> {
-            if (getParentActivity() == null) {
-                return;
-            }
-            int intensity = DrGramVoiceChanger.getIntensity();
-            String[] names = {
-                    LocaleController.getString(R.string.DrGramBeautifyLight) + (intensity == 0 ? "  \u2714" : ""),
-                    LocaleController.getString(R.string.DrGramBeautifyMedium) + (intensity == 1 ? "  \u2714" : ""),
-                    LocaleController.getString(R.string.DrGramBeautifyStrong) + (intensity == 2 ? "  \u2714" : "")
-            };
-            new AlertDialog.Builder(getParentActivity(), getResourceProvider())
-                    .setTitle(LocaleController.getString(R.string.DrGramVoiceIntensity))
-                    .setItems(names, (dialog, which) -> {
-                        DrGramVoiceChanger.setIntensity(which);
-                        refreshDynamicRows();
-                    })
-                    .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
-                    .show();
-        }, "media_voice_intensity"));
-
-        // DrGram Fix 38: echo is now a room-character picker (استودیو/غار/صحنه)
-        Switch echoSwitch = new Switch(context);
-        echoSwitch.setChecked(DrGramVoiceChanger.getEchoStyle() != DrGramVoiceChanger.ECHO_OFF, false);
-        LinearLayout echoRow = makeRow(context, LocaleController.getString(R.string.DrGramStudioEcho), echoSwitch);
-        echoRow.setTag("media_voice_echo");
-        echoRow.setOnClickListener(v -> {
-            if (getParentActivity() == null) {
-                return;
-            }
-            String[] echoItems = {
-                    LocaleController.getString(R.string.DrGramEchoOff),
-                    LocaleController.getString(R.string.DrGramEchoStudio),
-                    LocaleController.getString(R.string.DrGramEchoCave),
-                    LocaleController.getString(R.string.DrGramEchoStage)
-            };
-            new AlertDialog.Builder(getParentActivity(), getResourceProvider())
-                    .setTitle(LocaleController.getString(R.string.DrGramStudioEcho))
-                    .setItems(echoItems, (dialog, which) -> {
-                        DrGramVoiceChanger.setEchoStyle(which);
-                        echoSwitch.setChecked(which != DrGramVoiceChanger.ECHO_OFF, false);
-                    })
-                    .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
-                    .show();
-        });
-        addSectionRow(echoRow);
+        // DrGram Fix 72: unified professional voice preset picker — ALL voice
+        // effects (gender, kids, phone, radio, robot, space, echo rooms) live
+        // in one place now
+        addSectionRow(makeActionRow(context, voicePresetRowTitle(), v ->
+                org.telegram.messenger.DrGramVoiceChanger.showPresetPicker(this, this::refreshDynamicRows), "media_voice_change"));
 
         // DrGram Fix 37: luxury brand notification chime (gold / love)
         Switch luxSoundSwitch = new Switch(context);
@@ -1042,6 +996,13 @@ public class DrGramToolsActivity extends BaseFragment {
             guardGifSwitch.setChecked(newState, false);
         });
         addSectionRow(guardGifRow);
+    }
+
+    /** DrGram Fix 72: title with the current professional voice preset. */
+    private String voicePresetRowTitle() {
+        int preset = DrGramVoiceChanger.getPreset();
+        return LocaleController.getString(R.string.DrGramVoiceChange) + ": "
+                + (preset == 0 ? LocaleController.getString(R.string.DrGramVoiceChangeOff) : DrGramVoiceChanger.presetName(preset));
     }
 
     /** DrGram Fix 37: title with the current send-side voice changer mode. */

@@ -5237,6 +5237,7 @@
     <string name="DrGramDatingRetry">تلاش دوباره</string>
     <string name="DrGramDatingNoLocation">موقعیت در دسترس نیست — GPS را روشن کنید و دوباره تلاش کنید.</string>
     <string name="DrGramDatingFail">جستجو ناموفق بود؛ دوباره تلاش کنید.</string>
+    <string name="DrGramDatingRejected">سرور تلگرام درخواست موقعیت را نپذیرفت. لوکیشن گوشی را روشن کنید، یک‌بار برنامه نقشه را باز کنید تا موقعیت به‌روز شود، سپس دوباره تلاش کنید.</string>
     <string name="DrGramDatingFound">%d نفر نزدیک شما</string>
     <string name="DrGramDatingAge">سن</string>
     <string name="DrGramDatingYears">%d ساله</string>
