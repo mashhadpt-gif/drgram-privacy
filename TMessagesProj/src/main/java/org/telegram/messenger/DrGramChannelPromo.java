@@ -48,10 +48,13 @@ public class DrGramChannelPromo {
             if (System.currentTimeMillis() - p.getLong("last_asked", 0L) < ASK_COOLDOWN_MS) {
                 return; // declined recently — respect that for 3 days
             }
-            BaseFragment fragment = null;
+            BaseFragment lastFragment = null;
             if (activity instanceof org.telegram.ui.LaunchActivity) {
-                fragment = ((org.telegram.ui.LaunchActivity) activity).getLastFragment();
+                lastFragment = ((org.telegram.ui.LaunchActivity) activity).getLastFragment();
             }
+            // single assignment keeps the reference effectively final for the
+            // button lambdas below
+            final BaseFragment fragment = lastFragment;
             if (fragment == null || fragment.getParentActivity() == null) {
                 return; // no surface to show the dialog on — retry next launch
             }
