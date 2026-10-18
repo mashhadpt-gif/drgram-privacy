@@ -311,6 +311,9 @@
     <string name="DrGramVazirFont">فونت وزیرمتن</string>
     <string name="DrGramVazirFontInfo">فونت وزیرمتن برای فارسی — اعمال فوری روی کل برنامه و متن پیام‌ها</string>
     <string name="DrGramZabanavisTitle">استایل پیام</string>
+    <string name="DrGramAutoStyleMenu">زیباسازی خودکار پیام</string>
+    <string name="DrGramAutoStyleOn">زیباسازی خودکار: %1$s</string>
+    <string name="DrGramAutoStyleOff">زیباسازی خودکار خاموش شد</string>
     <string name="DrGramZabSample">این یک پیش‌نمایش است</string>
     <string name="DrGramZabNormal">معمولی — بدون استایل</string>
     <string name="DrGramZabBold">برجسته (بولد)</string>

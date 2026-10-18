@@ -1678,7 +1678,10 @@ public class ChatActivity extends BaseFragment implements
     private final static int drgramQuickChats = 47;
     private final static int drgramDrawSend = 48;
     private final static int drgramQuickReplies = 49;
-    private final static int drgramDating = 90; // DrGram Fix 70: dating entry in chat menu
+    private final static int drgramSmartReplyEntry = 91; // DrGram Fix 71: smart reply
+    private final static int drgramAutoStyle = 92;      // DrGram Fix 71: auto message style
+    private final static int drgramVoiceFx = 93;        // DrGram Fix 71: voice changer
+    private final static int drgramToolsHub = 94;       // DrGram Fix 71: full tools hub
 
     private final static int topic_close = 60;
     private final static int open_forum = 61;
@@ -3880,8 +3883,14 @@ public class ChatActivity extends BaseFragment implements
                     }
                 } else if (id == drgramQuickReplies) {
                     drgramShowQuickReplies();
-                } else if (id == drgramDating) {
-                    presentFragment(new DrGramDatingActivity()); // DrGram Fix 70
+                } else if (id == drgramSmartReplyEntry) { // DrGram Fix 71
+                    presentFragment(new DrGramSmartReplyActivity());
+                } else if (id == drgramAutoStyle) { // DrGram Fix 71
+                    drgramShowAutoStylePicker();
+                } else if (id == drgramVoiceFx) { // DrGram Fix 71
+                    drgramShowVoiceFxPicker();
+                } else if (id == drgramToolsHub) { // DrGram Fix 71
+                    presentFragment(new DrGramToolsActivity());
                 } else if (id == clear_history || id == delete_chat || id == auto_delete_timer) {
                     if (getParentActivity() == null) {
                         return;
@@ -4518,9 +4527,15 @@ public class ChatActivity extends BaseFragment implements
                 headerItem.lazilyAddSubItem(drgramQuickReplies, R.drawable.msg_add,
                     LocaleController.getString(R.string.DrGramSetRepliesUse));
             }
-            if (getDialogId() != 0) {
-                headerItem.lazilyAddSubItem(drgramDating, R.drawable.map_pin3, // DrGram Fix 70: dating
-                    LocaleController.getString(R.string.DrGramDatingTitle));
+            if (getDialogId() != 0 && !isSecretChat()) { // DrGram Fix 71: chat tools in three-dot menu
+                headerItem.lazilyAddSubItem(drgramSmartReplyEntry, R.drawable.msg_bot,
+                    LocaleController.getString(R.string.DrGramSmartReplyTitle));
+                headerItem.lazilyAddSubItem(drgramAutoStyle, R.drawable.msg_translate,
+                    LocaleController.getString(R.string.DrGramAutoStyleMenu));
+                headerItem.lazilyAddSubItem(drgramVoiceFx, R.drawable.msg_premium_voice,
+                    LocaleController.getString(R.string.DrGramVoiceChange));
+                headerItem.lazilyAddSubItem(drgramToolsHub, R.drawable.msg_settings,
+                    LocaleController.getString(R.string.DrGramToolsDrawer));
             }
             boolean addedSettings = false;
             if (!isTopic) {
@@ -19252,6 +19267,67 @@ public class ChatActivity extends BaseFragment implements
         if (hitLimit && getParentActivity() != null) {
             android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.DrGramSelectManyLimit), android.widget.Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /** DrGram Fix 71: pick the auto style applied to EVERY outgoing message. */
+    private void drgramShowAutoStylePicker() {
+        org.telegram.messenger.DrGramZabanavis.showPicker(this, org.telegram.messenger.DrGramZabanavis.getAutoStyle(), style -> {
+            org.telegram.messenger.DrGramZabanavis.setAutoStyle(style);
+            if (getParentActivity() == null) {
+                return;
+            }
+            String text;
+            if (style == org.telegram.messenger.DrGramZabanavis.STYLE_NORMAL) {
+                text = LocaleController.getString(R.string.DrGramAutoStyleOff);
+            } else {
+                text = LocaleController.formatString(R.string.DrGramAutoStyleOn, org.telegram.messenger.DrGramZabanavis.styleNameOf(style));
+            }
+            BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.contact_check, text).show();
+        });
+    }
+
+    /** DrGram Fix 71: voice changer quick picker (mode + intensity entry). */
+    private void drgramShowVoiceFxPicker() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        String[] drgramFxItems = {
+            LocaleController.getString(R.string.DrGramVoiceChangeOff),
+            LocaleController.getString(R.string.DrGramVoiceM2F),
+            LocaleController.getString(R.string.DrGramVoiceF2M),
+            LocaleController.getString(R.string.DrGramVoiceIntensity)
+        };
+        new AlertDialog.Builder(getParentActivity(), getResourceProvider())
+            .setTitle(LocaleController.getString(R.string.DrGramVoiceChange))
+            .setItems(drgramFxItems, (dialog, which) -> {
+                if (which == 3) {
+                    drgramShowVoiceIntensityPicker();
+                } else {
+                    org.telegram.messenger.DrGramVoiceChanger.setMode(which);
+                    if (getParentActivity() != null) {
+                        BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.contact_check,
+                            LocaleController.getString(R.string.DrGramVoiceChange) + ": " + drgramFxItems[which]).show();
+                    }
+                }
+            })
+            .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+            .show();
+    }
+
+    private void drgramShowVoiceIntensityPicker() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        String[] drgramFxLevels = {
+            LocaleController.getString(R.string.DrGramBeautifyLight),
+            LocaleController.getString(R.string.DrGramBeautifyMedium),
+            LocaleController.getString(R.string.DrGramBeautifyStrong)
+        };
+        new AlertDialog.Builder(getParentActivity(), getResourceProvider())
+            .setTitle(LocaleController.getString(R.string.DrGramVoiceIntensity))
+            .setItems(drgramFxLevels, (dialog, which) -> org.telegram.messenger.DrGramVoiceChanger.setIntensity(which))
+            .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+            .show();
     }
 
     private void drgramShowQuickReplies() {

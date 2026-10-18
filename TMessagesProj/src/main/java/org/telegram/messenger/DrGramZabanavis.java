@@ -387,4 +387,62 @@ public class DrGramZabanavis {
     public static int accentColor() {
         return Theme.getColor(Theme.key_chats_actionBackground);
     }
+
+    // ==================== DrGram Fix 71: automatic message beautification ====================
+    // When the user picks an auto style from the chat menu, EVERY typed message
+    // is transformed with it on send (ChatActivityEnterView hook). Picking
+    // "حالت معمولی" (STYLE_NORMAL) turns the auto mode off.
+
+    private static android.content.SharedPreferences autoPrefs() {
+        return ApplicationLoader.applicationContext.getSharedPreferences("drgram_zabanavis", android.content.Context.MODE_PRIVATE);
+    }
+
+    /** Currently selected auto style (STYLE_NORMAL = auto mode off). */
+    public static int getAutoStyle() {
+        try {
+            int s = autoPrefs().getInt("auto_style", STYLE_NORMAL);
+            for (int v : styleIds()) {
+                if (v == s) {
+                    return s;
+                }
+            }
+            return STYLE_NORMAL;
+        } catch (Throwable t) {
+            return STYLE_NORMAL;
+        }
+    }
+
+    public static void setAutoStyle(int style) {
+        autoPrefs().edit().putInt("auto_style", style).apply();
+    }
+
+    public static boolean isAutoEnabled() {
+        return getAutoStyle() != STYLE_NORMAL;
+    }
+
+    /** Public wrapper over the private styleName() for menu labels and bulletins. */
+    public static String styleNameOf(int style) {
+        return styleName(style);
+    }
+
+    /**
+     * Auto-mode entry point called on every outgoing typed message.
+     * Returns the transformed text + entities, or null when the auto mode is
+     * off or the text must not be touched (commands, links, huge texts).
+     */
+    public static Result autoApply(String raw) {
+        try {
+            int style = getAutoStyle();
+            if (style == STYLE_NORMAL || raw == null) {
+                return null;
+            }
+            String trimmed = raw.trim();
+            if (trimmed.length() < 2 || trimmed.startsWith("/") || raw.contains("://") || raw.length() > 2000) {
+                return null;
+            }
+            return apply(style, raw, null);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }

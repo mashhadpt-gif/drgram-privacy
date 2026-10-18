@@ -5828,6 +5828,9 @@
     <string name="DrGramVazirFont">Vazirmatn font</string>
     <string name="DrGramVazirFontInfo">Vazirmatn font for Persian — applies instantly app-wide, including message text</string>
     <string name="DrGramZabanavisTitle">Message style</string>
+    <string name="DrGramAutoStyleMenu">Auto message style</string>
+    <string name="DrGramAutoStyleOn">Auto style: %1$s</string>
+    <string name="DrGramAutoStyleOff">Auto style turned off</string>
     <string name="DrGramZabSample">This is a live preview</string>
     <string name="DrGramZabNormal">Plain — no style</string>
     <string name="DrGramZabBold">Bold</string>
