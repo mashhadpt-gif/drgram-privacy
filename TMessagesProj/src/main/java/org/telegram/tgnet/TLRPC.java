@@ -52528,12 +52528,21 @@ public class TLRPC {
     // DrGram Fix 69: request class for the People Nearby revival (دوستیابی).
     // The response is Updates whose update vector contains TL_updatePeerLocated
     // entries (peer + distance) and whose users vector carries the User objects.
+    // DrGram Fix 74: migrated to the CURRENT layer-225 revision of the method —
+    // contacts.getLocated#d348bc44 flags:# background:flags.1?true
+    // geo_point:InputGeoPoint self_expires:flags.0?int = Updates;
+    // The old revision contacts.getLocated#d348bcba (with "self_only") was
+    // removed from the TL schema long ago; the server answers
+    // INPUT_METHOD_INVALID_<ctor> for it no matter how perfect the geo point
+    // is. That was the real root cause of "سرور تلگرام درخواست موقعیت را
+    // نپذیرفت" in the dating screen.
     public static class TL_contacts_getLocated extends TLMethod<TLRPC.Updates> {
-        public static final int constructor = 0xd348bcba;
+        public static final int constructor = 0xd348bc44;
 
         public int flags;
         public boolean background;
-        public InputGeoPoint self_geo_point;
+        public InputGeoPoint geo_point;
+        public int self_expires;
 
         public TLRPC.Updates deserializeResponseT(InputSerializedData stream, int constructor, boolean exception) {
             return TLRPC.Updates.TLdeserialize(stream, constructor, exception);
@@ -52543,7 +52552,10 @@ public class TLRPC {
             stream.writeInt32(constructor);
             flags = setFlag(flags, FLAG_1, background);
             stream.writeInt32(flags);
-            self_geo_point.serializeToStream(stream);
+            geo_point.serializeToStream(stream);
+            if (hasFlag(flags, FLAG_0)) {
+                stream.writeInt32(self_expires);
+            }
         }
     }
 

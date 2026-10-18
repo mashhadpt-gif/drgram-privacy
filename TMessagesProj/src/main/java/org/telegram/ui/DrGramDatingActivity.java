@@ -216,7 +216,7 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
             double dLat = AndroidUtilities.fixLocationCoord(location.getLatitude());
             double dLon = AndroidUtilities.fixLocationCoord(location.getLongitude());
             // DrGram Fix 72: reject null-island / non-finite points — the server
-            // answers INPUT_METHOD_INVALID for them
+            // answers GEO_POINT_INVALID for them
             if (Double.isNaN(dLat) || Double.isNaN(dLon) || Double.isInfinite(dLat) || Double.isInfinite(dLon)
                     || (Math.abs(dLat) < 0.001 && Math.abs(dLon) < 0.001)) {
                 loading = false;
@@ -227,13 +227,19 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
             TLRPC.TL_inputGeoPoint geo = new TLRPC.TL_inputGeoPoint();
             geo.lat = dLat;
             geo._long = dLon;
-            // DrGram Fix 72: exactly what the official People Nearby sends —
+            // exactly what the official People Nearby sends —
             // accuracy radius present whenever the fix has one
             if (location.hasAccuracy()) {
                 geo.accuracy_radius = Math.max(1, Math.min(1000, (int) location.getAccuracy()));
                 geo.flags |= 1;
             }
-            req.self_geo_point = geo;
+            req.geo_point = geo;
+            // DrGram Fix 74: the CURRENT revision of contacts.getLocated carries
+            // self_expires (flags.0) — publishing our own position for one hour,
+            // exactly like the official People Nearby does when opened
+            // explicitly. Without it the server never lists nearby peers.
+            req.flags |= 1;
+            req.self_expires = 60 * 60;
             ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
                 loading = false;
                 items.clear();
