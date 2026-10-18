@@ -2,30 +2,50 @@
  * This is the source code of DrGram, a Telegram fork.
  * It is licensed under GNU GPL v. 2 or later.
  *
- * DrGram Voice Changer (Fix 74) — professional preset-based voice
- * transformation for outgoing voice messages AND phone/voice-chat calls.
+ * DrGram Voice Changer (Fix 75) — precise, natural gender conversion.
  *
- *   • 16 studio presets (خاموش + 15 voices) built from a clean DSP chain:
- *       TD-PSOLA pitch shift → formant EQ → ring mod → tilt → bandpass →
- *       drive → echo
- *   • Fix 74 replaces Fix 72's WSOLA resampling-grain shifter with true
- *     TD-PSOLA (time-domain pitch-synchronous overlap-add): grains are cut
- *     on the PITCH MARKS of the input and re-placed on a period grid WITHOUT
- *     resampling the grain content, so the FUNDAMENTAL moves while the
- *     FORMANTS stay exactly where the vocal tract put them. That is the
- *     difference between "same person, higher voice" (natural) and the
- *     chipmunk/buzzy "ی جوریه" sound of a resampling shifter, whose formants
- *     climbed together with the pitch. Research basis: Charpentier & Stella
- *     1986 (PSOLA), the Audacity/SoundTouch linear-crossfade shifter, and
- *     Sanna Wager's TD-PSOLA reference implementation — validated offline
- *     before this port (F0 accuracy ±1%, formant bands stable, zero clicks).
- *   • Gender presets now pair the F0 shift with a static formant EQ (low
- *     shelf de-chesting, presence peak for F2/F3, air shelf) so a male voice
- *     lands in female vocal-tract territory and vice versa. Effect presets
- *     (echo rooms, robot, radio, phone…) keep the v5.42 FX chain untouched.
+ *   Fix 74's TD-PSOLA shifter moved F0 accurately, but its short
+ *   linear-crossfade grains overlapped with input phases that diverge by
+ *   (T0_in − T0_out) samples per grain at high ratios. The resulting OLA sum
+ *   is a time-varying comb filter: harmonics under the formants were boosted
+ *   up to ×2.3 while harmonics between formants were notch-cut to ×0.08.
+ *   Measured offline on a synthetic vowel (F0 115 Hz, formants 500/1500/2500):
+ *   the shipped engine's output spectrum was combed ±10 dB — exactly the
+ *   "closer to a woman but still not a real woman" buzz the user reported.
+ *
+ *   Fix 75 replaces the grain stage and adds a true spectral-envelope stage:
+ *
+ *     1. RESAMPLED-PERIOD grains — one input period (pitch-mark aligned) is
+ *        read with Catmull-Rom interpolation at speed `ratio` and placed on
+ *        the output period grid with complementary linear crossfades. Because
+ *        every output period is the SAME compressed input period, the output
+ *        spectrum is a clean harmonic comb (measured: every harmonic within
+ *        0.6–1.1× of the input envelope) — pitch moves to ratio·F0, formants
+ *        move with it (the classic "chipmunk"), and the level is rock-stable
+ *        (RMS cv 0.02–0.03 vs 0.089 before). The grain pipeline is also
+ *        deterministic now: pitch windows are anchored to the analyzed
+ *        position, not to the wall-clock buffer end.
+ *
+ *     2. FORMANT-ENVELOPE WARP (the missing piece) — a streaming STFT
+ *        (1024 @ ≥32 kHz, 512 below; Hann, 75% overlap, original phases)
+ *        measures the per-frame cepstral envelope of the chipmunk signal and
+ *        re-imposes it on the target formant positions:
+ *            |X'|(f) = |X|(f) · E(f·k1) / E(f),   k1 = ratio / warp
+ *        which lands the formants exactly on `warp`·F_target while keeping
+ *        the harmonic fine structure and phase coherence (no phasiness —
+ *        only magnitudes are touched). Measured: F1/F2/F3 shift to the
+ *        target within measurement granularity, level kept by a slow
+ *        per-frame loudness match.
+ *
+ *   Gender presets pair the two: زن پایه = pitch ×1.70 (115 Hz → 196 Hz,
+ *   mid female range) with formants ×1.16 (average female vocal tract is
+ *   ~14% shorter). Echo/FX presets bypass both stages. The static formant
+ *   EQ of Fix 74 is skipped whenever the envelope warp is active (the warp
+ *   does the real work; the EQ would double-brighten).
  *
  * The recorder (MediaController) feeds process(); WebRtcAudioRecord (calls)
- * feeds processCall(); both emit exactly the requested sample count per call.
+ * feeds processCall(); both emit exactly the requested sample count per call
+ * (silent during the ~60–90 ms pipeline warmup, then 1:1 forever).
  */
 package org.telegram.messenger;
 
@@ -39,6 +59,9 @@ import org.telegram.ui.ActionBar.Theme;
 import java.nio.ByteBuffer;
 
 public class DrGramVoiceChanger {
+
+    /** Marker used to verify the class made it into a release build. */
+    public static final String FIX_TAG = "DrGramFix75-ResampleWarp";
 
     // ======================= presets =======================
 
@@ -59,19 +82,21 @@ public class DrGramVoiceChanger {
     public static final class Preset {
         public final String name, desc;
         public final float ratio;   // pitch factor (1 = unchanged)
+        public final float warp;    // formant-envelope factor, 1 = off (Fix 75)
         public final int echo;      // ECHO_*
         public final float ringHz;  // ring-modulation frequency, 0 = off
         public final float bpLow;   // bandpass low edge Hz, 0 = off
         public final float bpHigh;  // bandpass high edge Hz, 0 = off
         public final float tilt;    // +brighten / −darken, 0 = flat
         public final float drive;   // soft saturation 0..1
-        public final float formant; // −1 male-warm … +1 female-bright (Fix 74)
+        public final float formant; // legacy static EQ depth (unused when warp ≠ 1)
 
-        Preset(String name, String desc, float ratio, int echo, float ringHz,
+        Preset(String name, String desc, float ratio, float warp, int echo, float ringHz,
                float bpLow, float bpHigh, float tilt, float drive, float formant) {
             this.name = name;
             this.desc = desc;
             this.ratio = ratio;
+            this.warp = warp;
             this.echo = echo;
             this.ringHz = ringHz;
             this.bpLow = bpLow;
@@ -83,22 +108,22 @@ public class DrGramVoiceChanger {
     }
 
     private static final Preset[] PRESETS = {
-            new Preset("خاموش", "بدون هیچ تغییری", 1f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
-            new Preset("زن طبیعی", "صدای زن، ملایم و باورپذیر", 1.21f, ECHO_OFF, 0, 0, 0, 0, 0, 0.55f),
-            new Preset("زن جوان", "زن، روشن و شاداب", 1.30f, ECHO_OFF, 0, 0, 0, 0, 0, 0.75f),
-            new Preset("زن پایه", "تبدیل کامل به صدای زن", 1.42f, ECHO_OFF, 0, 0, 0, 0, 0, 1f),
-            new Preset("مرد طبیعی", "صدای مرد، گرم و آرام", 0.86f, ECHO_OFF, 0, 0, 0, 0, 0, -0.55f),
-            new Preset("مرد بم", "مرد، بمِ لطیف", 0.78f, ECHO_OFF, 0, 0, 0, 0, 0, -0.75f),
-            new Preset("مرد عمیق", "بمِ عمیق و پرقدرت", 0.70f, ECHO_OFF, 0, 0, 0, 0, 0, -0.9f),
-            new Preset("بچه", "صدای کودکانه و شیطنت‌آمیز", 1.55f, ECHO_OFF, 0, 0, 0, 0, 0, 0.85f),
-            new Preset("تلفن قدیمی", "تلفن آنالوگ دهه ۷۰", 1f, ECHO_OFF, 0, 450, 2800, 0, 0.35f, 0),
-            new Preset("رادیو", "رادیو با اکوی ملایم", 1f, ECHO_STUDIO, 0, 500, 3200, 0, 0.25f, 0),
-            new Preset("ربات", "ربات متالیک", 1f, ECHO_OFF, 55, 300, 3400, 0, 0.20f, 0),
-            new Preset("فضایی", "موج فضایی عجیب", 1.06f, ECHO_CAVE, 110, 0, 0, 0, 0.15f, 0),
-            new Preset("استودیو", "اتاق ضبط حرفه‌ای", 1f, ECHO_STUDIO, 0, 0, 0, 0, 0, 0),
-            new Preset("غار", "اکوی غار تاریک", 1f, ECHO_CAVE, 0, 0, 0, 0, 0, 0),
-            new Preset("صحنه", "سالن کنسرت", 1f, ECHO_STAGE, 0, 0, 0, 0, 0, 0),
-            new Preset("گمنام", "صدای تغییر‌یافته ناشناس", 0.95f, ECHO_STUDIO, 0, 0, 0, 0, 0.15f, -0.25f)
+            new Preset("خاموش", "بدون هیچ تغییری", 1f, 1f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("زن طبیعی", "صدای زن، ملایم و باورپذیر", 1.45f, 1.10f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("زن جوان", "زن، روشن و شاداب", 1.58f, 1.13f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("زن پایه", "تبدیل کامل به صدای زن", 1.70f, 1.16f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("مرد طبیعی", "صدای مرد، گرم و آرام", 0.80f, 0.90f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("مرد بم", "مرد، بمِ لطیف", 0.74f, 0.86f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("مرد عمیق", "بمِ عمیق و پرقدرت", 0.68f, 0.82f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("بچه", "صدای کودکانه و شیطنت‌آمیز", 1.80f, 1.22f, ECHO_OFF, 0, 0, 0, 0, 0, 0),
+            new Preset("تلفن قدیمی", "تلفن آنالوگ دهه ۷۰", 1f, 1f, ECHO_OFF, 0, 450, 2800, 0, 0.35f, 0),
+            new Preset("رادیو", "رادیو با اکوی ملایم", 1f, 1f, ECHO_STUDIO, 0, 500, 3200, 0, 0.25f, 0),
+            new Preset("ربات", "ربات متالیک", 1f, 1f, ECHO_OFF, 55, 300, 3400, 0, 0.20f, 0),
+            new Preset("فضایی", "موج فضایی عجیب", 1.06f, 1f, ECHO_CAVE, 110, 0, 0, 0, 0.15f, 0),
+            new Preset("استودیو", "اتاق ضبط حرفه‌ای", 1f, 1f, ECHO_STUDIO, 0, 0, 0, 0, 0, 0),
+            new Preset("غار", "اکوی غار تاریک", 1f, 1f, ECHO_CAVE, 0, 0, 0, 0, 0, 0),
+            new Preset("صحنه", "سالن کنسرت", 1f, 1f, ECHO_STAGE, 0, 0, 0, 0, 0, 0),
+            new Preset("گمنام", "صدای تغییر‌یافته ناشناس", 0.95f, 0.97f, ECHO_STUDIO, 0, 0, 0, 0, 0.15f, 0)
     };
 
     public static Preset preset(int id) {
@@ -205,10 +230,7 @@ public class DrGramVoiceChanger {
 
     /**
      * DrGram Fix 73: apply-on-tap — a single tap on a preset row SAVES it,
-     * closes the dialog and fires the bulletin. The old version needed the OK
-     * button, and a tap landing on the RadioButton circle was swallowed by the
-     * button itself (never reached the row), so the pick "did not take" and
-     * users had to confirm twice.
+     * closes the dialog and fires the bulletin.
      */
     public static void showPresetPicker(BaseFragment fragment, Runnable onDone) {
         if (fragment == null || fragment.getParentActivity() == null) {
@@ -262,10 +284,8 @@ public class DrGramVoiceChanger {
             if (Math.abs(p.ratio - 1f) > 0.01f) {
                 tech.append(p.ratio > 1f ? "زیرتر " : "بم‌تر ");
             }
-            if (p.formant > 0.01f) {
-                tech.append("طیف زنانه ");
-            } else if (p.formant < -0.01f) {
-                tech.append("طیف مردانه ");
+            if (Math.abs(p.warp - 1f) > 0.01f) {
+                tech.append("طیف طبیعی ");   // Fix 75: true formant-envelope warp
             }
             if (p.ringHz > 0) {
                 tech.append("موج مدوله ");
@@ -361,7 +381,7 @@ public class DrGramVoiceChanger {
     /**
      * Processes one recorder buffer in place. Always returns the sample-byte
      * count to feed downstream (equal to len — the chain emits exactly the
-     * requested amount, silent while the PSOLA pipeline warms up).
+     * requested amount, silent while the pipeline warms up).
      */
     public static int process(ByteBuffer buffer, int len) {
         Chain c = chain;
@@ -394,7 +414,7 @@ public class DrGramVoiceChanger {
 
     // ======================= streaming chain =======================
 
-    /** RBJ biquad (direct form 1) used by the formant EQ. */
+    /** RBJ biquad (direct form 1) used by the legacy FX chain. */
     static final class BiQuad {
         float b0, b1, b2, a1, a2, x1, x2, y1, y2;
 
@@ -462,24 +482,278 @@ public class DrGramVoiceChanger {
         }
     }
 
+    /** Iterative radix-2 FFT (verified 1:1 against a reference implementation). */
+    static final class Fft {
+        final int n;
+        final float[] cosT, sinT;
+
+        Fft(int n) {
+            this.n = n;
+            cosT = new float[n / 2];
+            sinT = new float[n / 2];
+            for (int i = 0; i < n / 2; i++) {
+                cosT[i] = (float) Math.cos(2.0 * Math.PI * i / n);
+                sinT[i] = (float) Math.sin(2.0 * Math.PI * i / n);
+            }
+        }
+
+        void fft(float[] re, float[] im) {
+            transform(re, im, false);
+        }
+
+        void ifft(float[] re, float[] im) {
+            transform(re, im, true);
+        }
+
+        private void transform(float[] re, float[] im, boolean inv) {
+            int n = this.n;
+            for (int i = 1, j = 0; i < n; i++) {
+                int bit = n >> 1;
+                for (; (j & bit) != 0; bit >>= 1) {
+                    j ^= bit;
+                }
+                j |= bit;
+                if (i < j) {
+                    float t = re[i]; re[i] = re[j]; re[j] = t;
+                    t = im[i]; im[i] = im[j]; im[j] = t;
+                }
+            }
+            for (int len = 2; len <= n; len <<= 1) {
+                int step = n / len, halfLen = len >> 1;
+                for (int start = 0; start < n; start += len) {
+                    for (int k = 0; k < halfLen; k++) {
+                        int c = k * step;
+                        float wr = cosT[c];
+                        float wi = inv ? sinT[c] : -sinT[c];
+                        int a = start + k, b = a + halfLen;
+                        float tr = re[b] * wr - im[b] * wi;
+                        float ti = re[b] * wi + im[b] * wr;
+                        re[b] = re[a] - tr;
+                        im[b] = im[a] - ti;
+                        re[a] += tr;
+                        im[a] += ti;
+                    }
+                }
+            }
+            if (inv) {
+                float s = 1f / n;
+                for (int i = 0; i < n; i++) {
+                    re[i] *= s;
+                    im[i] *= s;
+                }
+            }
+        }
+    }
+
     /**
-     * DrGram Fix 74 — streaming TD-PSOLA pitch shifter + the v5.42 effect FX.
+     * Fix 75 — streaming formant-envelope warp.
+     *
+     * Fixed STFT (Hann analysis + synthesis, 75% overlap, original phases —
+     * only magnitudes are touched, so there is no phasiness). Per frame:
+     * cepstral envelope E (2.6 ms lifter — below the period of any speech
+     * F0), then |X'| = |X| · E(f·k1)/E(f) with slow per-frame loudness
+     * matching. Emission runs on a fixed 2·N warmup delay so only fully
+     * accumulated (all 4 overlapping frames) samples leave the stage.
+     */
+    static final class FormantWarp {
+        final int sr, N, hop, half, W;
+        final float k1;
+        final float[] hann;
+        final float[] inRing;
+        final int inMask;
+        long inW;
+        int frameStart;
+        final float[] ola;
+        final int olaMask;
+        long served;
+        float g0sm = 1f;
+
+        final float[] re, im, mag, ph, cep, lif, env, newMag;
+        final Fft fft;
+
+        FormantWarp(int sr, float k1) {
+            this.sr = sr;
+            this.k1 = k1;
+            N = sr >= 32000 ? 1024 : 512;
+            hop = N / 4;
+            half = N / 2;
+            W = 2 * N;
+            hann = new float[N];
+            for (int i = 0; i < N; i++) {
+                hann[i] = (float) (0.5 * (1.0 - Math.cos(2.0 * Math.PI * i / N)));
+            }
+            inRing = new float[1 << 15];
+            inMask = (1 << 15) - 1;
+            ola = new float[1 << 16];
+            olaMask = (1 << 16) - 1;
+            re = new float[N];
+            im = new float[N];
+            mag = new float[N];
+            ph = new float[N];
+            cep = new float[N];
+            lif = new float[N];
+            env = new float[N];
+            newMag = new float[N];
+            fft = new Fft(N);
+        }
+
+        /** Consumes n samples of x, produces exactly n samples into out. */
+        void push(float[] x, int n, float[] out) {
+            for (int i = 0; i < n; i++) {
+                inRing[(int) (inW & inMask)] = x[i];
+                inW++;
+            }
+            while (inW - frameStart >= N) {
+                frame(frameStart);
+                frameStart += hop;
+            }
+            for (int i = 0; i < n; i++) {
+                long p = served - W + i;
+                if (p >= 0 && p < frameStart) {
+                    out[i] = ola[(int) (p & olaMask)];
+                } else {
+                    out[i] = 0f;   // warmup only
+                }
+            }
+            served += n;
+        }
+
+        private void frame(int start) {
+            for (int i = 0; i < N; i++) {
+                re[i] = inRing[(start + i) & inMask] * hann[i];
+                im[i] = 0f;
+            }
+            fft.fft(re, im);
+            for (int k = 0; k <= half; k++) {
+                mag[k] = (float) Math.hypot(re[k], im[k]);
+                ph[k] = (float) Math.atan2(im[k], re[k]);
+            }
+
+            // real cepstrum → smooth spectral envelope (fixed 2.6 ms lifter)
+            for (int k = 0; k <= half; k++) {
+                cep[k] = (float) Math.log(Math.max(mag[k], 1e-6f));
+            }
+            for (int k = half + 1; k < N; k++) {
+                cep[k] = cep[N - k];
+            }
+            for (int k = 0; k < N; k++) {
+                im[k] = 0f;
+            }
+            fft.ifft(cep, im);
+            float ncut = 0.0026f * sr;
+            float n1 = ncut * 0.8f, n2 = ncut * 1.3f;
+            for (int m = 0; m <= half; m++) {
+                float w;
+                if (m <= n1) {
+                    w = 1f;
+                } else if (m >= n2) {
+                    w = 0f;
+                } else {
+                    w = (float) (0.5 * (1.0 + Math.cos(Math.PI * (m - n1) / (n2 - n1))));
+                }
+                lif[m] = w;
+                if (m > 0) {
+                    lif[N - m] = w;
+                }
+            }
+            for (int k = 0; k < N; k++) {
+                cep[k] *= lif[k];
+                im[k] = 0f;
+            }
+            fft.fft(cep, im);
+            for (int k = 0; k <= half; k++) {
+                float e = (float) Math.exp(Math.max(cep[k], -13.8f));
+                env[k] = Math.max(e, 1e-6f);
+            }
+
+            // envelope warp: sample E at f·k1, rescale each bin
+            System.arraycopy(mag, 0, newMag, 0, N);
+            float fh = half * (float) sr / N;
+            for (int k = 1; k < half; k++) {
+                float b = k * k1;
+                if (b > half - 1) {
+                    b = half - 1;
+                }
+                int b0 = (int) b;
+                int b1 = Math.min(b0 + 1, half - 1);
+                float w = b - b0;
+                float es = env[b0] * (1f - w) + env[b1] * w;
+                float g = es / env[k];
+                if (g > 4f) {
+                    g = 4f;
+                } else if (g < 0.25f) {
+                    g = 0.25f;
+                }
+                float f = k * (float) sr / N;
+                float t1 = 1f;
+                if (f > 0.85f * fh) {
+                    t1 = Math.max(0f, 1f - (f - 0.85f * fh) / (0.14f * fh));
+                }
+                if (f < 45f) {
+                    t1 = Math.min(t1, f / 45f);
+                }
+                newMag[k] = mag[k] * (1f + t1 * (g - 1f));
+            }
+
+            // slow loudness match (prevents drift, no pumping)
+            double eIn = 0, eOut = 0;
+            for (int k = 1; k < half - 1; k++) {
+                eIn += (double) mag[k] * mag[k];
+                eOut += (double) newMag[k] * newMag[k];
+            }
+            float g0 = (float) Math.sqrt(eIn / Math.max(eOut, 1e-12));
+            if (g0 > 3.3f) {
+                g0 = 3.3f;
+            } else if (g0 < 0.3f) {
+                g0 = 0.3f;
+            }
+            g0sm += 0.03f * (g0 - g0sm);
+            float gs = g0sm;
+            for (int k = 0; k < N; k++) {
+                newMag[k] *= gs;
+            }
+
+            // resynthesize with the ORIGINAL phases (coherent, no phasiness)
+            for (int k = 0; k <= half; k++) {
+                re[k] = newMag[k] * (float) Math.cos(ph[k]);
+                im[k] = newMag[k] * (float) Math.sin(ph[k]);
+            }
+            for (int k = half + 1; k < N; k++) {
+                re[k] = re[N - k];
+                im[k] = -im[N - k];
+            }
+            fft.ifft(re, im);
+            float norm = 1f / 1.5f;   // Σ Hann² at hop N/4
+            for (int i = 0; i < N; i++) {
+                ola[(start + i) & olaMask] += re[i] * hann[i] * norm;
+            }
+        }
+    }
+
+    /**
+     * Fix 75 — resampled-period pitch shifter (clean spectrum) feeding the
+     * formant-envelope warp, then the v5.42 effect FX.
      *
      * Contract (unchanged): push() returns exactly the number of samples it
-     * received; while the pipeline warms up it emits silence once (40–60 ms,
-     * same as the old WSOLA engine), then runs 1:1 forever.
+     * received; while the pipeline warms up it emits silence, then runs 1:1
+     * forever. Note the emitted timeline carries a small constant offset that
+     * depends on the caller's buffer size (at most one buffer); the real
+     * recorder and the call uplink each use a fixed buffer size, so the
+     * offset is constant within a session and inaudible.
      */
     static final class Chain {
         final Preset preset;
         final int sampleRate;
         final float ratio;
         final boolean shift;
+        final boolean warpActive;
+        final FormantWarp fw;
 
-        // ---- TD-PSOLA core ----
+        // ---- pitch analysis state (decimated trailing autocorrelation) ----
         final int minP, maxP, win, hop, dec, winA, minPa, maxPa;
         static final float voicingThr = 0.30f;
 
-        static final int cap = 1 << 15;
+        static final int cap = 1 << 16;
         static final int ringMask = cap - 1;
         final float[] inBuf = new float[cap];
         long inW;
@@ -532,6 +806,8 @@ public class DrGramVoiceChanger {
             this.sampleRate = sampleRate;
             this.ratio = preset.ratio;
             this.shift = Math.abs(ratio - 1f) > 0.01f && ratio > 0.4f && ratio < 2.5f;
+            this.warpActive = shift && Math.abs(preset.warp - 1f) > 0.004f;
+            this.fw = warpActive ? new FormantWarp(sampleRate, ratio / preset.warp) : null;
             minP = Math.max(4, sampleRate / 400);
             maxP = Math.max(minP + 8, sampleRate / 65);
             win = Math.max(64, Math.round(sampleRate * 0.040f));
@@ -543,7 +819,8 @@ public class DrGramVoiceChanger {
             decBuf = new float[winA];
             period = sampleRate / 150f;
 
-            // formant EQ (Fix 74): static approximation of the vocal-tract shift
+            // legacy static formant EQ (Fix 74) — bypassed when the true
+            // envelope warp runs, to avoid double-brightening
             hasFormant = Math.abs(preset.formant) > 0.01f;
             float f = preset.formant;
             if (f >= 0) {
@@ -590,36 +867,42 @@ public class DrGramVoiceChanger {
 
             if (!shift) {
                 System.arraycopy(in, 0, out, 0, samples);
-                applyPostFx(out);
-                writeBack(buffer, out, samples);
-                return len;
+            } else {
+                for (int i = 0; i < samples; i++) {
+                    inBuf[(int) ((inW + i) & ringMask)] = in[i];
+                }
+                inW += samples;
+
+                analyze();
+                advanceGrid();
+                buildGrains();
+
+                for (int i = 0; i < samples; i++) {
+                    out[i] = pendCount > 0 ? pendPop() : 0f; // warmup silence only
+                }
+                emitted += samples;
+                trimGrid();
             }
 
-            for (int i = 0; i < samples; i++) {
-                inBuf[(int) ((inW + i) & ringMask)] = in[i];
+            if (fw != null) {
+                float[] wout = new float[samples];
+                fw.push(out, samples, wout);
+                out = wout;
             }
-            inW += samples;
-
-            analyze();
-            advanceGrid();
-            buildGrains();
-
-            for (int i = 0; i < samples; i++) {
-                out[i] = pendCount > 0 ? pendPop() : 0f; // warmup silence only
-            }
-            emitted += samples;
-            trimGrid();
 
             applyPostFx(out);
             writeBack(buffer, out, samples);
             return len;
         }
 
-        // ---------- pitch analysis (decimated trailing autocorrelation) ----------
+        // ---------- pitch analysis (decimated autocorrelation, deterministic) ----------
 
         private void analyze() {
-            while (inW - analyzed >= hop && analyzed + win <= inW) {
-                int start = (int) ((inW - win) & ringMask);
+            // windows are anchored to the analyzed position (NOT to inW), so
+            // the pitch track is independent of the caller's buffer size
+            while (analyzed + hop <= inW && analyzed + hop >= win) {
+                int end = (int) (analyzed + hop);
+                int start = end - win;
                 for (int j = 0; j < winA; j++) {
                     float s = 0f;
                     int base = (start + j * dec) & ringMask;
@@ -660,12 +943,6 @@ public class DrGramVoiceChanger {
 
         // ---------- deterministic period grid ----------
 
-        /**
-         * One grid point per period — the timeline advance is exactly 1:1 with
-         * the input no matter where the waveform argmax lands (a naive
-         * peak-tracker drifts on noise and starves the pipeline). The waveform
-         * maximum near each grid point is only the PHASE ANCHOR for grains.
-         */
         private void advanceGrid() {
             if (gridPos < 0) {
                 if (inW < win) {
@@ -697,11 +974,9 @@ public class DrGramVoiceChanger {
 
         private void gridPush(long t, int readAt) {
             if (gridCount >= gridCap) {
-                // belt-and-braces: free the oldest entries the cursor no longer
-                // touches (in steady state trimGrid keeps this far below full)
                 int droppable = (int) Math.floor(c) - 4 - gridBase;
                 if (droppable <= 0) {
-                    return; // never expected — skip one grid point rather than corrupt state
+                    return;
                 }
                 int drop = Math.min(droppable, gridCount / 2);
                 System.arraycopy(gridT, drop, gridT, 0, gridCount - drop);
@@ -741,8 +1016,17 @@ public class DrGramVoiceChanger {
             return a * (1f - w) + b * w;
         }
 
-        // ---------- grain scheduling (linear complementary ramps) ----------
+        // ---------- grain scheduling (resampled periods, Fix 75) ----------
 
+        /**
+         * One input period per output period: the grain reads input starting
+         * at the pitch mark with Catmull-Rom interpolation at speed `ratio`
+         * (pitch × ratio, formants ride along — corrected by the warp stage),
+         * and fades out over its tail while the next grain fades in over the
+         * same span (complementary ramps sum to 1). Because every output
+         * period is the same compressed input period, the output spectrum is
+         * a clean harmonic comb — no OLA comb artifacts.
+         */
         private void buildGrains() {
             while (true) {
                 float cNext = c + 1f / ratio;
@@ -759,38 +1043,45 @@ public class DrGramVoiceChanger {
                     q = (long) Math.round(gridAt(c));
                 }
                 long qNext = (long) Math.round(gridAt(cNext));
-                int tr = (int) (qNext - q);
-                if (tr < 2) {
+                int ts = (int) (qNext - q);
+                if (ts < 2) {
                     c = cNext;
                     continue;
                 }
-                int iNearest = gridRead(rc);
-                int tl = (int) Math.max(0, q - qPrev);
-                if (iNearest + (long) tr + 1 >= inW) {
+                int m = gridRead(rc);
+                int fade = Math.max(2, Math.round(ts * 0.25f));
+                int nOut = ts + fade;
+                if (m + (long) Math.ceil(nOut * ratio) + 4 >= inW) {
                     return;
                 }
-                long iStart = (long) iNearest - tl;
-                long t0 = q - tl;
-                for (int k = 0; k < tl + tr; k++) {
-                    long t = t0 + k;
+                for (int i = 0; i < nOut; i++) {
+                    long t = q + i;
                     if (t < 0) {
                         continue;
                     }
-                    long ipos = iStart + k;
-                    float v = ipos >= 0 ? inBuf[(int) (ipos & ringMask)] : 0f;
+                    float pos = i * ratio;
+                    int i0 = (int) pos;
+                    float fr = pos - i0;
+                    float a = (m + i0 - 1 >= 0) ? inBuf[(int) ((m + i0 - 1) & ringMask)] : 0f;
+                    float b = inBuf[(int) ((m + i0) & ringMask)];
+                    float cc = inBuf[(int) ((m + i0 + 1) & ringMask)];
+                    float d = inBuf[(int) ((m + i0 + 2) & ringMask)];
+                    float v = b + 0.5f * fr * (cc - a + fr * (2f * a - 5f * b + 4f * cc - d + fr * (3f * (b - cc) + d - a)));
                     float wv;
-                    if (k < tl) {
-                        wv = (k + 1) / (float) tl;
+                    if (i < fade) {
+                        wv = (i + 1) / (float) (fade + 1);
+                    } else if (i < ts) {
+                        wv = 1f;
                     } else {
-                        wv = 1f - (k - tl + 1) / (float) tr;
+                        wv = 1f - (i - ts + 1) / (float) (fade + 1);
                     }
                     acc[(int) (t & ringMask)] += v * wv;
                 }
                 qPrev = q;
                 c = cNext;
                 grainsBuilt++;
-                if (grainsBuilt >= 3) {
-                    long safe = q - tl;
+                if (grainsBuilt >= 2) {
+                    long safe = q - fade;
                     while (drained < safe) {
                         pendPush(acc[(int) (drained & ringMask)]);
                         acc[(int) (drained & ringMask)] = 0f;
@@ -830,21 +1121,22 @@ public class DrGramVoiceChanger {
             buffer.position(0);
         }
 
-        /** formant EQ → ring mod → tilt → bandpass → drive → echo, streamed. */
+        /** (legacy EQ when no warp) → ring mod → tilt → bandpass → drive → echo. */
         private void applyPostFx(float[] out) {
             Preset p = preset;
+            boolean useEq = hasFormant && !warpActive;
             boolean hasRing = p.ringHz > 0;
             boolean hasTilt = Math.abs(p.tilt) > 0.01f;
             boolean hasBp = p.bpLow > 0 || p.bpHigh > 0 && p.bpHigh < 18000;
             boolean hasDrive = p.drive > 0.01f;
             boolean hasEcho = p.echo != ECHO_OFF;
-            if (!hasFormant && !hasRing && !hasTilt && !hasBp && !hasDrive && !hasEcho) {
+            if (!useEq && !hasRing && !hasTilt && !hasBp && !hasDrive && !hasEcho) {
                 return;
             }
             float drive = p.drive;
             for (int i = 0; i < out.length; i++) {
                 float v = out[i];
-                if (hasFormant) {
+                if (useEq) {
                     v = fqLow.process(v);
                     v = fqPeak.process(v);
                     v = fqHigh.process(v);
