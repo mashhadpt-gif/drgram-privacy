@@ -485,6 +485,7 @@ public class DrGramVoiceChanger {
         long inW;
         final float[] acc = new float[cap];
         long drained;
+        long emitted;
 
         // pitch analysis state
         long analyzed;
