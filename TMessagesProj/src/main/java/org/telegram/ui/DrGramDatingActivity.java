@@ -27,6 +27,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -41,6 +42,7 @@ import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.DrGramThemeInstaller;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.LocaleController;
@@ -173,7 +175,7 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
             })));
             return;
         }
-        content.addView(makeHeader(LocaleController.formatPluralString("DrGramDatingFound", items.size())));
+        content.addView(makeHeader(LocaleController.formatString(R.string.DrGramDatingFound, items.size())));
         for (int i = 0; i < items.size(); i++) {
             content.addView(buildCard(items.get(i)));
         }
@@ -229,8 +231,11 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
                             ArrayList<TLRPC.PeerLocated> peers = ((org.telegram.tgnet.tl.TL_update.TL_updatePeerLocated) u).peers;
                             for (int b = 0; b < peers.size(); b++) {
                                 TLRPC.PeerLocated pl = peers.get(b);
-                                if (pl instanceof TLRPC.TL_peerLocated && pl.peer instanceof TLRPC.TL_peerUser) {
-                                    distances.put(((TLRPC.TL_peerUser) pl.peer).user_id, pl.distance);
+                                if (pl instanceof TLRPC.TL_peerLocated) {
+                                    TLRPC.TL_peerLocated loc = (TLRPC.TL_peerLocated) pl;
+                                    if (loc.peer instanceof TLRPC.TL_peerUser) {
+                                        distances.put(((TLRPC.TL_peerUser) loc.peer).user_id, loc.distance);
+                                    }
                                 }
                             }
                         }
@@ -398,7 +403,7 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
 
         BackupImageView avatar = new BackupImageView(context);
         avatar.setRoundRadius(AndroidUtilities.dp(48));
-        avatar.setImage(ImageLocation.getForUserOrChat(user, ImageLocation.TYPE_BIG), "120_120", avatarDrawable, user, currentAccount);
+        avatar.setImage(ImageLocation.getForUserOrChat(user, ImageLocation.TYPE_SMALL), "120_120", avatarDrawable, user);
         avatarDrawable.setInfo(currentAccount, user);
         header.addView(avatar, LayoutHelper.createLinear(96, 96, 0, 0, 14, 0));
 
@@ -427,7 +432,7 @@ public class DrGramDatingActivity extends BaseFragment implements NotificationCe
             int age = computeAge(full.birthday);
             if (age > 0) {
                 card.addView(makeMetaRow(LocaleController.getString(R.string.DrGramDatingAge),
-                        LocaleController.formatPluralString("DrGramDatingYears", age)));
+                        LocaleController.formatString(R.string.DrGramDatingYears, age)));
             }
         }
 
