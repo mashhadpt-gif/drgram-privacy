@@ -1678,6 +1678,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int drgramQuickChats = 47;
     private final static int drgramDrawSend = 48;
     private final static int drgramQuickReplies = 49;
+    private final static int drgramDating = 90; // DrGram Fix 70: dating entry in chat menu
 
     private final static int topic_close = 60;
     private final static int open_forum = 61;
@@ -3879,6 +3880,8 @@ public class ChatActivity extends BaseFragment implements
                     }
                 } else if (id == drgramQuickReplies) {
                     drgramShowQuickReplies();
+                } else if (id == drgramDating) {
+                    presentFragment(new DrGramDatingActivity()); // DrGram Fix 70
                 } else if (id == clear_history || id == delete_chat || id == auto_delete_timer) {
                     if (getParentActivity() == null) {
                         return;
@@ -4514,6 +4517,10 @@ public class ChatActivity extends BaseFragment implements
             if (getDialogId() != 0 && !isSecretChat() && org.telegram.messenger.DrGramQuickReplies.getCount() > 0) {
                 headerItem.lazilyAddSubItem(drgramQuickReplies, R.drawable.msg_add,
                     LocaleController.getString(R.string.DrGramSetRepliesUse));
+            }
+            if (getDialogId() != 0) {
+                headerItem.lazilyAddSubItem(drgramDating, R.drawable.map_pin3, // DrGram Fix 70: dating
+                    LocaleController.getString(R.string.DrGramDatingTitle));
             }
             boolean addedSettings = false;
             if (!isTopic) {

@@ -97,23 +97,29 @@ public class DrGramZabanavis {
         String[] names = styleNames();
         final int[] ids = styleIds();
 
-        // Telegram's AlertDialog has no setSingleChoiceItems — build the radio
-        // rows by hand. Fix 39: each row shows the style name in small gray
-        // text PLUS a live preview of the style applied to a sample sentence,
-        // so the user can actually SEE what every option does before picking.
+        // Fix 70: the old single-RadioButton rows concatenated the name line and
+        // the preview with "+", which silently dropped BOTH the small/gray spans
+        // of the name AND made every row look like two identical big lines —
+        // users could not tell the styles apart. Each row is now a real two-line
+        // layout: a small gray label above a live, unmistakable preview.
         android.widget.ScrollView scroll = new android.widget.ScrollView(ctx);
         android.widget.LinearLayout list = new android.widget.LinearLayout(ctx);
         list.setOrientation(android.widget.LinearLayout.VERTICAL);
         scroll.addView(list);
         final int[] pickedHolder = {-1};
+        int accent = accentColor();
+        final java.util.ArrayList<android.widget.RadioButton> radios = new java.util.ArrayList<>();
         for (int i = 0; i < ids.length; i++) {
             final int style = ids[i];
+
+            android.widget.LinearLayout row = new android.widget.LinearLayout(ctx);
+            row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(9), AndroidUtilities.dp(16), AndroidUtilities.dp(9));
+            row.setBackground(Theme.getSelectorDrawable(false));
+
             android.widget.RadioButton rb = new android.widget.RadioButton(ctx);
-            rb.setText(rowText(names[i], style, fragment.getResourceProvider()));
-            rb.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 16);
             rb.setChecked(ids[i] == styleInUse);
-            rb.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(9), AndroidUtilities.dp(16), AndroidUtilities.dp(9));
-            int accent = accentColor();
             rb.setHighlightColor(0x00000000);
             try {
                 android.content.res.ColorStateList csl = new android.content.res.ColorStateList(
@@ -121,11 +127,37 @@ public class DrGramZabanavis {
                         new int[]{accent, 0x66888888});
                 rb.setButtonTintList(csl);
             } catch (Throwable ignore) {}
-            rb.setOnClickListener(v -> {
+            row.addView(rb, new android.widget.LinearLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            android.widget.LinearLayout col = new android.widget.LinearLayout(ctx);
+            col.setOrientation(android.widget.LinearLayout.VERTICAL);
+
+            android.widget.TextView nameView = new android.widget.TextView(ctx);
+            nameView.setText(names[i]);
+            nameView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 13);
+            nameView.setTextColor(nameColor(fragment.getResourceProvider()));
+            nameView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            col.addView(nameView);
+
+            android.widget.TextView previewView = new android.widget.TextView(ctx);
+            previewView.setText(previewText(style, fragment.getResourceProvider()));
+            previewView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 17);
+            previewView.setTextColor(textColor(fragment.getResourceProvider()));
+            previewView.setLineSpacing(AndroidUtilities.dp(1), 1f);
+            col.addView(previewView);
+
+            row.addView(col, new android.widget.LinearLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+            radios.add(rb);
+            row.setOnClickListener(v -> {
                 DrGramHaptics.tick(v);
+                for (int r = 0; r < radios.size(); r++) {
+                    radios.get(r).setChecked(radios.get(r) == rb);
+                }
                 pickedHolder[0] = style;
             });
-            list.addView(rb, new android.widget.LinearLayout.LayoutParams(
+            list.addView(row, new android.widget.LinearLayout.LayoutParams(
                     android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
         }
         AlertDialog dialog = new AlertDialog.Builder(ctx, fragment.getResourceProvider())
@@ -141,76 +173,98 @@ public class DrGramZabanavis {
         dialog.show();
     }
 
-    /** DrGram Fix 39: two-line row — small gray style name over a live preview. */
-    private static CharSequence rowText(String name, int style, Theme.ResourcesProvider provider) {
-        String sample = LocaleController.getString(R.string.DrGramZabSample);
-        int gray = 0xFF8A8A8A;
+    /** Fix 70: small gray label color for the style name. */
+    private static int nameColor(Theme.ResourcesProvider provider) {
         try {
-            gray = Theme.getColor(Theme.key_dialogTextGray2, provider);
+            return Theme.getColor(Theme.key_dialogTextGray2, provider);
         } catch (Throwable ignore) {}
+        return 0xFF8A8A8A;
+    }
 
-        android.text.SpannableString nameLine = new android.text.SpannableString(name);
-        nameLine.setSpan(new android.text.style.RelativeSizeSpan(0.72f), 0, nameLine.length(), 0);
-        nameLine.setSpan(new android.text.style.ForegroundColorSpan(gray), 0, nameLine.length(), 0);
+    /** Fix 70: strong text color for the preview line. */
+    private static int textColor(Theme.ResourcesProvider provider) {
+        try {
+            return Theme.getColor(Theme.key_dialogTextBlack, provider);
+        } catch (Throwable ignore) {}
+        return 0xFF222222;
+    }
 
-        CharSequence preview;
+    /** Fix 70: bulletproof visual preview — no span-dropping concatenation. */
+    private static CharSequence previewText(int style, Theme.ResourcesProvider provider) {
+        String sample = LocaleController.getString(R.string.DrGramZabSample);
+        int accent = accentColor();
+        android.text.SpannableString sp;
         switch (style) {
             case STYLE_BOLD:
-                preview = wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD));
+                sp = wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD));
                 break;
             case STYLE_ITALIC:
-                preview = wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.ITALIC));
+                // Persian has no true italic face — force a visible slant.
+                sp = wrap(sample, new SkewSpan());
                 break;
             case STYLE_STRIKE:
-                preview = wrap(sample, new android.text.style.StrikethroughSpan());
+                sp = wrap(sample, new android.text.style.StrikethroughSpan());
                 break;
             case STYLE_UNDERLINE:
-                preview = wrap(sample, new android.text.style.UnderlineSpan());
+                sp = wrap(sample, new android.text.style.UnderlineSpan());
                 break;
             case STYLE_MONO:
-                preview = wrap(sample, new android.text.style.TypefaceSpan("monospace"));
+                sp = wrap(sample, new android.text.style.TypefaceSpan("monospace"));
+                sp.setSpan(new android.text.style.BackgroundColorSpan(0x33888888), 0, sp.length(), 0);
                 break;
             case STYLE_BOLD_ITALIC:
-                preview = wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD_ITALIC));
+                sp = wrap(wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD)), new SkewSpan());
                 break;
             case STYLE_BOLD_UNDER:
-                preview = wrap(wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD)), new android.text.style.UnderlineSpan());
+                sp = wrap(wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD)), new android.text.style.UnderlineSpan());
                 break;
             case STYLE_STRIKE_BOLD:
-                preview = wrap(wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD)), new android.text.style.StrikethroughSpan());
+                sp = wrap(wrap(sample, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD)), new android.text.style.StrikethroughSpan());
                 break;
             case STYLE_SPOILER:
-                preview = "\u25CF\u25CF\u25CF\u25CF\u25CF\u25CF\u25CF\u25CF";
+                sp = new android.text.SpannableString("\u25CF\u25CF\u25CF\u25CF\u25CF\u25CF\u25CF\u25CF\u25CF");
+                sp.setSpan(new android.text.style.ForegroundColorSpan(0xFF8A8A8A), 0, sp.length(), 0);
                 break;
             case STYLE_ORN_1:
-                preview = ORN_1_A + sample + ORN_1_B;
+                sp = ornamentPreview(ORN_1_A, ORN_1_B, sample, accent);
                 break;
             case STYLE_ORN_2:
-                preview = ORN_2_A + sample + ORN_2_B;
+                sp = ornamentPreview(ORN_2_A, ORN_2_B, sample, accent);
                 break;
             case STYLE_ORN_3:
-                preview = ORN_3 + sample;
+                sp = new android.text.SpannableString(ORN_3 + sample + "\n" + ORN_3);
+                sp.setSpan(new android.text.style.ForegroundColorSpan(accent), 0, ORN_3.length(), 0);
+                sp.setSpan(new android.text.style.ForegroundColorSpan(accent), sp.length() - ORN_3.length(), sp.length(), 0);
                 break;
             case STYLE_ORN_4:
-                preview = ORN_4_A + sample + ORN_4_B;
+                sp = ornamentPreview(ORN_4_A, ORN_4_B, sample, accent);
                 break;
             default:
-                preview = sample;
+                sp = android.text.SpannableString.valueOf(sample);
                 break;
         }
+        return sp;
+    }
 
-        android.text.SpannableString out = new android.text.SpannableString(
-                nameLine + "\n" + preview);
-        // re-attach the preview spans (SpannableString copy drops them)
-        if (preview instanceof android.text.Spanned) {
-            android.text.Spanned sp = (android.text.Spanned) preview;
-            Object[] spans = sp.getSpans(0, sp.length(), Object.class);
-            int shift = nameLine.length() + 1;
-            for (Object s : spans) {
-                out.setSpan(s, sp.getSpanStart(s) + shift, sp.getSpanEnd(s) + shift, sp.getSpanFlags(s));
-            }
+    /** Fix 70: ornament style preview with the golden ornaments colored. */
+    private static android.text.SpannableString ornamentPreview(String a, String b, String sample, int accent) {
+        android.text.SpannableString sp = new android.text.SpannableString(a + sample + b);
+        sp.setSpan(new android.text.style.ForegroundColorSpan(accent), 0, a.length(), 0);
+        sp.setSpan(new android.text.style.ForegroundColorSpan(accent), sp.length() - b.length(), sp.length(), 0);
+        return sp;
+    }
+
+    /** Fix 70: forces a real slant so the italic style is visible for Persian. */
+    private static class SkewSpan extends android.text.style.MetricAffectingSpan {
+        @Override
+        public void updateMeasureState(android.text.TextPaint p) {
+            p.setTextSkewX(-0.25f);
         }
-        return out;
+
+        @Override
+        public void updateDrawState(android.text.TextPaint p) {
+            p.setTextSkewX(-0.25f);
+        }
     }
 
     private static android.text.SpannableString wrap(CharSequence text, Object span) {
