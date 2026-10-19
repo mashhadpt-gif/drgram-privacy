@@ -5246,4 +5246,16 @@
     <string name="DrGramDatingSeen">آخرین بازدید</string>
     <string name="DrGramDatingBio">بیوگرافی</string>
     <string name="DrGramDatingMessage">پیام دادن</string>
+    <string name="DrGramDatingRadarHint">رادار زندهٔ افراد اطراف موقعیت شما در تلگرام — از هر برنامه‌ای که استفاده می‌کنند، نه فقط لوکس گرام. حلقه‌ها: ۱ / ۱۰ / ۱۰۰ کیلومتر.</string>
+    <string name="DrGramDatingRadarEmpty">رادار خالی است</string>
+    <string name="DrGramDatingVisibleUntil">موقعیت شما تا حدود ۱ ساعت برای افراد نزدیک قابل مشاهده می‌ماند.</string>
+    <string name="DrGramDatingLocating">در حال قفل روی موقعیت شما…</string>
+    <string name="DrGramDatingGpsOff">موقعیت گوشی خاموش است. از تنظیمات سریع، GPS را روشن کنید و دوباره امتحان کنید.</string>
+    <string name="DrGramDatingWeakFix">هنوز موقعیت دقیقی گرفته نشد. کمی در جای باز بروید یا یک‌بار برنامه نقشه را باز کنید، سپس دوباره امتحان کنید.</string>
+    <string name="DrGramDatingRadiusAll">همه</string>
+    <string name="DrGramDatingRadiusKm1">۱ کیلومتر</string>
+    <string name="DrGramDatingRadiusKm5">۵ کیلومتر</string>
+    <string name="DrGramDatingRadiusKm25">۲۵ کیلومتر</string>
+    <string name="DrGramDatingRadiusKm100">۱۰۰ کیلومتر</string>
+    <string name="DrGramDatingEmptyFiltered">در این شعاع کسی نیست. یک شعاع بزرگ‌تر انتخاب کنید.</string>
 </resources>

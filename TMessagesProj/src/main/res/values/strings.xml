@@ -11870,4 +11870,16 @@
     <string name="DrGramDatingSeen">Last seen</string>
     <string name="DrGramDatingBio">Bio</string>
     <string name="DrGramDatingMessage">Message</string>
+    <string name="DrGramDatingRadarHint">Live radar of the people around your position on Telegram — from any app they use, not only LuxGram. Rings: 1 / 10 / 100 km.</string>
+    <string name="DrGramDatingRadarEmpty">Radar is empty</string>
+    <string name="DrGramDatingVisibleUntil">Your position stays visible to nearby people for about 1 hour.</string>
+    <string name="DrGramDatingLocating">Locking on your position…</string>
+    <string name="DrGramDatingGpsOff">Device location is off. Turn on GPS/location from quick settings, then try again.</string>
+    <string name="DrGramDatingWeakFix">No precise position yet. Step outside or open a maps app once, then try again.</string>
+    <string name="DrGramDatingRadiusAll">All</string>
+    <string name="DrGramDatingRadiusKm1">1 km</string>
+    <string name="DrGramDatingRadiusKm5">5 km</string>
+    <string name="DrGramDatingRadiusKm25">25 km</string>
+    <string name="DrGramDatingRadiusKm100">100 km</string>
+    <string name="DrGramDatingEmptyFiltered">No one inside this radius. Pick a wider one.</string>
 </resources>
