@@ -372,7 +372,7 @@ public class DrGramThemeInstaller {
      * dark-mode events) resolved to Telegram's stock asset themes ("Gold",
      * "Red", "Day"...), which showed the unbranded look until the next app
      * start re-asserted the branded file theme. This resolves every such event
-     * back to the active LuxGram palette — unless the user deliberately picked
+     * back to the active DrGram palette — unless the user deliberately picked
      * a curated theme (free mode) or the requested theme is already one of ours.
      */
     public static Theme.ThemeInfo resolveDayNightTheme(Theme.ThemeInfo requested) {

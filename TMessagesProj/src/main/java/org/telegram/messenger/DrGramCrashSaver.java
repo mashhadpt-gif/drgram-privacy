@@ -63,10 +63,10 @@ public final class DrGramCrashSaver {
     private static void append(String kind, Throwable t) throws Exception {
         synchronized (LOCK) {
             StringBuilder sb = new StringBuilder();
-            sb.append("==== LuxGram ").append(kind).append(" ====")
+            sb.append("==== DrGram ").append(kind).append(" ====")
               .append('\n')
               .append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date()))
-              .append(" | LuxGram v").append(BuildVars.BUILD_VERSION_STRING)
+              .append(" | DrGram v").append(BuildVars.BUILD_VERSION_STRING)
               .append(" | Android ").append(android.os.Build.VERSION.RELEASE)
               .append(" | ").append(android.os.Build.MANUFACTURER).append(' ').append(android.os.Build.MODEL)
               .append(" | thread=").append(Thread.currentThread().getName())

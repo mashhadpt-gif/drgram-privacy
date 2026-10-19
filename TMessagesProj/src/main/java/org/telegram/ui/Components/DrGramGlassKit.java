@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  *
  * DrGram Fix 36: DrGramGlassKit — the shared glassmorphism design system that
- * Fix 34 introduced on the Tools page, extracted so EVERY LuxGram page
+ * Fix 34 introduced on the Tools page, extracted so EVERY DrGram page
  * (control center, style gallery and every sub-page) renders the same
  * minimal, translucent, luxury look.
  *
@@ -49,7 +49,7 @@ public final class DrGramGlassKit {
         return love() ? LOVE_HINT : GOLD_HINT;
     }
 
-    /** The calm onyx canvas every LuxGram page shares. */
+    /** The calm onyx canvas every DrGram page shares. */
     public static GradientDrawable pageGradient() {
         return new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
                 love()

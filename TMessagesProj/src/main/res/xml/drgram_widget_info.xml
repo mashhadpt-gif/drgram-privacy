@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- DrGram Fix 36: LuxGram tools widget -->
+<!-- DrGram Fix 36: DrGram tools widget -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="180dp"
     android:minHeight="44dp"

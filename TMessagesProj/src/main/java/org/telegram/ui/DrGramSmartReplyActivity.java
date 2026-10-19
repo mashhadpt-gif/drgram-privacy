@@ -2,7 +2,7 @@
  * This is the source code of DrGram, a Telegram fork.
  * It is licensed under GNU GPL v. 2 or later.
  *
- * DrGram Smart Reply UI (Fix 35) — glassmorphism page matching the LuxGram
+ * DrGram Smart Reply UI (Fix 35) — glassmorphism page matching the DrGram
  * Tools design: glass panels, hairline strokes, flat rows, clear rhythm.
  * Left panel = PV commands, right panel = group admin commands; every
  * trigger is renameable, every command toggleable, custom PV commands are

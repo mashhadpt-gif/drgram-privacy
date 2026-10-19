@@ -8,19 +8,19 @@
 -->
 <resources>
     <!-- Brand — always resource-resolved (see LocaleController.getStringV2 guard) -->
-    <string name="AppName">لوکس گرام</string>
-    <string name="AppNameBeta">لوکس گرام بتا</string>
+    <string name="AppName">دکترگرام</string>
+    <string name="AppNameBeta">دکترگرام بتا</string>
     <string name="LanguageName">فارسی</string>
 
     <!-- DrGram Fix 8: luxury intro & branding -->
-    <string name="Page1Title">لوکس گرام</string>
+    <string name="Page1Title">دکترگرام</string>
     <string name="Page1Message">پیام‌رسان **لوکس**.\nساخته‌شده برای **خاص‌ها**.</string>
     <string name="DrGramTagline">پیام‌رسان لوکس</string>
-    <string name="DrGramSetTheme">مود اختصاصی LuxGram</string>
-    <string name="DrGramSetThemeHint">دستی انتخاب کن: Gold Mode (لاکچری) یا LOVE Mode (عاشقانه). همیشه یکی از تم‌های LuxGram فعال می‌ماند و تم پیش‌فرض تلگرام انتخاب نمی‌شود.</string>
+    <string name="DrGramSetTheme">مود اختصاصی DrGram</string>
+    <string name="DrGramSetThemeHint">دستی انتخاب کن: Gold Mode (لاکچری) یا LOVE Mode (عاشقانه). همیشه یکی از تم‌های DrGram فعال می‌ماند و تم پیش‌فرض تلگرام انتخاب نمی‌شود.</string>
     <string name="DrGramSetThemeGold">Gold Mode (لاکچری)</string>
     <string name="DrGramSetThemeRed">LOVE Mode (عاشقانه)</string>
-    <string name="DrGramSetThemeApplyFailed">اعمال مود LuxGram ناموفق بود؛ برنامه را دوباره باز کن و مجدداً امتحان کن.</string>
+    <string name="DrGramSetThemeApplyFailed">اعمال مود DrGram ناموفق بود؛ برنامه را دوباره باز کن و مجدداً امتحان کن.</string>
     <string name="DrGramQuickLinksTitle">لینک‌های سریع</string>
     <string name="DrGramQuickLinksHint">پیوندهای پرکاربردت را ذخیره کن؛ اطلاعات فقط روی همین دستگاه می‌ماند.</string>
     <string name="DrGramQuickLinksAdd">افزودن لینک سریع</string>
@@ -39,7 +39,7 @@
     <string name="DrGramHiddenAccountsHiddenResult">حساب از فهرست‌های انتخاب حساب پنهان شد. از همین بخش می‌توانی دوباره نمایش آن را فعال کنی.</string>
     <string name="DrGramHiddenAccountsVisibleResult">حساب دوباره در فهرست انتخاب حساب نمایش داده می‌شود.</string>
     <string name="DrGramOpenToolsTitle">پاسخ‌گوی خودکار و ابزارهای پیشرفته</string>
-    <string name="DrGramOpenToolsHint">پاسخ خودکار، هشدار آنلاین‌شدن، گفتگوهای پنهان و ابزارهای دیگر LuxGram.</string>
+    <string name="DrGramOpenToolsHint">پاسخ خودکار، هشدار آنلاین‌شدن، گفتگوهای پنهان و ابزارهای دیگر DrGram.</string>
     <string name="DrGramSetExploreOpen">کاوش رسانه‌های کانال‌های عضو‌شده</string>
     <string name="DrGramSetChatList">لیست گفتگوها / صفحه اصلی</string>
     <string name="DrGramSetChatListHint">پوشه‌ها و فیلترهای اصلی تلگرام را مدیریت کن.</string>
@@ -48,7 +48,7 @@
     <string name="DrGramSetGiftsHint">انتخاب‌گر اصلی تلگرام برای گیرنده هدیه را باز کن.</string>
     <string name="DrGramSetGiftsOpen">ارسال هدیه</string>
     <string name="DrGramSetHotNotifications">اعلان‌های داغ</string>
-    <string name="DrGramSetHotNotificationsHint">هشدار آنلاین‌شدن و ابزار پاسخ‌گوی خودکار LuxGram را باز کن.</string>
+    <string name="DrGramSetHotNotificationsHint">هشدار آنلاین‌شدن و ابزار پاسخ‌گوی خودکار DrGram را باز کن.</string>
     <string name="DrGramPrivateContactsTitle">مخاطبین خصوصی</string>
     <string name="DrGramPrivateContactsHint">مخاطب‌های انتخاب‌شده را بدون حذف از تلگرام، از فهرست معمول مخاطبین پنهان کن. این تنظیم فقط روی همین حساب و دستگاه ذخیره می‌شود.</string>
     <string name="DrGramPrivateContactsEmpty">فعلاً مخاطب بارگذاری‌شده‌ای در دسترس نیست.</string>
@@ -57,21 +57,21 @@
     <string name="YourNumber">شماره تلفن خود را وارد کنید</string>
 
     <!-- DrGram Fix 9: full Persian branding -->
-    <string name="Page2Message">**LuxGram** پیام‌ها را سریع‌تر از\nهر اپلیکیشن دیگری می‌رساند.</string>
-    <string name="Page3Message">**LuxGram** فضای ابری نامحدود و رایگان برای چت‌ها و رسانه‌ها فراهم می‌کند.</string>
-    <string name="Page4Message">**LuxGram** پیام‌های شما را از حمله‌ی هکرها محافظت می‌کند.</string>
-    <string name="Page5Message">**LuxGram** هیچ محدودیتی روی\nحجم رسانه‌ها و چت‌های شما ندارد.</string>
-    <string name="Page6Message">**LuxGram** اجازه می‌دهد از چند دستگاه\nهم‌زمان به پیام‌هایتان دسترسی داشته باشید.</string>
-    <string name="PermissionXiaomiLockscreen">لطفاً به LuxGram اجازه دهید روی صفحه‌ی قفل نمایش داده شود تا تماس‌ها به‌درستی کار کنند.</string>
-    <string name="PermissionFSILockscreen">لطفاً به LuxGram اجازه دهید روی صفحه‌ی قفل نمایش داده شود تا تماس‌ها به‌درستی کار کنند.</string>
+    <string name="Page2Message">**DrGram** پیام‌ها را سریع‌تر از\nهر اپلیکیشن دیگری می‌رساند.</string>
+    <string name="Page3Message">**DrGram** فضای ابری نامحدود و رایگان برای چت‌ها و رسانه‌ها فراهم می‌کند.</string>
+    <string name="Page4Message">**DrGram** پیام‌های شما را از حمله‌ی هکرها محافظت می‌کند.</string>
+    <string name="Page5Message">**DrGram** هیچ محدودیتی روی\nحجم رسانه‌ها و چت‌های شما ندارد.</string>
+    <string name="Page6Message">**DrGram** اجازه می‌دهد از چند دستگاه\nهم‌زمان به پیام‌هایتان دسترسی داشته باشید.</string>
+    <string name="PermissionXiaomiLockscreen">لطفاً به DrGram اجازه دهید روی صفحه‌ی قفل نمایش داده شود تا تماس‌ها به‌درستی کار کنند.</string>
+    <string name="PermissionFSILockscreen">لطفاً به DrGram اجازه دهید روی صفحه‌ی قفل نمایش داده شود تا تماس‌ها به‌درستی کار کنند.</string>
 
     <!-- DrGram Premium section (Settings → Chats) -->
-    <string name="DrGramPremium">لوکس گرام پریمیوم</string>
+    <string name="DrGramPremium">دکترگرام پریمیوم</string>
     <string name="SparksOnSend">جرقه هنگام ارسال</string>
     <string name="SparksOnSendInfo">انیمیشن جرقه‌های طلایی هنگام ارسال پیام</string>
     <string name="GoldRainOnReactions">بارش طلایی روی واکنش‌ها</string>
     <string name="GoldRainOnReactionsInfo">بارش طلا برای واکنش پیام‌ها، جرقه هنگام واکنش به استوری‌ها</string>
-    <string name="SparksOnSendHint">افکت‌های پریمیوم لوکس گرام: جرقه ارسال و بارش طلایی واکنش‌ها</string>
+    <string name="SparksOnSendHint">افکت‌های پریمیوم دکترگرام: جرقه ارسال و بارش طلایی واکنش‌ها</string>
 
     <!-- DrGram Explore -->
     <string name="Explore">اکسپلور</string>
@@ -122,7 +122,7 @@
     <string name="ArchivedChats">گفتگوهای بایگانی‌شده</string>
     <string name="SelectChat">انتخاب گفتگو</string>
     <string name="SelectChats">انتخاب گفتگوها</string>
-    <string name="NoChats">به لوکس گرام خوش آمدید</string>
+    <string name="NoChats">به دکترگرام خوش آمدید</string>
     <string name="NoChatsHelp">برای شروع پیام‌رسانی، روی دکمه مداد در گوشه پایین ضربه بزنید.</string>
 
     <!-- Common actions -->
@@ -176,7 +176,7 @@
     <string name="Passcode">قفل رمز عبور</string>
     <string name="TwoStepVerification">تأیید دو مرحله‌ای</string>
     <string name="Proxy">پروکسی</string>
-    <string name="TelegramPremium">لوکس گرام پریمیوم</string>
+    <string name="TelegramPremium">دکترگرام پریمیوم</string>
 
     <!-- DrGram: expanded Persian localization (core UI batch) -->
     <string name="Downloading">در حال دریافت</string>
@@ -356,16 +356,16 @@
     <string name="DrGramLuxSoundCustom">صدای دلخواه شما فعال است</string>
     <string name="DrGramLuxSoundBundled">فعلاً: زنگ لوکس همراه برنامه</string>
     <string name="DrGramAppIcon">آیکون اپ</string>
-    <string name="DrGramToolsTitle">ابزارهای لوکس گرام</string>
-    <string name="DrGramToolsDrawer">ابزارهای لوکس گرام</string>
-    <string name="DrGramSecretaryTitle">منشی لوکس گرام</string>
+    <string name="DrGramToolsTitle">ابزارهای دکترگرام</string>
+    <string name="DrGramToolsDrawer">ابزارهای دکترگرام</string>
+    <string name="DrGramSecretaryTitle">منشی دکترگرام</string>
     <string name="DrGramSecretaryHint">وقتی سرت شلوغه، منشی به جای تو به پیام‌ها جواب می‌دهد.</string>
     <string name="DrGramSecretaryEnable">پاسخ خودکار</string>
     <string name="DrGramSecretaryText">متن پاسخ</string>
     <string name="DrGramSecretaryEditTitle">متن پاسخ</string>
     <string name="DrGramSecretaryGroups">پاسخ در گروه‌ها هم فعال شود</string>
     <string name="DrGramSave">ذخیره</string>
-    <string name="DrGramVaultSection">گاوصندوق لوکس گرام</string>
+    <string name="DrGramVaultSection">گاوصندوق دکترگرام</string>
     <string name="DrGramVaultHint">چت‌ها را از همه لیست‌ها پنهان کن. برای باز کردن گاوصندوق، کد مخفی‌ات را در جستجوی اصلی بنویس.</string>
     <string name="DrGramVaultSetCode">تنظیم کد مخفی</string>
     <string name="DrGramVaultCodeTitle">کد مخفی</string>
@@ -375,7 +375,7 @@
     <string name="DrGramVaultEmpty">گاوصندوق خالی است. برای پنهان کردن، از منوی سه‌نقطه داخل چت استفاده کن.</string>
     <string name="DrGramVaultRowHint">برای بازگشت به لیست، انگشتت را نگه دار</string>
     <string name="DrGramVaultHide">پنهان در گاوصندوق</string>
-    <string name="DrGramVaultHideConfirm">این چت از همه لیست‌های این دستگاه محو می‌شود. هر زمان خواستی از ابزارهای لوکس گرام برگردانش.</string>
+    <string name="DrGramVaultHideConfirm">این چت از همه لیست‌های این دستگاه محو می‌شود. هر زمان خواستی از ابزارهای دکترگرام برگردانش.</string>
     <string name="DrGramVaultHiddenDone">چت به گاوصندوق منتقل شد</string>
     <string name="DrGramVaultUnhideTitle">بازگشت چت به لیست</string>
     <string name="DrGramVaultUnhideText">«%1$s» دوباره در لیست چت‌ها ظاهر می‌شود.</string>
@@ -385,17 +385,17 @@
     <string name="DrGramGuardEnable">نگهبان آنلاین</string>
     <string name="DrGramGuardAdd">افزودن مخاطب به نگهبان</string>
     <string name="DrGramGuardUnknownUser">مخاطب</string>
-    <string name="DrGramGuardNotificationTitle">نگهبان آنلاین لوکس گرام</string>
+    <string name="DrGramGuardNotificationTitle">نگهبان آنلاین دکترگرام</string>
     <string name="DrGramGuardNotificationText">%1$s آنلاین شد</string>
     <string name="DrGramGuardChannelName">نگهبان آنلاین</string>
     <string name="DrGramSelectMany">انتخاب انبوه</string>
     <string name="DrGramSelectManyLimit">تا سقف ۱۰۰ پیام انتخاب شد</string>
-    <string name="DrGramVaultTitle">گاوصندوق لوکس گرام</string>
-    <string name="DrGramFavSection">برگزیده‌های لوکس گرام</string>
+    <string name="DrGramVaultTitle">گاوصندوق دکترگرام</string>
+    <string name="DrGramFavSection">برگزیده‌های دکترگرام</string>
     <string name="DrGramFavHint">پیام‌هایی که ستاره‌دار می‌کنی، همین‌جا روی دستگاهت ذخیره می‌شوند. با زدن هر ردیف به خود پیام برگرد.</string>
     <string name="DrGramFavOpen">نمایش برگزیده‌ها</string>
     <string name="DrGramFavCount">پیام‌های ذخیره‌شده</string>
-    <string name="DrGramFavTitle">برگزیده‌های لوکس گرام</string>
+    <string name="DrGramFavTitle">برگزیده‌های دکترگرام</string>
     <string name="DrGramFavEmpty">هنوز چیزی ذخیره نکردی. روی یک پیام نگه دار و «افزودن به برگزیده‌ها» را بزن.</string>
     <string name="DrGramFavRowHint">برای حذف، انگشتت را نگه دار</string>
     <string name="DrGramFavAdd">افزودن به برگزیده‌ها</string>
@@ -412,7 +412,7 @@
     <string name="DrGramMsgEdited">ویرایش‌شده</string>
     <string name="DrGramShowFull">نمایش کامل پیام</string>
     <string name="DrGramCopyId">کپی شناسه</string>
-    <string name="DrGramIdSection">ردیاب شناسه لوکس گرام</string>
+    <string name="DrGramIdSection">ردیاب شناسه دکترگرام</string>
     <string name="DrGramIdHint">هر پروفایلی را با شناسه عددی، @نام‌کاربری یا لینک t.me باز کن.</string>
     <string name="DrGramIdAction">جستجو با شناسه</string>
     <string name="DrGramIdInputHint">شناسه عددی، @نام‌کاربری یا لینک t.me</string>
@@ -485,7 +485,7 @@
     <string name="DrGramButlerFreed">%1$s آزاد شد</string>
     <string name="DrGramButlerRealNames">نگه داشتن نام اصلی فایل‌ها</string>
     <string name="DrGramButlerRealNamesHint">هنگام ذخیره رسانه از گپ‌ها نام اصلی فایل ترجیح داده شود (برای ذخیره‌های جدید).</string>
-    <string name="DrGramButlerPath">محل نگهداری رسانه‌های لوکس‌گرام</string>
+    <string name="DrGramButlerPath">محل نگهداری رسانه‌های دکترگرام</string>
     <string name="DrGramButlerCopied">مسیر کپی شد</string>
     <string name="DrGramButlerImages">کش تصاویر</string>
     <string name="DrGramButlerVideos">کش ویدیوها</string>
@@ -514,8 +514,8 @@
     <string name="DrGramTagsClearText">کل مجموعه هشتگ‌ها از این دستگاه پاک می‌شود.</string>
     <string name="DrGramTagsUsedCount">%1$d بار استفاده شده</string>
     <string name="DrGramTagsFromSearch">از تاریخچه جست‌وجو</string>
-    <string name="DrGramSettingsCenter">مرکز کنترل لوکس گرام</string>
-    <string name="DrGramSettingsCenterHint">همه‌ی قابلیت‌های لوکس گرام در یک جا</string>
+    <string name="DrGramSettingsCenter">مرکز کنترل دکترگرام</string>
+    <string name="DrGramSettingsCenterHint">همه‌ی قابلیت‌های دکترگرام در یک جا</string>
     <string name="DrGramSettingsCenterOpen">باز کردن مرکز کنترل</string>
     <string name="DrGramSetGeneral">همگانی</string>
     <string name="DrGramSetGeneralHint">پروفایل، ظاهر و زبان</string>
@@ -523,7 +523,7 @@
     <string name="DrGramSetAppearance">ظاهر و تم‌ها</string>
     <string name="DrGramSetLanguage">زبان</string>
     <string name="DrGramSetChat">حال‌وهوای گفتگو</string>
-    <string name="DrGramSetChatHint">لمس‌های اختصاصی لوکس گرام داخل گفتگوها</string>
+    <string name="DrGramSetChatHint">لمس‌های اختصاصی دکترگرام داخل گفتگوها</string>
     <string name="DrGramSetGoldChats">رگه‌های طلایی در گفتگوها</string>
     <string name="DrGramSetSparks">جرقه‌ها هنگام ارسال</string>
     <string name="DrGramSetGlass">سطوح شیشه‌ای</string>
@@ -587,12 +587,12 @@
     <!-- DrGram Fix 13: brand-critical keys. These resolve from this packaged file
          only — cloud language packs cannot override them
          (see LocaleController.isBrandProtectedKey). -->
-    <string name="TelegramFeatures">امکانات لوکس گرام</string>
-    <string name="TelegramVersion">لوکس گرام برای اندروید %1$s</string>
-    <string name="TelegramFAQ">پرسش‌های متداول لوکس گرام</string>
-    <string name="SecretChatName">لوکس گرام</string>
-    <string name="NotificationHiddenName">لوکس گرام</string>
-    <string name="NotificationHiddenChatName">لوکس گرام</string>
+    <string name="TelegramFeatures">امکانات دکترگرام</string>
+    <string name="TelegramVersion">دکترگرام برای اندروید %1$s</string>
+    <string name="TelegramFAQ">پرسش‌های متداول دکترگرام</string>
+    <string name="SecretChatName">دکترگرام</string>
+    <string name="NotificationHiddenName">دکترگرام</string>
+    <string name="NotificationHiddenChatName">دکترگرام</string>
     <string name="DrGramSetMembersBar">نوار اعضای گروه</string>
     <string name="DrGramSetJalaliDates">تاریخ خورشیدی</string>
 
@@ -640,7 +640,7 @@
 
     <!-- DrGram Fix 27 -->
     <string name="DrGramCCFallback">مرکز کنترل باز نشد (%1$s)</string>
-    <string name="DrGramCCFallbackText">مرکز کنترل به خطای غیرمنتظره‌ای خورد. دوباره تلاش کنید — اگر تکرار شد، همین پیام را برای تیم لوکس‌گرام بفرستید.</string>
+    <string name="DrGramCCFallbackText">مرکز کنترل به خطای غیرمنتظره‌ای خورد. دوباره تلاش کنید — اگر تکرار شد، همین پیام را برای تیم دکترگرام بفرستید.</string>
     <string name="DrGramSendCrash">ارسال آخرین کرش به پشتیبانی</string>
     <string name="DrGramNoCrash">کرشی ثبت نشده است</string>
     <!-- DrGram Fix 57: camera GL shader diagnostics -->
@@ -691,15 +691,15 @@
     <string name="DrGramSetThemeGoldDesc">لوکسِ سیاه و طلایی</string>
     <string name="DrGramSetThemeRedDesc">رمانتیکِ سیاه و قرمز</string>
     <string name="DrGramGalleryOpen">باز کردن گالری ظاهر</string>
-    <string name="DrGramGalleryBrand">تم‌های امضای لوکس‌گرام</string>
-    <string name="DrGramGalleryBrandHint">دو پالت دست‌ساز لوکس‌گرام با شدت رنگ قابل تنظیم، به‌همراه مجموعه ویژه شیک در ادامه.</string>
+    <string name="DrGramGalleryBrand">تم‌های امضای دکترگرام</string>
+    <string name="DrGramGalleryBrandHint">دو پالت دست‌ساز دکترگرام با شدت رنگ قابل تنظیم، به‌همراه مجموعه ویژه شیک در ادامه.</string>
     <string name="DrGramGalleryCurated">پوسته‌های ویژه</string>
     <string name="DrGramGalleryCuratedHint">پوسته‌های شیک گردآوری‌شده از جامعه تلگرام.</string>
     <string name="DrGramGalleryApplied">پوسته اعمال شد</string>
     <string name="DrGramGalleryActive">فعال</string>
     <string name="DrGramGalleryApplyFailed">اعمال این پوسته ممکن نشد</string>
-    <string name="DrGramGalleryBackToBrand">بازگشت به تم‌های لوکس‌گرام</string>
-    <string name="DrGramGalleryBackHint">کنار گذاشتن پوسته انتخابی و بازگشت به نمای اصلی لوکس‌گرام</string>
+    <string name="DrGramGalleryBackToBrand">بازگشت به تم‌های دکترگرام</string>
+    <string name="DrGramGalleryBackHint">کنار گذاشتن پوسته انتخابی و بازگشت به نمای اصلی دکترگرام</string>
     <string name="DrGramThemeNameAmoled">شب خالص</string>
     <string name="DrGramThemeNameIndigo">نیلی</string>
     <string name="DrGramThemeNameSoftDark">تاریک لطیف</string>
@@ -762,10 +762,10 @@
 
     <!-- DrGram Fix 36: Encrypted Backup (Fix 37: Persian) -->
     <string name="DrGramBackupSectionTitle">بکاپ رمزنگاری‌شده</string>
-    <string name="DrGramBackupSectionHint">همه‌ی تنظیمات لوکس گرام در یک فایل رمزنگاری‌شده‌ی AES-GCM.</string>
+    <string name="DrGramBackupSectionHint">همه‌ی تنظیمات دکترگرام در یک فایل رمزنگاری‌شده‌ی AES-GCM.</string>
     <string name="DrGramBackupOpen">باز کردن بکاپ رمزنگاری‌شده</string>
     <string name="DrGramBackupTitle">بکاپ رمزنگاری‌شده</string>
-    <string name="DrGramBackupHero">همه‌ی تنظیمات ابزارهای لوکس گرام — منشی، پاسخ هوشمند، ضد حذف، خزانه، استایل و بیشتر — در یک فایل رمزنگاری‌شده‌ی AES-256 با رمز اختصاصی تو.</string>
+    <string name="DrGramBackupHero">همه‌ی تنظیمات ابزارهای دکترگرام — منشی، پاسخ هوشمند، ضد حذف، خزانه، استایل و بیشتر — در یک فایل رمزنگاری‌شده‌ی AES-256 با رمز اختصاصی تو.</string>
     <string name="DrGramBackupActions">اقدامات</string>
     <string name="DrGramBackupCreate">ساخت بکاپ رمزنگاری‌شده</string>
     <string name="DrGramBackupRestoreHint">برای بازگردانی روی یکی از فایل‌های زیر بزن</string>
@@ -815,7 +815,7 @@
     <string name="DrGramSmartCmdDesc">توضیحات گروه + متن</string>
     <string name="DrGramSmartCityTitle">شهر آب و هوا</string>
     <string name="DrGramSmartCityHint">نام شهرت را بنویس، مثلاً تهران یا مشهد</string>
-    <string name="DrGramSmartNeedArg">متن دستور را بعد از دستور بنویس، مثل «اسم گروه: لوکس‌گرام»</string>
+    <string name="DrGramSmartNeedArg">متن دستور را بعد از دستور بنویس، مثل «اسم گروه: دکترگرام»</string>
     <string name="DrGramBeautifyLight">کم</string>
     <string name="DrGramBeautifyMedium">متوسط</string>
     <string name="DrGramBeautifyStrong">زیاد</string>
@@ -5086,7 +5086,7 @@
 <string name="login_with_telegram">ورود با حساب کاربری تلگرام</string>
 <string name="telegram_passport">پاسپورت تلگرام</string>
 
-    <!-- DrGram Fix 66: hand-written fa for newer login keys + LuxGram intro -->
+    <!-- DrGram Fix 66: hand-written fa for newer login keys + DrGram intro -->
     <string name="AddEmailSubtitle">لطفاً برای محافظت از اکانتت، آدرس ایمیل معتبرت رو وارد کن.</string>
     <string name="AddEmailTitle">افزودن ایمیل</string>
     <string name="BackEnteringCode">&lt; بازگشت به واردکردن کد</string>

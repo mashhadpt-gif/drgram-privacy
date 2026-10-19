@@ -2,7 +2,7 @@
  * This is the source code of DrGram, a Telegram fork.
  * It is licensed under GNU GPL v. 2 or later.
  *
- * DrGram Encrypted Backup (Fix 36) — packs every LuxGram drgram_* preference
+ * DrGram Encrypted Backup (Fix 36) — packs every DrGram drgram_* preference
  * file of this account (tools, smart reply, anti-delete, vault lists, style,
  * guard, favorites metadata...) into ONE AES-GCM encrypted .luxbak file.
  * The key is derived from a user password (PBKDF2, 150k rounds); the file is

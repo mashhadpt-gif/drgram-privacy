@@ -4,7 +4,7 @@
  *
  * DrGram Profile Card (Fix 36) — renders a luxury portrait card (1080x1350)
  * of the current user: onyx gradient, gold hairline frame, avatar, name,
- * username, id and a LuxGram wordmark. Saved as PNG in the app's external
+ * username, id and a DrGram wordmark. Saved as PNG in the app's external
  * files dir and offered to the system share sheet.
  */
 package org.telegram.ui;

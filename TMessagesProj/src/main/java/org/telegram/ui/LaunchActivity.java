@@ -7479,7 +7479,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             Theme.ThemeInfo theme = (Theme.ThemeInfo) args[0];
             // DrGram Fix 32: the day/night switch used to activate Telegram's
             // stock theme until the next restart re-asserted the brand look.
-            // Resolve every switch to the active LuxGram palette instead.
+            // Resolve every switch to the active DrGram palette instead.
             theme = org.telegram.messenger.DrGramThemeInstaller.resolveDayNightTheme(theme);
             boolean nightTheme = (Boolean) args[1];
             int accentId = (Integer) args[3];

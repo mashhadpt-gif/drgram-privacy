@@ -336,7 +336,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
         telegramLogoView.setContentDescription(getString(R.string.AppName));
         telegramLogoView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         // DrGram Fix 31: the upstream "Telegram" wordmark image is replaced with a
-        // locale-aware LuxGram wordmark rendered at runtime. Glyphs are drawn white
+        // locale-aware DrGram wordmark rendered at runtime. Glyphs are drawn white
         // so the existing MULTIPLY color filter keeps tinting them for both themes.
         // Scrolling still collapses the header exactly as before — the brand just
         // never says "Telegram" anymore.
@@ -1155,7 +1155,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
     }
 
     /**
-     * DrGram Fix 31: renders the LuxGram wordmark ("LuxGram" / "لوکس گرام" — the
+     * DrGram Fix 31: renders the DrGram wordmark ("DrGram" / "دکترگرام" — the
      * localized AppName) into a bitmap for the chat-list header. White glyphs on a
      * transparent background, sized for the 90x22dp logo slot.
      */
@@ -1651,7 +1651,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
                     }
                     if (user.id == 777000) {
                         // DrGram Fix 19: brand the official service story cell
-                        name = "fa".equals(LocaleController.getInstance().getCurrentLocale().getLanguage()) ? "لوکس‌گرام" : "LuxGram";
+                        name = "fa".equals(LocaleController.getInstance().getCurrentLocale().getLanguage()) ? "دکترگرام" : "DrGram";
                     }
                     if (user.verified) {
                         if (verifiedDrawable == null) {

@@ -110,6 +110,7 @@
         tools:replace="android:supportsRtl"
         android:usesCleartextTraffic="false"
         android:enableOnBackInvokedCallback="true"
+        android:label="@string/AppName"
     >
         <!-- Cleartext HTTP is disabled for release builds. HTTPS links remain supported. -->
 
@@ -642,7 +643,7 @@
 
         <receiver android:name=".CustomTabsCopyReceiver" android:enabled="true"/>
 
-        <!-- DrGram Fix 36: LuxGram quick tiles + home-screen widget -->
+        <!-- DrGram Fix 36: quick tiles + home-screen widget -->
         <service
             android:name=".messenger.DrGramSecretaryTile"
             android:icon="@mipmap/ic_launcher"
