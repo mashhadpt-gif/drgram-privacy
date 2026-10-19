@@ -448,6 +448,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         Theme.createCommonChatResources();
         Theme.createDialogsResources(this);
+        org.telegram.messenger.DrGramScreenshotLock.apply(getWindow()); // DrGram Fix 79: optional app-wide screenshot lock
         AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.DrGramAutoProxy.onAppOpen(), 6500); // DrGram Fix 26: auto proxy
         AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.DrGramChannelPromo.maybeShow(this), 9000); // DrGram Fix 68: official channel invite (explicit consent only)
         if (SharedConfig.passcodeHash.length() != 0 && SharedConfig.appLocked) {

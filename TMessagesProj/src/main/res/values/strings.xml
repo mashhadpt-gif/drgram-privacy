@@ -11852,4 +11852,26 @@
 
     <!-- DrGram Fix 77: dating button opens the @HaQiQatRobot Truth-or-Dare game bot -->
     <string name="DrGramDatingTitle">Dating</string>
+    <!-- DrGram Fix 79: the difference pack — quick tools only DrGram has -->
+    <string name="DrGramQuickTools">Quick tools</string>
+    <string name="DrGramQuickToolsHint">One-tap helpers that only exist in DrGram</string>
+    <string name="DrGramLangQuick">Language quick switch</string>
+    <string name="DrGramLangQuickTitle">App language</string>
+    <string name="DrGramRepeatTool">Text repeater</string>
+    <string name="DrGramRepeatInput">The text to repeat</string>
+    <string name="DrGramRepeatCount">How many times? (1 to 200)</string>
+    <string name="DrGramRepeatResult">Repeated text</string>
+    <string name="DrGramDigitsTool">Digit converter (Persian/English)</string>
+    <string name="DrGramDigitsInput">Text that contains digits</string>
+    <string name="DrGramDigitsToFa">Convert to Persian (۱۲۳)</string>
+    <string name="DrGramDigitsToEn">Convert to English (123)</string>
+    <string name="DrGramLotteryTool">Group lottery</string>
+    <string name="DrGramLotteryHint">Participant names — one per line</string>
+    <string name="DrGramLotteryWinners">How many winners?</string>
+    <string name="DrGramLotteryResult">Winners</string>
+    <string name="DrGramLotteryEmpty">No participants found</string>
+    <string name="DrGramScreenshotLock">Screenshot lock</string>
+    <string name="DrGramAboutTool">About DrGram</string>
+    <string name="DrGramAboutBody">DrGram %s — the messenger that stands apart from every other Telegram fork.\n\nBuilt-in exclusives: smart secretary, online guard, vault, anti-delete, style gallery, Hafez fortune, Zabanavis styles, quick tools and 40+ more.\n\nPackage: com.drgram.messenger</string>
+    <string name="DrGramCopied">Copied</string>
 </resources>

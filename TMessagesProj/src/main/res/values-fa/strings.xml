@@ -5228,4 +5228,26 @@
 
     <!-- DrGram Fix 77: dating button opens the @HaQiQatRobot Truth-or-Dare game bot -->
     <string name="DrGramDatingTitle">دوستیابی</string>
+    <!-- DrGram Fix 79: پک تفاوت — ابزارهای سریعی که فقط در دکترگرام هست -->
+    <string name="DrGramQuickTools">ابزارهای سریع</string>
+    <string name="DrGramQuickToolsHint">کمک‌یارهای تک‌ضربتی که فقط در دکترگرام وجود دارد</string>
+    <string name="DrGramLangQuick">سوییچ سریع زبان</string>
+    <string name="DrGramLangQuickTitle">زبان برنامه</string>
+    <string name="DrGramRepeatTool">تکرار متن</string>
+    <string name="DrGramRepeatInput">متنی که باید تکرار شود</string>
+    <string name="DrGramRepeatCount">چند بار؟ (۱ تا ۲۰۰)</string>
+    <string name="DrGramRepeatResult">متن تکرارشده</string>
+    <string name="DrGramDigitsTool">تبدیل اعداد (فارسی/انگلیسی)</string>
+    <string name="DrGramDigitsInput">متنی که اعداد دارد</string>
+    <string name="DrGramDigitsToFa">به فارسی ۱۲۳</string>
+    <string name="DrGramDigitsToEn">به انگلیسی 123</string>
+    <string name="DrGramLotteryTool">قرعه‌کشی گروه</string>
+    <string name="DrGramLotteryHint">نام شرکت‌کننده‌ها — هر خط یک نام</string>
+    <string name="DrGramLotteryWinners">چند برنده؟</string>
+    <string name="DrGramLotteryResult">برنده‌ها</string>
+    <string name="DrGramLotteryEmpty">شرکت‌کننده‌ای پیدا نشد</string>
+    <string name="DrGramScreenshotLock">قفل اسکرین‌شات</string>
+    <string name="DrGramAboutTool">درباره دکترگرام</string>
+    <string name="DrGramAboutBody">دکترگرام %s — پیام‌رسانی که با همه تلگرام‌های دیگر فرق دارد.\n\nامکانات انحصاری داخلی: منشی هوشمند، نگهبان آنلاین، گاوصندوق، ضدحذف، گالری ظاهر، فال حافظ، زیانویس، ابزارهای سریع و بیش از ۴۰ امکان دیگر.\n\nبسته: com.drgram.messenger</string>
+    <string name="DrGramCopied">کپی شد</string>
 </resources>

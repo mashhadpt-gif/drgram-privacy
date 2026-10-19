@@ -40,6 +40,8 @@ import org.telegram.messenger.DrGramOnlineGuard;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.DrGramSecretary;
 import org.telegram.messenger.DrGramVault;
+import org.telegram.messenger.DrGramScreenshotLock; // DrGram Fix 79
+import org.telegram.messenger.BuildVars; // DrGram Fix 79
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -154,6 +156,7 @@ public class DrGramToolsActivity extends BaseFragment {
         buildButlerSection(context);
         buildTagsSection(context);
         buildClogSection(context);
+        buildQuickToolsSection(context); // DrGram Fix 79: the difference pack
 
         closeGlassCard(); // DrGram Fix 34: the last section's panel closes before the brand footer
         try {
@@ -1449,4 +1452,341 @@ public class DrGramToolsActivity extends BaseFragment {
             FileLog.e(t);
         }
     }
+
+    //region Quick tools (DrGram Fix 79 — the difference pack)
+
+    /**
+     * DrGram Fix 79: the Quick tools section — one-tap helpers that only
+     * DrGram ships: offline language quick switch, text repeater, Persian
+     * <-> English digit converter, group lottery, screenshot lock and the
+     * DrGram identity card. Everything is local, guarded, and instant.
+     */
+    private void buildQuickToolsSection(Context context) {
+        addHeader(context, LocaleController.getString(R.string.DrGramQuickTools),
+                LocaleController.getString(R.string.DrGramQuickToolsHint));
+        // One tap -> instant Persian/English switch. Both languages ship as
+        // built-in locale packs (Fix 67), so no network is ever needed.
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramLangQuick), v -> showQuickLanguageDialog()));
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramRepeatTool), v -> showRepeatDialog()));
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramDigitsTool), v -> showDigitsDialog()));
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramLotteryTool), v -> showLotteryDialog()));
+        // Screenshot lock: FLAG_SECURE on the main window blocks screenshots,
+        // screen recording and blurs the app-switcher preview, system-wide.
+        Switch lockSwitch = new Switch(context);
+        lockSwitch.setChecked(DrGramScreenshotLock.isEnabled(), false);
+        LinearLayout lockRow = makeRow(context, LocaleController.getString(R.string.DrGramScreenshotLock), lockSwitch);
+        lockRow.setOnClickListener(v -> {
+            boolean newState = !DrGramScreenshotLock.isEnabled();
+            DrGramScreenshotLock.setEnabled(newState);
+            lockSwitch.setChecked(newState, false);
+            if (getParentActivity() != null) {
+                DrGramScreenshotLock.apply(getParentActivity().getWindow());
+            }
+        });
+        addSectionRow(lockRow);
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramAboutTool), v -> showAboutDialog()));
+    }
+
+    /** DrGram Fix 79: shared luxury input — guaranteed ivory text on dark glass dialogs. */
+    private EditText drgramQuickInput(Context context, int inputType) {
+        EditText input = new EditText(context);
+        input.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        input.setInputType(inputType);
+        int pad = AndroidUtilities.dp(20);
+        input.setPadding(pad, pad / 2, pad, pad / 2);
+        input.setTextColor(0xFFF7F0DF);
+        input.setHintTextColor(0x99B9AD95);
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setCornerRadius(AndroidUtilities.dp(12));
+        bg.setColor(0x1AFFFFFF);
+        bg.setStroke(AndroidUtilities.dp(1), 0x59F4D27A);
+        input.setBackground(bg);
+        return input;
+    }
+
+    /** DrGram Fix 79: shared result dialog — selectable body + one-tap copy. */
+    private void drgramShowResult(String title, String body) {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(title);
+        TextView out = new TextView(context);
+        out.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        out.setTextColor(0xFFF1EADA);
+        out.setText(body);
+        out.setTextIsSelectable(true);
+        int pad = AndroidUtilities.dp(20);
+        out.setPadding(pad, pad / 2, pad, pad / 2);
+        FrameLayout container = new FrameLayout(context);
+        container.addView(out, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 8, 8, 8, 0));
+        builder.setView(container);
+        builder.setPositiveButton(LocaleController.getString(R.string.Copy), (dialog, which) -> {
+            AndroidUtilities.addToClipboard(body);
+            try {
+                android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramCopied), android.widget.Toast.LENGTH_SHORT).show();
+            } catch (Throwable t) {
+                FileLog.e(t);
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    /** DrGram Fix 79: clamped digit-aware count parser (accepts ۱۲ too). */
+    private static int drgramParseCount(String raw, int min, int max, int def) {
+        try {
+            int v = Integer.parseInt(drgramDigitsToEn(raw == null ? "" : raw.trim()));
+            return Math.max(min, Math.min(max, v));
+        } catch (Exception e) {
+            return def;
+        }
+    }
+
+    private void showQuickLanguageDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        LocaleController.LocaleInfo current = LocaleController.getInstance().getCurrentLocaleInfo();
+        String currentCode = current == null ? "en" : current.pluralLangCode;
+
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        int pad = AndroidUtilities.dp(8);
+        box.setPadding(pad, 0, pad, 0);
+
+        final AlertDialog[] ref = new AlertDialog[1];
+        box.addView(drgramLangRow(context, "فارسی (Persian)", "fa", currentCode, ref));
+        box.addView(drgramLangRow(context, "English (انگلیسی)", "en", currentCode, ref));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramLangQuickTitle));
+        FrameLayout container = new FrameLayout(context);
+        container.addView(box, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 8, 8, 8, 0));
+        builder.setView(container);
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        ref[0] = builder.show();
+    }
+
+    private TextView drgramLangRow(Context context, String title, String code, String currentCode, AlertDialog[] ref) {
+        TextView cell = new TextView(context);
+        cell.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        cell.setTextColor("fa".equals(code) ? 0xFFF4D27A : 0xFFF1EADA);
+        cell.setText(code.equals(currentCode) ? "✓  " + title : title);
+        int pad = AndroidUtilities.dp(16);
+        cell.setPadding(pad, pad, pad, pad);
+        cell.setOnClickListener(v -> {
+            try {
+                if (!code.equals(currentCode)) {
+                    LocaleController.LocaleInfo info = LocaleController.getInstance().getLanguageFromDict(code);
+                    if (info != null) {
+                        LocaleController.getInstance().applyLanguage(info, true, false, false, true, currentAccount, null);
+                    }
+                }
+            } catch (Throwable t) {
+                FileLog.e(t); // DrGram Fix 29 rule: the tools page never crashes
+            }
+            if (ref[0] != null) {
+                ref[0].dismiss();
+            }
+        });
+        return cell;
+    }
+
+    private void showRepeatDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramRepeatTool));
+
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        EditText text = drgramQuickInput(context, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        text.setHint(LocaleController.getString(R.string.DrGramRepeatInput));
+        text.setMinLines(2);
+        EditText count = drgramQuickInput(context, InputType.TYPE_CLASS_NUMBER);
+        count.setHint(LocaleController.getString(R.string.DrGramRepeatCount));
+        int gap = AndroidUtilities.dp(10);
+        LinearLayout.LayoutParams p1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        p1.setMargins(0, gap, 0, 0);
+        LinearLayout.LayoutParams p2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        p2.setMargins(0, gap, 0, 0);
+        box.addView(text, p1);
+        box.addView(count, p2);
+        FrameLayout container = new FrameLayout(context);
+        container.addView(box, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 8, 8, 8, 0));
+        builder.setView(container);
+
+        builder.setPositiveButton(LocaleController.getString(R.string.Done), (dialog, which) -> {
+            String src = text.getText().toString().trim();
+            int n = drgramParseCount(count.getText().toString(), 1, 200, 2);
+            if (src.length() == 0) {
+                return;
+            }
+            StringBuilder sb = new StringBuilder();
+            int total = 0;
+            for (int i = 0; i < n; i++) {
+                if (i > 0) {
+                    sb.append('\n');
+                    total++;
+                }
+                sb.append(src);
+                total += src.length();
+                if (total > 50000) {
+                    break; // clipboard/binder safety cap
+                }
+            }
+            drgramShowResult(LocaleController.getString(R.string.DrGramRepeatResult), sb.toString());
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    private void showDigitsDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramDigitsTool));
+
+        EditText input = drgramQuickInput(context, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        input.setHint(LocaleController.getString(R.string.DrGramDigitsInput));
+        input.setMinLines(2);
+        FrameLayout container = new FrameLayout(context);
+        container.addView(input, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 8, 8, 8, 0));
+        builder.setView(container);
+
+        builder.setPositiveButton(LocaleController.getString(R.string.DrGramDigitsToEn), (dialog, which) ->
+                drgramShowResult(LocaleController.getString(R.string.DrGramDigitsTool), drgramDigitsToEn(input.getText().toString())));
+        builder.setNegativeButton(LocaleController.getString(R.string.DrGramDigitsToFa), (dialog, which) ->
+                drgramShowResult(LocaleController.getString(R.string.DrGramDigitsTool), drgramDigitsToFa(input.getText().toString())));
+        builder.setNeutralButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    /** Persian ۰-۹ and Arabic ٠-٩ -> English 0-9. */
+    private static String drgramDigitsToEn(String s) {
+        if (s == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= '\u06F0' && c <= '\u06F9') {
+                c = (char) ('0' + (c - '\u06F0'));
+            } else if (c >= '\u0660' && c <= '\u0669') {
+                c = (char) ('0' + (c - '\u0660'));
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    /** English 0-9 -> Persian ۰-۹. */
+    private static String drgramDigitsToFa(String s) {
+        if (s == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= '0' && c <= '9') {
+                c = (char) ('\u06F0' + (c - '0'));
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    private void showLotteryDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramLotteryTool));
+
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        EditText names = drgramQuickInput(context, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        names.setHint(LocaleController.getString(R.string.DrGramLotteryHint));
+        names.setMinLines(4);
+        EditText winners = drgramQuickInput(context, InputType.TYPE_CLASS_NUMBER);
+        winners.setHint(LocaleController.getString(R.string.DrGramLotteryWinners));
+        int gap = AndroidUtilities.dp(10);
+        LinearLayout.LayoutParams p1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        p1.setMargins(0, gap, 0, 0);
+        LinearLayout.LayoutParams p2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        p2.setMargins(0, gap, 0, 0);
+        box.addView(names, p1);
+        box.addView(winners, p2);
+        FrameLayout container = new FrameLayout(context);
+        container.addView(box, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 8, 8, 8, 0));
+        builder.setView(container);
+
+        builder.setPositiveButton(LocaleController.getString(R.string.Done), (dialog, which) -> {
+            ArrayList<String> pool = new ArrayList<>();
+            for (String line : names.getText().toString().split("\n")) {
+                String t = line.trim();
+                if (t.length() > 0 && !pool.contains(t)) {
+                    pool.add(t);
+                }
+            }
+            if (pool.isEmpty()) {
+                try {
+                    android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramLotteryEmpty), android.widget.Toast.LENGTH_SHORT).show();
+                } catch (Throwable t) {
+                    FileLog.e(t);
+                }
+                return;
+            }
+            int n = drgramParseCount(winners.getText().toString(), 1, Math.min(100, pool.size()), 1);
+            java.util.Collections.shuffle(pool, new java.util.Random());
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < n && i < pool.size(); i++) {
+                sb.append(i + 1).append(". ").append(pool.get(i));
+                if (i < n - 1) {
+                    sb.append('\n');
+                }
+            }
+            drgramShowResult(LocaleController.getString(R.string.DrGramLotteryResult), sb.toString());
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    private void showAboutDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramAboutTool));
+        String body;
+        try {
+            body = LocaleController.formatString("DrGramAboutBody", R.string.DrGramAboutBody, BuildVars.BUILD_VERSION_STRING);
+        } catch (Throwable t) {
+            body = "DrGram " + BuildVars.BUILD_VERSION_STRING; // never crash the tools page
+            FileLog.e(t);
+        }
+        builder.setMessage(body);
+        builder.setPositiveButton(LocaleController.getString(R.string.Copy), (dialog, which) -> {
+            AndroidUtilities.addToClipboard(body);
+            try {
+                android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramCopied), android.widget.Toast.LENGTH_SHORT).show();
+            } catch (Throwable t) {
+                FileLog.e(t);
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    //endregion
+
 }
