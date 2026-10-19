@@ -5226,36 +5226,6 @@
     <string name="DrGramChannelPromoJoined">به کانال رسمی خوش آمدید!</string>
     <string name="DrGramChannelPromoFail">عضویت انجام نشد؛ کمی بعد دوباره تلاش کنید.</string>
 
-    <!-- DrGram Fix 69: dating / people nearby cards -->
+    <!-- DrGram Fix 77: dating button opens the @HaQiQatRobot Truth-or-Dare game bot -->
     <string name="DrGramDatingTitle">دوستیابی</string>
-    <string name="DrGramDatingPerm">برای نمایش اطرافیان، لوکس گرام به مجوز موقعیت مکانی نیاز دارد. این مجوز فقط یک‌بار برای یافتن افراد نزدیک استفاده می‌شود و هیچ چیزی ذخیره نمی‌شود.</string>
-    <string name="DrGramDatingPermBtn">اجازه دسترسی به موقعیت</string>
-    <string name="DrGramDatingConsent">با ادامه دادن، موقعیت شما برای مدتی کوتاه (حدود یک ساعت) با تلگرام به اشتراک گذاشته می‌شود تا اطرافیان هم شما را ببینند. هر زمان بخواهید می‌توانید با خاموش کردن موقعیت، متوقفش کنید.</string>
-    <string name="DrGramDatingOpen">نمایش اطرافیان</string>
-    <string name="DrGramDatingLoading">در حال جستجوی اطرافیان…</string>
-    <string name="DrGramDatingEmpty">فعلاً کسی نزدیک شما نیست. کمی بعد دوباره امتحان کنید.</string>
-    <string name="DrGramDatingRetry">تلاش دوباره</string>
-    <string name="DrGramDatingNoLocation">موقعیت در دسترس نیست — GPS را روشن کنید و دوباره تلاش کنید.</string>
-    <string name="DrGramDatingFail">جستجو ناموفق بود؛ دوباره تلاش کنید.</string>
-    <string name="DrGramDatingRejected">سرور تلگرام درخواست موقعیت را نپذیرفت. لوکیشن گوشی را روشن کنید، یک‌بار برنامه نقشه را باز کنید تا موقعیت به‌روز شود، سپس دوباره تلاش کنید.</string>
-    <string name="DrGramDatingNeedPhoto">برای دوستیابی، تلگرام عکس پروفایل لازم دارد. یک عکس برای پروفایل حساب خود بگذارید و دوباره امتحان کنید.</string>
-    <string name="DrGramDatingPhotoPrivacy">حریم خصوصی عکس پروفایل شما دوستیابی را مسدود کرده است. در تنظیمات ← حریم خصوصی و امنیت ← عکس پروفایل، آن را روی «همه» بگذارید و دوباره امتحان کنید.</string>
-    <string name="DrGramDatingFound">%d نفر نزدیک شما</string>
-    <string name="DrGramDatingAge">سن</string>
-    <string name="DrGramDatingYears">%d ساله</string>
-    <string name="DrGramDatingSeen">آخرین بازدید</string>
-    <string name="DrGramDatingBio">بیوگرافی</string>
-    <string name="DrGramDatingMessage">پیام دادن</string>
-    <string name="DrGramDatingRadarHint">رادار زندهٔ افراد اطراف موقعیت شما در تلگرام — از هر برنامه‌ای که استفاده می‌کنند، نه فقط لوکس گرام. حلقه‌ها: ۱ / ۱۰ / ۱۰۰ کیلومتر.</string>
-    <string name="DrGramDatingRadarEmpty">رادار خالی است</string>
-    <string name="DrGramDatingVisibleUntil">موقعیت شما تا حدود ۱ ساعت برای افراد نزدیک قابل مشاهده می‌ماند.</string>
-    <string name="DrGramDatingLocating">در حال قفل روی موقعیت شما…</string>
-    <string name="DrGramDatingGpsOff">موقعیت گوشی خاموش است. از تنظیمات سریع، GPS را روشن کنید و دوباره امتحان کنید.</string>
-    <string name="DrGramDatingWeakFix">هنوز موقعیت دقیقی گرفته نشد. کمی در جای باز بروید یا یک‌بار برنامه نقشه را باز کنید، سپس دوباره امتحان کنید.</string>
-    <string name="DrGramDatingRadiusAll">همه</string>
-    <string name="DrGramDatingRadiusKm1">۱ کیلومتر</string>
-    <string name="DrGramDatingRadiusKm5">۵ کیلومتر</string>
-    <string name="DrGramDatingRadiusKm25">۲۵ کیلومتر</string>
-    <string name="DrGramDatingRadiusKm100">۱۰۰ کیلومتر</string>
-    <string name="DrGramDatingEmptyFiltered">در این شعاع کسی نیست. یک شعاع بزرگ‌تر انتخاب کنید.</string>
 </resources>

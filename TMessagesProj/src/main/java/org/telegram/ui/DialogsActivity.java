@@ -13860,7 +13860,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         });
         io.addGap();
         io.add(R.drawable.drgram_explore, getString(R.string.Explore), () -> presentFragment(new DrGramExploreActivity()));
-        io.add(R.drawable.drgram_dating, getString(R.string.DrGramDatingTitle), () -> presentFragment(new DrGramDatingActivity())); // DrGram Fix 72: clean 24dp pin+heart (map_pin3 was 72dp and rendered huge)
+        io.add(R.drawable.drgram_dating, getString(R.string.DrGramDatingTitle), () -> getMessagesController().openByUserName("HaQiQatRobot", DialogsActivity.this, 0)); // DrGram Fix 77: button -> @HaQiQatRobot (Truth-or-Dare game bot); People-Nearby machinery removed — Telegram killed the nearby servers Sep 2024
         io.add(R.drawable.msg_secret, getString(R.string.DrGramToolsDrawer), () -> presentFragment(new DrGramToolsActivity()));
         io.add(R.drawable.outline_groups_24, getString(R.string.NewGroup), () -> {
             Bundle args = new Bundle();
