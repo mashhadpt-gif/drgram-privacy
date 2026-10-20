@@ -39,7 +39,6 @@ android {
 
     defaultConfig.applicationId = APP_PACKAGE
 
-    sourceSets.main.jniLibs.srcDirs = ['../TMessagesProj/jni/']
 
     lintOptions {
         disable 'MissingTranslation'
@@ -83,6 +82,12 @@ android {
                 keyAlias RELEASE_KEY_ALIAS
                 keyPassword RELEASE_KEY_PASSWORD
             }
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
 
@@ -154,23 +159,6 @@ android {
             }
             buildConfigField "boolean", "BUNDLE", "true"
         }
-        bundleAfat_SDK23 {
-            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [luxgramPlayMode: 'true']
-            ndk {
-                GRAM_ABIS.each { abiFilters(it) }
-            }
-            sourceSets.debug {
-                manifest.srcFile '../TMessagesProj/config/debug/AndroidManifest_SDK23.xml'
-            }
-            sourceSets.release {
-                manifest.srcFile '../TMessagesProj/config/release/AndroidManifest_SDK23.xml'
-            }
-            minSdkVersion 23
-            ext {
-                abiVersionCode = 2
-            }
-            buildConfigField "boolean", "BUNDLE", "true"
-        }
         afat {
             manifestPlaceholders = (manifestPlaceholders ?: [:]) + [luxgramPlayMode: 'false']
             ndk {
@@ -209,7 +197,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 36
         versionName APP_VERSION_NAME
         ndkVersion "27.2.12479018"
