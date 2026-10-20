@@ -289,9 +289,105 @@ public class DrGramSmartReply {
     //region PV module — incoming auto answers
 
     /** Called from NotificationsController.processNewMessages — never throws into the caller. */
+    /**
+     * DrGram Fix 80: execution mode. When owner-only (the secure DEFAULT),
+     * incoming messages never trigger PV commands — only the account owner
+     * firing them from their own side (onOutgoingPvCommand) can execute.
+     */
+    public boolean isOwnerOnlyPv() {
+        try {
+            return preferences.getBoolean("smart_pv_owner_only", true);
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    public void setOwnerOnlyPv(boolean value) {
+        try {
+            preferences.edit().putBoolean("smart_pv_owner_only", value).apply();
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
+    /**
+     * DrGram Fix 80: execution mode. When owner-only (the secure DEFAULT),
+     * incoming messages never trigger PV commands — only the account owner
+     * firing them from their own side (onOutgoingPvCommand) can execute.
+     */
+    public boolean isOwnerOnlyPv() {
+        try {
+            return preferences.getBoolean("smart_pv_owner_only", true);
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    public void setOwnerOnlyPv(boolean value) {
+        try {
+            preferences.edit().putBoolean("smart_pv_owner_only", value).apply();
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
+    /**
+     * DrGram Fix 80: execution mode. When owner-only (the secure DEFAULT),
+     * incoming messages never trigger PV commands — only the account owner
+     * firing them from their own side (onOutgoingPvCommand) can execute.
+     */
+    public boolean isOwnerOnlyPv() {
+        try {
+            return preferences.getBoolean("smart_pv_owner_only", true);
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    public void setOwnerOnlyPv(boolean value) {
+        try {
+            preferences.edit().putBoolean("smart_pv_owner_only", value).apply();
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
+    /**
+     * DrGram Fix 80: execution mode. When owner-only (the secure DEFAULT),
+     * incoming messages never trigger PV commands — only the account owner
+     * firing them from their own side (onOutgoingPvCommand) can execute.
+     */
+    public boolean isOwnerOnlyPv() {
+        try {
+            return preferences.getBoolean("smart_pv_owner_only", true);
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    public void setOwnerOnlyPv(boolean value) {
+        try {
+            preferences.edit().putBoolean("smart_pv_owner_only", value).apply();
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
     public void onNewMessages(ArrayList<MessageObject> messageObjects) {
         if (!isPvEnabled() || messageObjects == null || messageObjects.isEmpty()) {
             return;
+        }
+        if (isOwnerOnlyPv()) {
+            return; // DrGram Fix 80: secure default — the counterpart cannot execute commands
+        }
+        if (isOwnerOnlyPv()) {
+            return; // DrGram Fix 80: secure default — the counterpart cannot execute commands
+        }
+        if (isOwnerOnlyPv()) {
+            return; // DrGram Fix 80: secure default — the counterpart cannot execute commands
+        }
+        if (isOwnerOnlyPv()) {
+            return; // DrGram Fix 80: secure default — the counterpart cannot execute commands
         }
         for (int i = 0; i < messageObjects.size(); i++) {
             try {

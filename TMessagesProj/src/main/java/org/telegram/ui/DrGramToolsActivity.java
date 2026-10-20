@@ -157,6 +157,10 @@ public class DrGramToolsActivity extends BaseFragment {
         buildTagsSection(context);
         buildClogSection(context);
         buildQuickToolsSection(context); // DrGram Fix 79: the difference pack
+        buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
+        buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
+        buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
+        buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
 
         closeGlassCard(); // DrGram Fix 34: the last section's panel closes before the brand footer
         try {
@@ -188,10 +192,6 @@ public class DrGramToolsActivity extends BaseFragment {
         // DrGram Fix 32: style gallery — brand palettes + curated collection
         addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramStyleGallery), v ->
                 presentFragment(new DrGramStyleGalleryActivity())));
-        // DrGram Fix 57: camera GL shader diagnostics — the exact GLSL compile/link
-        // logs + GPU identity the camera records on this device (tap to view).
-        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramGlDiag), v ->
-                drgramShowGlDiag()));
     }
 
     //endregion
@@ -220,42 +220,6 @@ public class DrGramToolsActivity extends BaseFragment {
      * DrGram Fix 29: share the last recorded crash log so a bug report carries
      * the exact stack trace — no adb or logcat needed.
      */
-    /**
-     * DrGram Fix 57: show the camera's recorded GL shader diagnostics (GPU
-     * identity + exact compile/link logs) so a single screenshot of this
-     * dialog pins down any remaining shader incompatibility.
-     */
-    private void drgramShowGlDiag() {
-        try {
-            Context ctx = getParentActivity();
-            if (ctx == null) {
-                return;
-            }
-            String text;
-            try {
-                text = ctx.getSharedPreferences("drgramconf", Context.MODE_PRIVATE)
-                        .getString("gldiag", null);
-            } catch (Throwable ignore) {
-                text = null;
-            }
-            if (text == null || text.length() == 0) {
-                text = LocaleController.getString(R.string.DrGramGlDiagClean);
-            }
-            TextView tv = new TextView(ctx);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.5f);
-            tv.setTextColor(0xFFEDE7DA);
-            tv.setPadding(AndroidUtilities.dp(20), AndroidUtilities.dp(16), AndroidUtilities.dp(20), AndroidUtilities.dp(8));
-            tv.setText(text);
-            AlertDialog.Builder b = new AlertDialog.Builder(ctx);
-            b.setTitle(LocaleController.getString(R.string.DrGramGlDiag));
-            b.setView(tv);
-            b.setPositiveButton(LocaleController.getString(R.string.OK), null);
-            b.show();
-        } catch (Throwable t) {
-            FileLog.e(t);
-        }
-    }
-
     private void drgramShareLastCrash() {
         try {
             if (getParentActivity() == null) {
@@ -1786,6 +1750,128 @@ public class DrGramToolsActivity extends BaseFragment {
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         builder.show();
+    }
+
+    //endregion
+
+
+    //region Two-layer chat lock (DrGram Fix 80)
+
+    /**
+     * DrGram Fix 80: a second lock layer for chosen chats — PIN + optional
+     * fingerprint, re-armed every time the app goes to background.
+     */
+    private void buildChatLockSection(Context context) {
+        addHeader(context, LocaleController.getString(R.string.DrGramChatLockSection),
+                LocaleController.getString(R.string.DrGramChatLockHint));
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramChatLockSetPin), v -> showChatLockPinDialog()));
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramChatLockPick), v -> showChatLockPicker()));
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramChatLockCount) + ": " + DrGramChatLock.lockedCount(), v -> {
+        }));
+    }
+
+    private void showChatLockPinDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramChatLockSetPin));
+        builder.setMessage(LocaleController.getString(R.string.DrGramChatLockPinHint));
+
+        EditText input = new EditText(context);
+        input.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        int pad = AndroidUtilities.dp(20);
+        input.setPadding(pad, pad / 2, pad, pad / 2);
+        input.setTextColor(0xFFF7F0DF);
+        input.setHintTextColor(0x99B9AD95);
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setCornerRadius(AndroidUtilities.dp(12));
+        bg.setColor(0x1AFFFFFF);
+        bg.setStroke(AndroidUtilities.dp(1), 0x59F4D27A);
+        input.setBackground(bg);
+        FrameLayout container = new FrameLayout(context);
+        container.addView(input, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 8, 8, 8, 0));
+        builder.setView(container);
+
+        builder.setPositiveButton(LocaleController.getString(R.string.DrGramSave), (dialog, which) -> {
+            String pin = input.getText().toString().trim();
+            if (pin.length() < 4) {
+                android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramChatLockPinHint), android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            DrGramChatLock.setPin(pin);
+            android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramDone), android.widget.Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    private void showChatLockPicker() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        Context context = getParentActivity();
+        if (!DrGramChatLock.hasPin()) {
+            android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramChatLockNeedPin), android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle(LocaleController.getString(R.string.DrGramChatLockPick));
+
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        int pad = AndroidUtilities.dp(8);
+        box.setPadding(pad, 0, pad, 0);
+        try {
+            java.util.ArrayList<TLRPC.Dialog> all = MessagesController.getInstance(currentAccount).getAllDialogs();
+            int shown = 0;
+            for (int i = 0; i < all.size() && shown < 30; i++) {
+                TLRPC.Dialog d = all.get(i);
+                if (d == null || d.id == 0) {
+                    continue;
+                }
+                String name;
+                if (d.id > 0) {
+                    TLRPC.User u = MessagesController.getInstance(currentAccount).getUser(d.id);
+                    name = u == null ? "?" : UserObject.getUserName(u);
+                } else {
+                    TLRPC.Chat c = MessagesController.getInstance(currentAccount).getChat(-d.id);
+                    name = c == null ? "?" : c.title;
+                }
+                box.addView(makeLockToggleRow(context, d.id, name));
+                shown++;
+            }
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+        FrameLayout container = new FrameLayout(context);
+        android.widget.ScrollView sc = new android.widget.ScrollView(context);
+        sc.addView(box);
+        container.addView(sc, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(360), Gravity.TOP, 8, 8, 8, 0));
+        builder.setView(container);
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    private TextView makeLockToggleRow(Context context, final long dialogId, String name) {
+        TextView cell = new TextView(context);
+        cell.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        cell.setTextColor(0xFFF1EADA);
+        int pad = AndroidUtilities.dp(14);
+        cell.setPadding(pad, pad, pad, pad);
+        cell.setText((DrGramChatLock.isLocked(dialogId) ? "✓  " : "—  ") + name);
+        cell.setOnClickListener(v -> {
+            boolean nowLocked = !DrGramChatLock.isLocked(dialogId);
+            DrGramChatLock.toggleLocked(dialogId, nowLocked);
+            cell.setText((nowLocked ? "✓  " : "—  ") + name);
+            cell.setTextColor(nowLocked ? 0xFFF4D27A : 0xFFF1EADA);
+        });
+        if (DrGramChatLock.isLocked(dialogId)) {
+            cell.setTextColor(0xFFF4D27A);
+        }
+        return cell;
     }
 
     //endregion

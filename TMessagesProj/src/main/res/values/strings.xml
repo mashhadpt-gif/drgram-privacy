@@ -11874,4 +11874,31 @@
     <string name="DrGramAboutTool">About DrGram</string>
     <string name="DrGramAboutBody">DrGram %s — the messenger that stands apart from every other Telegram fork.\n\nBuilt-in exclusives: smart secretary, online guard, vault, anti-delete, style gallery, Hafez fortune, Zabanavis styles, quick tools and 40+ more.\n\nPackage: com.drgram.messenger</string>
     <string name="DrGramCopied">Copied</string>
+    <!-- DrGram Fix 80: security + difference upgrades -->
+    <string name="DrGramSmartOwnerOnly">Only I can run the commands</string>
+    <string name="DrGramChatLockSection">Two-layer chat lock</string>
+    <string name="DrGramChatLockHint">PIN + fingerprint for chosen chats — the lock re-arms every time the app goes to background. The other side can never unlock anything.</string>
+    <string name="DrGramChatLockSetPin">Set the lock PIN</string>
+    <string name="DrGramChatLockPinHint">PIN (at least 4 digits)</string>
+    <string name="DrGramChatLockNeedPin">First set a PIN for the lock</string>
+    <string name="DrGramChatLockPick">Choose locked chats</string>
+    <string name="DrGramChatLockCount">Locked chats</string>
+    <string name="DrGramChatLockTitle">Chat locked</string>
+    <string name="DrGramChatLockEnter">This chat is locked — enter the PIN</string>
+    <string name="DrGramChatLockWrong">Wrong PIN, try again</string>
+    <string name="DrGramChatLockFpHint">Or touch the fingerprint sensor</string>
+    <string name="DrGramChatLockClose">Close chat</string>
+    <string name="DrGramAiSummaryMenu">AI chat summary</string>
+    <string name="DrGramAiSummaryTitle">AI summary</string>
+    <string name="DrGramAiNoKey">No AI key is set — add one in the AI tools page</string>
+    <string name="DrGramAiWorking">Summarizing…</string>
+    <string name="DrGramAiSummaryEmpty">No text messages found to summarize</string>
+    <string name="DrGramCardQr">Live QR card</string>
+    <string name="DrGramQrShare">Share link</string>
+    <string name="DrGramWidgetChatTitle">DrGram quick chat</string>
+    <string name="DrGramWidgetChatOpen">Open DrGram</string>
+    <string name="DrGramWidgetReplies">Quick replies</string>
+    <string name="DrGramWidgetSaved">Saved Messages</string>
+    <string name="DrGramWidgetRadarTitle">Online radar</string>
+    <string name="DrGramWidgetRadarEmpty">Online Guard is off or nobody is watched</string>
 </resources>

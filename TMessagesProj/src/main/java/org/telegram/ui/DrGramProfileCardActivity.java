@@ -119,6 +119,8 @@ public class DrGramProfileCardActivity extends BaseFragment {
             toast(LocaleController.getString(R.string.DrGramCardRendered));
         }));
         card.addView(makeActionRow(context, LocaleController.getString(R.string.DrGramCardShare), v -> shareCard()));
+        card.addView(makeActionRow(context, LocaleController.getString(R.string.DrGramCardQr), v -> showQrCard(context))); // DrGram Fix 80
+        card.addView(makeActionRow(context, LocaleController.getString(R.string.DrGramCardQr), v -> showQrCard(context))); // DrGram Fix 80
 
         renderCard();
         return fragmentView;
@@ -363,4 +365,96 @@ public class DrGramProfileCardActivity extends BaseFragment {
             FileLog.e(t);
         }
     }
+
+    /**
+     * DrGram Fix 80: live QR business card — a golden-framed QR of the
+     * user's t.me link, generated on-device with zxing (already a build
+     * dependency). Share or copy the link straight from the dialog.
+     */
+    private void showQrCard(android.content.Context context) {
+        try {
+            org.telegram.tgnet.TLRPC.User me = UserConfig.getInstance(currentAccount).getCurrentUser();
+            if (me == null) {
+                return;
+            }
+            final String link = !android.text.TextUtils.isEmpty(me.username)
+                    ? "https://t.me/" + me.username
+                    : "tg://user?id=" + me.id;
+            org.telegram.messenger.Utilities.globalQueue.postRunnable(() -> {
+                android.graphics.Bitmap bmp = null;
+                try {
+                    com.google.zxing.qrcode.QRCodeWriter writer = new com.google.zxing.qrcode.QRCodeWriter();
+                    java.util.Hashtable<com.google.zxing.EncodeHintType, Object> hints = new java.util.Hashtable<>();
+                    hints.put(com.google.zxing.EncodeHintType.MARGIN, 1);
+                    com.google.zxing.common.BitMatrix mx = writer.encode(link, com.google.zxing.BarcodeFormat.QR_CODE, 640, 640, hints);
+                    bmp = android.graphics.Bitmap.createBitmap(640, 640, android.graphics.Bitmap.Config.ARGB_8888);
+                    for (int y = 0; y < 640; y++) {
+                        for (int x = 0; x < 640; x++) {
+                            bmp.setPixel(x, y, mx.get(x, y) ? 0xFF14120D : 0xFFFFFFFF);
+                        }
+                    }
+                } catch (Throwable t) {
+                    FileLog.e(t);
+                }
+                final android.graphics.Bitmap finalBmp = bmp;
+                AndroidUtilities.runOnUIThread(() -> {
+                    try {
+                        android.app.Activity act = getParentActivity();
+                        if (act == null) {
+                            return;
+                        }
+                        LinearLayout box = new LinearLayout(context);
+                        box.setOrientation(LinearLayout.VERTICAL);
+                        box.setGravity(Gravity.CENTER);
+                        int pad = AndroidUtilities.dp(18);
+                        box.setPadding(pad, pad, pad, pad);
+                        if (finalBmp != null) {
+                            android.widget.ImageView iv = new android.widget.ImageView(context);
+                            iv.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+                            android.graphics.drawable.GradientDrawable frame = new android.graphics.drawable.GradientDrawable();
+                            frame.setCornerRadius(AndroidUtilities.dp(18));
+                            frame.setColor(0xFFFFFFFF);
+                            frame.setStroke(AndroidUtilities.dp(3), 0xFFF4D27A);
+                            iv.setBackground(frame);
+                            int side = AndroidUtilities.dp(260);
+                            iv.setPadding(AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10));
+                            iv.setImageBitmap(finalBmp);
+                            box.addView(iv, new LinearLayout.LayoutParams(side, side));
+                        }
+                        TextView cap = new TextView(context);
+                        cap.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+                        cap.setTextColor(0xFFB9AD95);
+                        cap.setGravity(Gravity.CENTER);
+                        cap.setText(link);
+                        box.addView(cap, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                        org.telegram.ui.ActionBar.AlertDialog.Builder builder = new org.telegram.ui.ActionBar.AlertDialog.Builder(act, getResourceProvider());
+                        builder.setTitle(LocaleController.getString(R.string.DrGramCardQr));
+                        builder.setView(box);
+                        builder.setPositiveButton(LocaleController.getString(R.string.DrGramQrShare), (dialog, which) -> {
+                            try {
+                                android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                                intent.setType("text/plain");
+                                intent.putExtra(android.content.Intent.EXTRA_TEXT, link);
+                                context.startActivity(android.content.Intent.createChooser(intent, link));
+                            } catch (Throwable t) {
+                                FileLog.e(t);
+                            }
+                        });
+                        builder.setNeutralButton(LocaleController.getString(R.string.Copy), (dialog, which) -> {
+                            AndroidUtilities.addToClipboard(link);
+                            toast(LocaleController.getString(R.string.DrGramCopied));
+                        });
+                        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+                        builder.show();
+                    } catch (Throwable t) {
+                        FileLog.e(t);
+                    }
+                });
+            });
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+    }
+
 }

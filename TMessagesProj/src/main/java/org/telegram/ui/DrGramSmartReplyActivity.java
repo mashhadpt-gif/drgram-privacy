@@ -284,6 +284,11 @@ public class DrGramSmartReplyActivity extends BaseFragment {
                 LocaleController.getString(R.string.DrGramSmartGroupSwitch), engine.isGroupEnabled(), v -> {
                     DrGramSmartReply.getInstance(currentAccount).setGroupEnabled(v);
                 }));
+        // DrGram Fix 80: who may execute the PV commands — only me (default) / everyone
+        card.addView(makeSwitchRow(context,
+                LocaleController.getString(R.string.DrGramSmartOwnerOnly), engine.isOwnerOnlyPv(), v -> {
+                    DrGramSmartReply.getInstance(currentAccount).setOwnerOnlyPv(v);
+                }));
     }
 
     private void buildPvSection(Context context) {

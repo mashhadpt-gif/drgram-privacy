@@ -6730,6 +6730,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onPause() {
         super.onPause();
+        DrGramChatLock.onAppPaused(); // DrGram Fix 80: re-arm two-layer chat locks
         isResumed = false;
         pipActivityHandler.onPause();
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 4096);
@@ -6982,12 +6983,50 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
     }
 
+
+    /**
+     * DrGram Fix 80: deep opens requested by the Quick Chat home widget —
+     * jump straight to Quick Replies or to Saved Messages.
+     */
+    private void drgramHandleWidgetOpens() {
+        try {
+            Intent intent = getIntent();
+            if (intent == null) {
+                return;
+            }
+            final boolean replies = intent.getBooleanExtra("drgram_open_replies", false);
+            final boolean saved = intent.getBooleanExtra("drgram_open_saved", false);
+            if (!replies && !saved) {
+                return;
+            }
+            intent.removeExtra("drgram_open_replies");
+            intent.removeExtra("drgram_open_saved");
+            AndroidUtilities.runOnUIThread(() -> {
+                try {
+                    if (replies) {
+                        presentFragment(new QuickRepliesSettingsActivity());
+                    } else {
+                        Bundle args = new Bundle();
+                        args.putLong("user_id", UserConfig.getInstance(UserConfig.selectedAccount).clientUserId);
+                        presentFragment(new ChatActivity(args));
+                    }
+                } catch (Throwable t) {
+                    FileLog.e(t);
+                }
+            }, 240);
+        } catch (Throwable ignore) {
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         isResumed = true;
         pipActivityHandler.onResume();
         drgramHandleOpenVault(); // DrGram Fix 36: widget / quick-tile deep open
+        drgramHandleWidgetOpens(); // DrGram Fix 80: quick chat widget deep opens
+        drgramHandleWidgetOpens(); // DrGram Fix 80: quick chat widget deep opens
+        drgramHandleWidgetOpens(); // DrGram Fix 80: quick chat widget deep opens
         if (onResumeStaticCallback != null) {
             onResumeStaticCallback.run();
             onResumeStaticCallback = null;

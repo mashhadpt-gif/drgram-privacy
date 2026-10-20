@@ -5250,4 +5250,31 @@
     <string name="DrGramAboutTool">درباره دکترگرام</string>
     <string name="DrGramAboutBody">دکترگرام %s — پیام‌رسانی که با همه تلگرام‌های دیگر فرق دارد.\n\nامکانات انحصاری داخلی: منشی هوشمند، نگهبان آنلاین، گاوصندوق، ضدحذف، گالری ظاهر، فال حافظ، زیانویس، ابزارهای سریع و بیش از ۴۰ امکان دیگر.\n\nبسته: com.drgram.messenger</string>
     <string name="DrGramCopied">کپی شد</string>
+    <!-- DrGram Fix 80: امنیت + ارتقاهای تفاوت‌ساز -->
+    <string name="DrGramSmartOwnerOnly">فقط خودم بتوانم دستورها را اجرا کنم</string>
+    <string name="DrGramChatLockSection">قفل دو-لایه چت‌ها</string>
+    <string name="DrGramChatLockHint">پین + اثر انگشت برای چت‌های انتخابی؛ با هر خروج از برنامه دوباره قفل می‌شود. طرف مقابل هیچ‌وقت نمی‌تواند قفل را باز کند.</string>
+    <string name="DrGramChatLockSetPin">تعیین پین قفل</string>
+    <string name="DrGramChatLockPinHint">پین (حداقل ۴ رقم)</string>
+    <string name="DrGramChatLockNeedPin">اول پین قفل را تعیین کن</string>
+    <string name="DrGramChatLockPick">انتخاب چت‌های قفل‌شده</string>
+    <string name="DrGramChatLockCount">چت‌های قفل‌شده</string>
+    <string name="DrGramChatLockTitle">چت قفل است</string>
+    <string name="DrGramChatLockEnter">این چت قفل است — پین را وارد کن</string>
+    <string name="DrGramChatLockWrong">پین اشتباه بود، دوباره تلاش کن</string>
+    <string name="DrGramChatLockFpHint">یا اثر انگشت را لمس کن</string>
+    <string name="DrGramChatLockClose">بستن چت</string>
+    <string name="DrGramAiSummaryMenu">خلاصه هوشمند چت</string>
+    <string name="DrGramAiSummaryTitle">خلاصه هوشمند</string>
+    <string name="DrGramAiNoKey">کلید هوش مصنوعی تنظیم نشده — از صفحه ابزارهای AI ثبتش کن</string>
+    <string name="DrGramAiWorking">در حال خلاصه‌سازی…</string>
+    <string name="DrGramAiSummaryEmpty">پیام متنی برای خلاصه‌سازی پیدا نشد</string>
+    <string name="DrGramCardQr">کد QR زنده</string>
+    <string name="DrGramQrShare">اشتراک لینک</string>
+    <string name="DrGramWidgetChatTitle">چت سریع دکترگرام</string>
+    <string name="DrGramWidgetChatOpen">باز کردن دکترگرام</string>
+    <string name="DrGramWidgetReplies">پاسخ‌های سریع</string>
+    <string name="DrGramWidgetSaved">ذخیره‌ها</string>
+    <string name="DrGramWidgetRadarTitle">رادار آنلاین</string>
+    <string name="DrGramWidgetRadarEmpty">نگهبان آنلاین خاموش است یا کسی انتخاب نشده</string>
 </resources>

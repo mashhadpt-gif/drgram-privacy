@@ -676,6 +676,30 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/drgram_widget_info" />
         </receiver>
+        <receiver
+            android:name=".messenger.DrGramQuickChatWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="org.telegram.messenger.DRGRAM_OPEN_REPLIES" />
+                <action android:name="org.telegram.messenger.DRGRAM_OPEN_SAVED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/drgram_widget_quickchat_info" />
+        </receiver>
+
+        <receiver
+            android:name=".messenger.DrGramRadarWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/drgram_widget_radar_info" />
+        </receiver>
+
 
         <receiver android:name=".NotificationDismissReceiver" android:exported="false"/>
 
