@@ -1683,8 +1683,6 @@ public class ChatActivity extends BaseFragment implements
     private final static int drgramVoiceFx = 93;        // DrGram Fix 71: voice changer
     private final static int drgramToolsHub = 94;       // DrGram Fix 71: full tools hub
     private final static int drgramAiSummary = 95;      // DrGram Fix 80: AI chat summary
-    private final static int drgramAiSummary = 95;      // DrGram Fix 80: AI chat summary
-    private final static int drgramAiSummary = 95;      // DrGram Fix 80: AI chat summary
 
     private final static int topic_close = 60;
     private final static int open_forum = 61;
@@ -3894,10 +3892,6 @@ public class ChatActivity extends BaseFragment implements
                     drgramShowVoiceFxPicker();
                 } else if (id == drgramToolsHub) { // DrGram Fix 71
                     presentFragment(new DrGramToolsActivity());
-                } else if (id == drgramAiSummary) { // DrGram Fix 80
-                    org.telegram.messenger.DrGramChatSummary.summarize(this, messages);
-                } else if (id == drgramAiSummary) { // DrGram Fix 80
-                    org.telegram.messenger.DrGramChatSummary.summarize(this, messages);
                 } else if (id == drgramAiSummary) { // DrGram Fix 80
                     org.telegram.messenger.DrGramChatSummary.summarize(this, messages);
                 } else if (id == clear_history || id == delete_chat || id == auto_delete_timer) {

@@ -158,9 +158,6 @@ public class DrGramToolsActivity extends BaseFragment {
         buildClogSection(context);
         buildQuickToolsSection(context); // DrGram Fix 79: the difference pack
         buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
-        buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
-        buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
-        buildChatLockSection(context); // DrGram Fix 80: two-layer chat lock
 
         closeGlassCard(); // DrGram Fix 34: the last section's panel closes before the brand footer
         try {

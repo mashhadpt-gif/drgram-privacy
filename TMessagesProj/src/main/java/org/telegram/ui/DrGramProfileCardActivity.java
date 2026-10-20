@@ -120,7 +120,6 @@ public class DrGramProfileCardActivity extends BaseFragment {
         }));
         card.addView(makeActionRow(context, LocaleController.getString(R.string.DrGramCardShare), v -> shareCard()));
         card.addView(makeActionRow(context, LocaleController.getString(R.string.DrGramCardQr), v -> showQrCard(context))); // DrGram Fix 80
-        card.addView(makeActionRow(context, LocaleController.getString(R.string.DrGramCardQr), v -> showQrCard(context))); // DrGram Fix 80
 
         renderCard();
         return fragmentView;

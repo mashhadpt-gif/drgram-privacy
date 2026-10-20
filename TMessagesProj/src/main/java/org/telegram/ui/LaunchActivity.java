@@ -7025,8 +7025,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         pipActivityHandler.onResume();
         drgramHandleOpenVault(); // DrGram Fix 36: widget / quick-tile deep open
         drgramHandleWidgetOpens(); // DrGram Fix 80: quick chat widget deep opens
-        drgramHandleWidgetOpens(); // DrGram Fix 80: quick chat widget deep opens
-        drgramHandleWidgetOpens(); // DrGram Fix 80: quick chat widget deep opens
         if (onResumeStaticCallback != null) {
             onResumeStaticCallback.run();
             onResumeStaticCallback = null;
