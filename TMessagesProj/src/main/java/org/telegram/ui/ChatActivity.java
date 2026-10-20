@@ -3893,7 +3893,7 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == drgramToolsHub) { // DrGram Fix 71
                     presentFragment(new DrGramToolsActivity());
                 } else if (id == drgramAiSummary) { // DrGram Fix 80
-                    org.telegram.messenger.DrGramChatSummary.summarize(this, messages);
+                    org.telegram.messenger.DrGramChatSummary.summarize(ChatActivity.this, messages);
                 } else if (id == clear_history || id == delete_chat || id == auto_delete_timer) {
                     if (getParentActivity() == null) {
                         return;

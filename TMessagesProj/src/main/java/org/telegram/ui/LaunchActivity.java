@@ -6730,7 +6730,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onPause() {
         super.onPause();
-        DrGramChatLock.onAppPaused(); // DrGram Fix 80: re-arm two-layer chat locks
+        org.telegram.messenger.DrGramChatLock.onAppPaused(); // DrGram Fix 80: re-arm two-layer chat locks
         isResumed = false;
         pipActivityHandler.onPause();
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 4096);

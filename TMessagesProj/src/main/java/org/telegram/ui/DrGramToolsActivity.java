@@ -1763,7 +1763,7 @@ public class DrGramToolsActivity extends BaseFragment {
                 LocaleController.getString(R.string.DrGramChatLockHint));
         addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramChatLockSetPin), v -> showChatLockPinDialog()));
         addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramChatLockPick), v -> showChatLockPicker()));
-        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramChatLockCount) + ": " + DrGramChatLock.lockedCount(), v -> {
+        addSectionRow(makeActionRow(context, LocaleController.getString(R.string.DrGramChatLockCount) + ": " + org.telegram.messenger.DrGramChatLock.lockedCount(), v -> {
         }));
     }
 
@@ -1798,7 +1798,7 @@ public class DrGramToolsActivity extends BaseFragment {
                 android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramChatLockPinHint), android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
-            DrGramChatLock.setPin(pin);
+            org.telegram.messenger.DrGramChatLock.setPin(pin);
             android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramDone), android.widget.Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1810,7 +1810,7 @@ public class DrGramToolsActivity extends BaseFragment {
             return;
         }
         Context context = getParentActivity();
-        if (!DrGramChatLock.hasPin()) {
+        if (!org.telegram.messenger.DrGramChatLock.hasPin()) {
             android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramChatLockNeedPin), android.widget.Toast.LENGTH_LONG).show();
             return;
         }
@@ -1858,14 +1858,14 @@ public class DrGramToolsActivity extends BaseFragment {
         cell.setTextColor(0xFFF1EADA);
         int pad = AndroidUtilities.dp(14);
         cell.setPadding(pad, pad, pad, pad);
-        cell.setText((DrGramChatLock.isLocked(dialogId) ? "✓  " : "—  ") + name);
+        cell.setText((org.telegram.messenger.DrGramChatLock.isLocked(dialogId) ? "✓  " : "—  ") + name);
         cell.setOnClickListener(v -> {
-            boolean nowLocked = !DrGramChatLock.isLocked(dialogId);
-            DrGramChatLock.toggleLocked(dialogId, nowLocked);
+            boolean nowLocked = !org.telegram.messenger.DrGramChatLock.isLocked(dialogId);
+            org.telegram.messenger.DrGramChatLock.toggleLocked(dialogId, nowLocked);
             cell.setText((nowLocked ? "✓  " : "—  ") + name);
             cell.setTextColor(nowLocked ? 0xFFF4D27A : 0xFFF1EADA);
         });
-        if (DrGramChatLock.isLocked(dialogId)) {
+        if (org.telegram.messenger.DrGramChatLock.isLocked(dialogId)) {
             cell.setTextColor(0xFFF4D27A);
         }
         return cell;
