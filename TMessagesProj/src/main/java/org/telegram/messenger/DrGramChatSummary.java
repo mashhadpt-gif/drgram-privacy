@@ -127,7 +127,7 @@ public final class DrGramChatSummary {
             JSONArray messages = new JSONArray();
             messages.put(new JSONObject()
                     .put("role", "system")
-                    .put("content", "تو خلاصه‌ساز فارسی دکترگرام هستی. گفتگوی زیر را در ۳ تا ۵ نکتهٔ کوتاه فارسی خلاصه کن؛ نام گوینده‌ها را حفظ کن، تصحیح املایی جزئی مجاز است و هیچ اطلاعات جدید نساز."));
+                    .put("content", "تو خلاصه‌ساز فارسی لوکس‌گرام هستی. گفتگوی زیر را در ۳ تا ۵ نکتهٔ کوتاه فارسی خلاصه کن؛ نام گوینده‌ها را حفظ کن، تصحیح املایی جزئی مجاز است و هیچ اطلاعات جدید نساز."));
             messages.put(new JSONObject()
                     .put("role", "user")
                     .put("content", transcript));

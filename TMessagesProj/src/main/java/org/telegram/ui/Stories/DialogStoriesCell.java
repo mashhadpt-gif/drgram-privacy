@@ -1155,7 +1155,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
     }
 
     /**
-     * DrGram Fix 31: renders the DrGram wordmark ("DrGram" / "دکترگرام" — the
+     * DrGram Fix 31: renders the LuxGram wordmark ("LuxGram" / "لوکس‌گرام" — the
      * localized AppName) into a bitmap for the chat-list header. White glyphs on a
      * transparent background, sized for the 90x22dp logo slot.
      */
@@ -1651,7 +1651,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
                     }
                     if (user.id == 777000) {
                         // DrGram Fix 19: brand the official service story cell
-                        name = "fa".equals(LocaleController.getInstance().getCurrentLocale().getLanguage()) ? "دکترگرام" : "DrGram";
+                        name = "fa".equals(LocaleController.getInstance().getCurrentLocale().getLanguage()) ? "لوکس‌گرام" : "LuxGram";
                     }
                     if (user.verified) {
                         if (verifiedDrawable == null) {

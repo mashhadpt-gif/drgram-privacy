@@ -91,7 +91,8 @@ public class TranslateController extends BaseController {
     }
 
     public boolean isFeatureAvailable() {
-        return isChatTranslateEnabled() && UserConfig.getInstance(currentAccount).isPremium();
+        // DrGram Fix 80: per-chat auto-translate unlock (Tools toggle / chat menu)
+        return isChatTranslateEnabled() && (UserConfig.getInstance(currentAccount).isPremium() || org.telegram.messenger.DrGramAutoTranslate.isFeatureUnlocked());
     }
 
     public boolean isFeatureAvailable(long dialogId) {
@@ -101,7 +102,8 @@ public class TranslateController extends BaseController {
         final TLRPC.Chat chat = getMessagesController().getChat(-dialogId);
         return (
             UserConfig.getInstance(currentAccount).isPremium() ||
-            chat != null && chat.autotranslation
+            chat != null && chat.autotranslation ||
+            org.telegram.messenger.DrGramAutoTranslate.isEnabled(dialogId) // DrGram Fix 80
         );
     }
 

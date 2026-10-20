@@ -61,10 +61,10 @@ public class DrGramStyleGalleryActivity extends BaseFragment {
 
     private static final String[][] CURATED = {
             // asset, internal theme name, localization key, fallback bg, fallback accent
-            {"luxgram_amoled.attheme", "DrGram AMOLED", "DrGramThemeNameAmoled", "0xFF101114", "0xFF4A9CD8"},
-            {"luxgram_indigo.attheme", "DrGram Indigo", "DrGramThemeNameIndigo", "0xFFFAFAFA", "0xFF3F51B5"},
-            {"luxgram_softdark.attheme", "DrGram Soft Dark", "DrGramThemeNameSoftDark", "0xFF222B35", "0xFF54677D"},
-            {"luxgram_skyblue.attheme", "DrGram Sky Blue", "DrGramThemeNameSkyBlue", "0xFF1D2C3B", "0xFF4E7A9E"},
+            {"luxgram_amoled.attheme", "LuxGram AMOLED", "DrGramThemeNameAmoled", "0xFF101114", "0xFF4A9CD8"},
+            {"luxgram_indigo.attheme", "LuxGram Indigo", "DrGramThemeNameIndigo", "0xFFFAFAFA", "0xFF3F51B5"},
+            {"luxgram_softdark.attheme", "LuxGram Soft Dark", "DrGramThemeNameSoftDark", "0xFF222B35", "0xFF54677D"},
+            {"luxgram_skyblue.attheme", "LuxGram Sky Blue", "DrGramThemeNameSkyBlue", "0xFF1D2C3B", "0xFF4E7A9E"},
             {"luxgram_dracula.attheme", "DrGram Dracula", "DrGramThemeNameDracula", "0xFF282A36", "0xFFBD93F9"},
     };
 

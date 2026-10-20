@@ -451,6 +451,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         org.telegram.messenger.DrGramScreenshotLock.apply(getWindow()); // DrGram Fix 79: optional app-wide screenshot lock
         AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.DrGramAutoProxy.onAppOpen(), 6500); // DrGram Fix 26: auto proxy
         AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.DrGramChannelPromo.maybeShow(this), 9000); // DrGram Fix 68: official channel invite (explicit consent only)
+        AndroidUtilities.runOnUIThread(() -> {
+            try {
+                if (UserConfig.getInstance(UserConfig.selectedAccount).isClientActivated()) {
+                    org.telegram.messenger.DrGramWhatsNew.showIfNew(LaunchActivity.this); // DrGram Fix 80: What's New popup on first open after update
+                }
+            } catch (Throwable t) {
+                FileLog.e(t);
+            }
+        }, 7000);
         if (SharedConfig.passcodeHash.length() != 0 && SharedConfig.appLocked) {
             SharedConfig.lastPauseTime = (int) (SystemClock.elapsedRealtime() / 1000);
         }

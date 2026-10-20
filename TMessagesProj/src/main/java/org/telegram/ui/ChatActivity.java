@@ -1683,6 +1683,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int drgramVoiceFx = 93;        // DrGram Fix 71: voice changer
     private final static int drgramToolsHub = 94;       // DrGram Fix 71: full tools hub
     private final static int drgramAiSummary = 95;      // DrGram Fix 80: AI chat summary
+    private final static int drgramAutoTranslate = 96;  // DrGram Fix 80: per-chat auto-translate
 
     private final static int topic_close = 60;
     private final static int open_forum = 61;
@@ -3894,6 +3895,18 @@ public class ChatActivity extends BaseFragment implements
                     presentFragment(new DrGramToolsActivity());
                 } else if (id == drgramAiSummary) { // DrGram Fix 80
                     org.telegram.messenger.DrGramChatSummary.summarize(ChatActivity.this, messages);
+                } else if (id == drgramAutoTranslate) { // DrGram Fix 80: toggle per-chat auto-translate
+                    boolean drgramNewState = org.telegram.messenger.DrGramAutoTranslate.toggle(getDialogId());
+                    try {
+                        if (getParentActivity() != null) {
+                            android.widget.Toast.makeText(getParentActivity(),
+                                LocaleController.getString(drgramNewState ? R.string.DrGramAutoTranslateOn : R.string.DrGramAutoTranslateOff),
+                                android.widget.Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Throwable t) {
+                        FileLog.e(t);
+                    }
+                    updateTopPanel(false);
                 } else if (id == clear_history || id == delete_chat || id == auto_delete_timer) {
                     if (getParentActivity() == null) {
                         return;
@@ -4525,6 +4538,10 @@ public class ChatActivity extends BaseFragment implements
             if (getDialogId() != 0 && org.telegram.messenger.DrGramMedia.isDrawSendEnabled()) {
                 headerItem.lazilyAddSubItem(drgramDrawSend, R.drawable.photo_paint_brush,
                     LocaleController.getString(R.string.DrGramDrawSend));
+            }
+            if (getDialogId() != 0) { // DrGram Fix 80: auto-translate this chat
+                headerItem.lazilyAddSubItem(drgramAutoTranslate, R.drawable.msg_translate,
+                    LocaleController.getString(R.string.DrGramAutoTranslateMenu));
             }
             if (getDialogId() != 0 && !isSecretChat() && org.telegram.messenger.DrGramQuickReplies.getCount() > 0) {
                 headerItem.lazilyAddSubItem(drgramQuickReplies, R.drawable.msg_add,
@@ -29624,7 +29641,7 @@ public class ChatActivity extends BaseFragment implements
 
         boolean showRestartTopic = !isInPreviewMode() && forumTopic != null && forumTopic.closed && !forumTopic.hidden && ChatObject.canManageTopic(currentAccount, currentChat, forumTopic);
         boolean showTranslate = (
-            getUserConfig().isPremium() || currentChat != null && currentChat.autotranslation ?
+            getUserConfig().isPremium() || currentChat != null && currentChat.autotranslation || org.telegram.messenger.DrGramAutoTranslate.isEnabled(getDialogId()) ?
                 getMessagesController().getTranslateController().isDialogTranslatable(getDialogId()) && !getMessagesController().getTranslateController().isTranslateDialogHidden(getDialogId()) :
                 !getMessagesController().premiumFeaturesBlocked() && preferences.getInt("dialog_show_translate_count" + did, 5) <= 0
         ) || DEBUG_TOP_PANELS;

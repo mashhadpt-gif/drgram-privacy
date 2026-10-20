@@ -34,6 +34,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.AlertsCreator;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -148,6 +149,13 @@ public class DrGramForwardEditor extends BaseFragment implements DialogsActivity
         hint.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText));
         hint.setPadding(AndroidUtilities.dp(4), 0, AndroidUtilities.dp(4), AndroidUtilities.dp(10));
         content.addView(hint);
+
+        TextView editHint = new TextView(context); // DrGram Fix 80: Telegraph-style editability note
+        editHint.setText(LocaleController.getString(R.string.DrGramAdvFwdEditable));
+        editHint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        editHint.setTextColor(GOLD);
+        editHint.setPadding(AndroidUtilities.dp(4), 0, AndroidUtilities.dp(4), AndroidUtilities.dp(10));
+        content.addView(editHint);
 
         if (quoteMode) { // DrGram Fix 33: explain the quote mode
             TextView quoteHint = new TextView(context);
@@ -334,9 +342,40 @@ public class DrGramForwardEditor extends BaseFragment implements DialogsActivity
 
     @Override
     public boolean didSelectDialogs(DialogsActivity fragment, ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
+        // DrGram Fix 80: the old single batched call could drop every message
+        // after the first one. Each message now goes out on its own — text
+        // messages are sent from the user's own name (Telegraph-style, still
+        // editable after sending), everything else is forwarded per-message.
+        final ArrayList<MessageObject> drgramSendList = buildSendList();
+        final boolean drgramFromMyName = fromMyNameCheck.isChecked();
         for (int j = 0; j < dids.size(); j++) {
-            long did = dids.get(j).dialogId;
-            SendMessagesHelper.getInstance(currentAccount).sendMessage(buildSendList(), did, fromMyNameCheck.isChecked(), false, notify, scheduleDate, null, -1, 0);
+            final long did = dids.get(j).dialogId;
+            final SendMessagesHelper drgramSender = SendMessagesHelper.getInstance(currentAccount);
+            AlertsCreator.ensurePaidMessageConfirmation(currentAccount, did, drgramSendList.size(), drgramPayStars -> {
+                for (int i = 0; i < drgramSendList.size(); i++) {
+                    MessageObject drgramMo = drgramSendList.get(i);
+                    if (drgramMo == null || drgramMo.messageOwner == null) {
+                        continue;
+                    }
+                    boolean drgramPureText = drgramMo.messageOwner.action == null
+                        && !TextUtils.isEmpty(drgramMo.messageOwner.message)
+                        && (drgramMo.messageOwner.media == null
+                            || drgramMo.messageOwner.media instanceof TLRPC.TL_messageMediaEmpty
+                            || drgramMo.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage);
+                    if (drgramFromMyName && drgramPureText) {
+                        SendMessagesHelper.SendMessageParams drgramParams = SendMessagesHelper.SendMessageParams.of(
+                            drgramMo.messageOwner.message, did, null, null, null, false,
+                            drgramMo.messageOwner.entities != null ? drgramMo.messageOwner.entities : new ArrayList<>(),
+                            null, null, notify, scheduleDate, 0, null, false);
+                        drgramParams.payStars = drgramPayStars;
+                        drgramSender.sendMessage(drgramParams);
+                    } else {
+                        ArrayList<MessageObject> drgramSingle = new ArrayList<>();
+                        drgramSingle.add(drgramMo);
+                        drgramSender.sendMessage(drgramSingle, did, drgramFromMyName, false, notify, scheduleDate, null, -1, drgramPayStars);
+                    }
+                }
+            });
         }
         fragment.finishFragment();
         finishFragment();

@@ -52,12 +52,12 @@
     <string name="DrGramFakeNotificationSend">نمایش اعلان محلی</string>
     <string name="DrGramFakeNotificationTitleRequired">برای پیش‌نمایش، عنوان یا متن اعلان را وارد کن.</string>
     <string name="DrGramFakeNotificationPermTitle">اجازه اعلان‌ها</string>
-    <string name="DrGramFakeNotificationPermMessage">اعلان‌های DrGram در اندروید غیرفعال‌اند. برای نمایش پیش‌نمایش محلی، آن‌ها را فعال کن.</string>
+    <string name="DrGramFakeNotificationPermMessage">اعلان‌های LuxGram در اندروید غیرفعال‌اند. برای نمایش پیش‌نمایش محلی، آن‌ها را فعال کن.</string>
     <string name="DrGramFakeNotificationOpenSettings">باز کردن تنظیمات</string>
     <string name="DrGramFakeNotificationSent">اعلان آزمایشی محلی نمایش داده شد.</string>
-    <string name="DrGramFakeNotificationChannel">پیش‌نمایش‌های محلی DrGram</string>
-    <string name="DrGramToolsHero">پنل فرمان زرین‌پوش تو — همه‌ی قدرت‌های دکترگرام، یک‌جا</string>
-    <string name="DrGramSettingsHero">مرکز فرمانروایی دکترگرام — لوکس، رمانتیک، ماندگار</string>
+    <string name="DrGramFakeNotificationChannel">پیش‌نمایش‌های محلی LuxGram</string>
+    <string name="DrGramToolsHero">پنل فرمان زرین‌پوش تو — همه‌ی قدرت‌های لوکس‌گرام، یک‌جا</string>
+    <string name="DrGramSettingsHero">مرکز فرمانروایی لوکس‌گرام — لوکس، رمانتیک، ماندگار</string>
 
     <string name="DrGramFwdWithQuote">هدایت با نقل قول</string>
     <string name="DrGramAdvFwdQuoteHint">پیام از طرف خودتان فرستاده می‌شود و با سرصفحه نقل‌قول از منبع آغاز می‌گردد.</string>
@@ -71,5 +71,5 @@
     <string name="DrGramGalleryBubbleRadiusHint">از حباب‌های کلاسیک مربعی (۰) تا کاملاً گرد (۱۸).</string>
     <string name="DrGramGalleryAppIconHint">لانچر چند لحظه بعد آیکن جدید را نشان می‌دهد.</string>
     <string name="DrGramGalleryDisplay">جلوه‌های نمایش</string>
-    <string name="DrGramGalleryDisplayHint">حس و حال روزانه‌ی دکترگرام را خودت تنظیم کن.</string>
+    <string name="DrGramGalleryDisplayHint">حس و حال روزانه‌ی لوکس‌گرام را خودت تنظیم کن.</string>
 </resources>
