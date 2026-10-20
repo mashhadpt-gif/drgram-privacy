@@ -1774,9 +1774,10 @@ public class DrGramToolsActivity extends BaseFragment {
             body = "DrGram " + BuildVars.BUILD_VERSION_STRING; // never crash the tools page
             FileLog.e(t);
         }
-        builder.setMessage(body);
+        final String aboutBody = body; // effectively-final copy for the lambda (Fix 79)
+        builder.setMessage(aboutBody);
         builder.setPositiveButton(LocaleController.getString(R.string.Copy), (dialog, which) -> {
-            AndroidUtilities.addToClipboard(body);
+            AndroidUtilities.addToClipboard(aboutBody);
             try {
                 android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramCopied), android.widget.Toast.LENGTH_SHORT).show();
             } catch (Throwable t) {
