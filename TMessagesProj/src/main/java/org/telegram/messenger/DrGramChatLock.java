@@ -23,6 +23,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -173,7 +174,6 @@ public final class DrGramChatLock {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, fragment.getResourceProvider());
         builder.setTitle(LocaleController.getString(R.string.DrGramChatLockTitle));
         builder.setMessage(LocaleController.getString(R.string.DrGramChatLockEnter));
-        builder.setCancelable(false);
 
         final EditText input = new EditText(context);
         input.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
@@ -230,7 +230,9 @@ public final class DrGramChatLock {
             }
         });
 
-        final AlertDialog dialog = builder.show();
+        final AlertDialog dialog = builder.create();
+        dialog.setCancelable(false); // gate: only PIN / fingerprint / close-chat
+        dialog.show();
         final CancellationSignal[] signal = new CancellationSignal[1];
 
         dialog.setOnDismissListener(d -> {

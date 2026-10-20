@@ -1799,7 +1799,7 @@ public class DrGramToolsActivity extends BaseFragment {
                 return;
             }
             org.telegram.messenger.DrGramChatLock.setPin(pin);
-            android.widget.Toast.makeText(context, LocaleController.getString(R.string.DrGramDone), android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(context, LocaleController.getString(R.string.Done), android.widget.Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         builder.show();
