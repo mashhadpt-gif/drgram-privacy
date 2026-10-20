@@ -18,7 +18,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.CancellationSignal;
+import androidx.core.os.CancellationSignal;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -204,7 +204,9 @@ public final class DrGramChatLock {
         box.addView(hint, hp);
 
         FrameLayout container = new FrameLayout(context);
-        container.addView(box, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP, 8, 8, 8, 0));
+        FrameLayout.LayoutParams gateLp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+        gateLp.setMargins(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
+        container.addView(box, gateLp);
         builder.setView(container);
 
         // Only two ways out: the right PIN / fingerprint, or closing the chat.
