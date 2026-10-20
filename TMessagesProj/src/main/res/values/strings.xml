@@ -11891,7 +11891,6 @@
     <string name="DrGramAiSummaryMenu">AI chat summary</string>
     <string name="DrGramAiSummaryTitle">AI summary</string>
     <string name="DrGramAiNoKey">No AI key is set — add one in the AI tools page</string>
-    <string name="DrGramAiWorking">Summarizing…</string>
     <string name="DrGramAiSummaryEmpty">No text messages found to summarize</string>
     <string name="DrGramCardQr">Live QR card</string>
     <string name="DrGramQrShare">Share link</string>
