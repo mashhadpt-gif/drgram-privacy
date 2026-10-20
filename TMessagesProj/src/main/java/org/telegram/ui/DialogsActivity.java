@@ -106,7 +106,7 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.DialogObject;
-import org.telegram.messenger.DrGramThemeInstaller;
+import org.telegram.messenger.LuxGramThemeInstaller;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
@@ -655,9 +655,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private boolean canSelectTopics;
     private String searchString;
     private String initialSearchString;
-    private boolean drgramStartDownloads;
-    // DrGram Fix 14: true while the user is inside the downloads subpage.
-    private boolean drgramDownloadsMode;
+    private boolean luxgramStartDownloads;
+    // LuxGram Fix 14: true while the user is inside the downloads subpage.
+    private boolean luxgramDownloadsMode;
     private MessagesStorage.TopicKey openedDialogId = new MessagesStorage.TopicKey();
     private boolean cantSendToChannels;
     private boolean allowSwitchAccount;
@@ -760,7 +760,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private Long statusDrawableGiftId;
     private Drawable logoDrawable;
     private AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable statusDrawable;
-    private CharSequence drgramBrandTitle; // DrGram Fix 29: luxury wordmark reference
+    private CharSequence luxgramBrandTitle; // LuxGram Fix 29: luxury wordmark reference
     private AnimatedStatusView animatedStatusView;
     public RightSlidingDialogContainer rightSlidingDialogContainer;
 
@@ -2874,7 +2874,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             closeFragment = arguments.getBoolean("closeFragment", true);
             allowGlobalSearch = arguments.getBoolean("allowGlobalSearch", true);
             hasMainTabs = arguments.getBoolean("hasMainTabs", false);
-            drgramStartDownloads = arguments.getBoolean("drgramStartDownloads", false);
+            luxgramStartDownloads = arguments.getBoolean("luxgramStartDownloads", false);
 
             byte[] requestPeerTypeBytes = arguments.getByteArray("requestPeerType");
             if (requestPeerTypeBytes != null) {
@@ -3193,20 +3193,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public void setTitleOverlayText(String title, int titleId, Runnable action) {
-        // DrGram Fix 29: the luxury brand header must never be lost. In the default
+        // LuxGram Fix 29: the luxury brand header must never be lost. In the default
         // chat list only connection-state notices may replace the wordmark; any
         // other overlay (stale titles like the "Telegram" service-chat name) is
         // refused and the gold brand header is re-applied.
         boolean brandState = initialDialogsType == DIALOGS_TYPE_DEFAULT && !onlySelect
-                && folderId == 0 && communityId == 0 && !drgramDownloadsMode;
+                && folderId == 0 && communityId == 0 && !luxgramDownloadsMode;
         boolean connectionNotice = title != null && (title.equals("WaitingForNetwork")
                 || title.equals("Updating") || title.equals("Connecting")
                 || title.equals("ConnectingToProxyWithDots"));
-        if (brandState && actionBar != null && drgramBrandTitle != null
+        if (brandState && actionBar != null && luxgramBrandTitle != null
                 && (title == null || !connectionNotice)) {
             actionBar.setTitleOverlayText(null, 0, action);
-            actionBar.setTitle(drgramBrandTitle, statusDrawable);
-            actionBar.setSubtitle(LocaleController.getString(R.string.DrGramTagline));
+            actionBar.setTitle(luxgramBrandTitle, statusDrawable);
+            actionBar.setSubtitle(LocaleController.getString(R.string.LuxGramTagline));
             if (dialogStoriesCell != null) {
                 dialogStoriesCell.setTitleOverlayText(null, 0);
             }
@@ -3422,10 +3422,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             @Override
             public void onTextChanged(EditText editText) {
                 String text = editText.getText().toString();
-                if (org.telegram.messenger.DrGramVault.getInstance(currentAccount).matchesRevealCode(text)) {
+                if (org.telegram.messenger.LuxGramVault.getInstance(currentAccount).matchesRevealCode(text)) {
                     editText.setText("");
                     closeSearch();
-                    presentFragment(new DrGramVaultActivity());
+                    presentFragment(new LuxGramVaultActivity());
                     return;
                 }
                 if (!text.isEmpty() || (searchViewPager != null && searchViewPager.dialogsSearchAdapter != null && searchViewPager.dialogsSearchAdapter.hasRecentSearch()) || searchFiltersWasShowed || hasStories) {
@@ -3469,9 +3469,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         fragmentSearchFieldWatcher.setDoNotCloseAfterFieldEmpty();
 
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
-            exploreItem = menu.addItem(6, R.drawable.drgram_explore);
+            exploreItem = menu.addItem(6, R.drawable.luxgram_explore);
             exploreItem.setContentDescription(LocaleController.getString(R.string.AccDescrExplore));
-            exploreItem.setOnClickListener(v -> presentFragment(new DrGramExploreActivity()));
+            exploreItem.setOnClickListener(v -> presentFragment(new LuxGramExploreActivity()));
 
             optionsItem = menu.addItem(4, R.drawable.ic_ab_other);
             optionsItem.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
@@ -3547,10 +3547,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } else {
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, dp(26));
                 statusDrawable.center = true;
-                // DrGram Fix 8: luxury branding — gold (or red) "DrGram" wordmark text + Persian tagline,
+                // LuxGram Fix 8: luxury branding — gold (or red) "LuxGram" wordmark text + Persian tagline,
                 // replacing the upstream "Telegram" wordmark image span
                 SpannableStringBuilder ssb = new SpannableStringBuilder(LocaleController.getString(R.string.AppName));
-                ssb.setSpan(new android.text.style.ForegroundColorSpan(org.telegram.messenger.DrGramThemeInstaller.accentColor()), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ssb.setSpan(new android.text.style.ForegroundColorSpan(org.telegram.messenger.LuxGramThemeInstaller.accentColor()), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ssb.setSpan(new android.text.style.MetricAffectingSpan() {
                     @Override
                     public void updateMeasureState(@NonNull android.text.TextPaint p) {
@@ -3564,8 +3564,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 }, 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 actionBar.setTitle(ssb, statusDrawable);
-                actionBar.setSubtitle(LocaleController.getString(R.string.DrGramTagline));
-                drgramBrandTitle = ssb; // DrGram Fix 29: kept for the header shield
+                actionBar.setSubtitle(LocaleController.getString(R.string.LuxGramTagline));
+                luxgramBrandTitle = ssb; // LuxGram Fix 29: kept for the header shield
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
             }
             if (folderId == 0) {
@@ -3940,8 +3940,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         } else {
                             hideActionMode(true);
                         }
-                    } else if (onlySelect || folderId != 0 || communityId != 0 || drgramDownloadsMode) {
-                        // DrGram Fix 14: downloads subpage arrow returns to the caller.
+                    } else if (onlySelect || folderId != 0 || communityId != 0 || luxgramDownloadsMode) {
+                        // LuxGram Fix 14: downloads subpage arrow returns to the caller.
                         finishFragment();
                     }
                 } else if (id == 1) {
@@ -5466,15 +5466,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (fragmentSearchField != null) {
                 fragmentSearchField.setTranslationY(-dp(FILTER_TABS_HEIGHT) + getSearchFieldAdditionOffset());
             }
-        } else if (drgramStartDownloads) {
-            drgramStartDownloads = false;
-            // DrGram Fix 14: downloads behaves as a real subpage — visible back
+        } else if (luxgramStartDownloads) {
+            luxgramStartDownloads = false;
+            // LuxGram Fix 14: downloads behaves as a real subpage — visible back
             // arrow + title, and the search state watcher is armed so the X
             // button and the back gesture can always leave the screen
             // (before this, toggleSearch(false) was a no-op and the page stuck).
-            drgramDownloadsMode = true;
+            luxgramDownloadsMode = true;
             actionBar.setBackButtonDrawable(backDrawable = new BackDrawable(false));
-            actionBar.setTitle(LocaleController.getString(R.string.DrGramSetDownloads));
+            actionBar.setTitle(LocaleController.getString(R.string.LuxGramSetDownloads));
             showSearch(true, true, false);
             fragmentSearchFieldWatcher.toggleSearch(true);
         } else {
@@ -7085,16 +7085,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (rightSlidingDialogContainer != null) {
             rightSlidingDialogContainer.onResume();
         }
-        // DrGram Fix 29: back on the list — the luxury brand header must always show
+        // LuxGram Fix 29: back on the list — the luxury brand header must always show
         try {
             boolean brandState = initialDialogsType == DIALOGS_TYPE_DEFAULT && !onlySelect
-                    && folderId == 0 && communityId == 0 && !drgramDownloadsMode;
-            if (brandState && actionBar != null && drgramBrandTitle != null
+                    && folderId == 0 && communityId == 0 && !luxgramDownloadsMode;
+            if (brandState && actionBar != null && luxgramBrandTitle != null
                     && !actionBar.isActionModeShowed()) {
                 SimpleTextView tv = actionBar.getTitleTextView();
-                if (tv != null && tv.getText() != drgramBrandTitle) {
-                    actionBar.setTitle(drgramBrandTitle, statusDrawable);
-                    actionBar.setSubtitle(LocaleController.getString(R.string.DrGramTagline));
+                if (tv != null && tv.getText() != luxgramBrandTitle) {
+                    actionBar.setTitle(luxgramBrandTitle, statusDrawable);
+                    actionBar.setSubtitle(LocaleController.getString(R.string.LuxGramTagline));
                 }
             }
         } catch (Throwable t) {
@@ -8865,14 +8865,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             previewMenu[0].addView(muteItem);
         }
 
-        // DrGram Fix 38: PV lux tools — the private-chat toolkit (voice changer,
+        // LuxGram Fix 38: PV lux tools — the private-chat toolkit (voice changer,
         // favorites, AI) lives in the avatar-preview menu, private chats only,
         // exactly where users expect these options
         if (DialogObject.isUserDialog(dialogId) && !UserObject.isUserSelf(getMessagesController().getUser(dialogId))) {
-            final long drgramPvDid = dialogId;
+            final long luxgramPvDid = dialogId;
 
             ActionBarMenuSubItem pvVoiceItem = new ActionBarMenuSubItem(getParentActivity(), true, false);
-            pvVoiceItem.setTextAndIcon(LocaleController.getString(R.string.DrGramVoiceChange), R.drawable.msg_mute);
+            pvVoiceItem.setTextAndIcon(LocaleController.getString(R.string.LuxGramVoiceChange), R.drawable.msg_mute);
             pvVoiceItem.setMinimumWidth(160);
             pvVoiceItem.setOnClickListener(e -> {
                 finishPreviewFragment();
@@ -8880,21 +8880,21 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     return;
                 }
                 String[] pvVoiceModes = {
-                        LocaleController.getString(R.string.DrGramVoiceChangeOff),
-                        LocaleController.getString(R.string.DrGramVoiceM2F),
-                        LocaleController.getString(R.string.DrGramVoiceF2M),
-                        LocaleController.getString(R.string.DrGramStudioEcho) + " — " + LocaleController.getString(org.telegram.messenger.DrGramVoiceChanger.getEchoStyle() != org.telegram.messenger.DrGramVoiceChanger.ECHO_OFF ? R.string.DrGramEchoOn : R.string.DrGramEchoOff)
+                        LocaleController.getString(R.string.LuxGramVoiceChangeOff),
+                        LocaleController.getString(R.string.LuxGramVoiceM2F),
+                        LocaleController.getString(R.string.LuxGramVoiceF2M),
+                        LocaleController.getString(R.string.LuxGramStudioEcho) + " — " + LocaleController.getString(org.telegram.messenger.LuxGramVoiceChanger.getEchoStyle() != org.telegram.messenger.LuxGramVoiceChanger.ECHO_OFF ? R.string.LuxGramEchoOn : R.string.LuxGramEchoOff)
                 };
                 new AlertDialog.Builder(getParentActivity(), getResourceProvider())
-                        .setTitle(LocaleController.getString(R.string.DrGramPvTools))
+                        .setTitle(LocaleController.getString(R.string.LuxGramPvTools))
                         .setItems(pvVoiceModes, (d2, which2) -> {
                             if (which2 <= 2) {
-                                org.telegram.messenger.DrGramVoiceChanger.setMode(which2);
+                                org.telegram.messenger.LuxGramVoiceChanger.setMode(which2);
                             } else {
-                                int cur = org.telegram.messenger.DrGramVoiceChanger.getEchoStyle();
-                                org.telegram.messenger.DrGramVoiceChanger.setEchoStyle(cur == org.telegram.messenger.DrGramVoiceChanger.ECHO_OFF ? org.telegram.messenger.DrGramVoiceChanger.ECHO_STUDIO : org.telegram.messenger.DrGramVoiceChanger.ECHO_OFF);
+                                int cur = org.telegram.messenger.LuxGramVoiceChanger.getEchoStyle();
+                                org.telegram.messenger.LuxGramVoiceChanger.setEchoStyle(cur == org.telegram.messenger.LuxGramVoiceChanger.ECHO_OFF ? org.telegram.messenger.LuxGramVoiceChanger.ECHO_STUDIO : org.telegram.messenger.LuxGramVoiceChanger.ECHO_OFF);
                             }
-                            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.DrGramPvToolsApplied), android.widget.Toast.LENGTH_SHORT).show();
+                            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.LuxGramPvToolsApplied), android.widget.Toast.LENGTH_SHORT).show();
                         })
                         .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
                         .show();
@@ -8902,41 +8902,41 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             previewMenu[0].addView(pvVoiceItem);
 
             ActionBarMenuSubItem pvFavItem = new ActionBarMenuSubItem(getParentActivity(), false, false);
-            pvFavItem.setTextAndIcon(LocaleController.getString(R.string.DrGramPvFavorites), R.drawable.msg_fave);
+            pvFavItem.setTextAndIcon(LocaleController.getString(R.string.LuxGramPvFavorites), R.drawable.msg_fave);
             pvFavItem.setMinimumWidth(160);
             pvFavItem.setOnClickListener(e -> {
                 finishPreviewFragment();
-                presentFragment(new DrGramFavoritesActivity());
+                presentFragment(new LuxGramFavoritesActivity());
             });
             previewMenu[0].addView(pvFavItem);
 
-            org.telegram.messenger.DrGramFavorites.Entry pvLatest = null;
-            for (org.telegram.messenger.DrGramFavorites.Entry en : org.telegram.messenger.DrGramFavorites.getInstance(currentAccount).getList()) {
-                if (en != null && en.dialogId == drgramPvDid && (pvLatest == null || en.date > pvLatest.date)) {
+            org.telegram.messenger.LuxGramFavorites.Entry pvLatest = null;
+            for (org.telegram.messenger.LuxGramFavorites.Entry en : org.telegram.messenger.LuxGramFavorites.getInstance(currentAccount).getList()) {
+                if (en != null && en.dialogId == luxgramPvDid && (pvLatest == null || en.date > pvLatest.date)) {
                     pvLatest = en;
                 }
             }
             if (pvLatest != null) {
                 ActionBarMenuSubItem pvJumpItem = new ActionBarMenuSubItem(getParentActivity(), false, false);
-                pvJumpItem.setTextAndIcon(LocaleController.getString(R.string.DrGramPvJumpMarked), R.drawable.msg_saved);
+                pvJumpItem.setTextAndIcon(LocaleController.getString(R.string.LuxGramPvJumpMarked), R.drawable.msg_saved);
                 pvJumpItem.setMinimumWidth(160);
                 final int pvJumpMsgId = pvLatest.msgId;
                 pvJumpItem.setOnClickListener(e -> {
                     finishPreviewFragment();
-                    Bundle drgramJumpArgs = new Bundle();
-                    drgramJumpArgs.putLong("dialog_id", drgramPvDid);
-                    drgramJumpArgs.putInt("message_id", pvJumpMsgId);
-                    presentFragment(new ChatActivity(drgramJumpArgs));
+                    Bundle luxgramJumpArgs = new Bundle();
+                    luxgramJumpArgs.putLong("dialog_id", luxgramPvDid);
+                    luxgramJumpArgs.putInt("message_id", pvJumpMsgId);
+                    presentFragment(new ChatActivity(luxgramJumpArgs));
                 });
                 previewMenu[0].addView(pvJumpItem);
             }
 
             ActionBarMenuSubItem pvAiItem = new ActionBarMenuSubItem(getParentActivity(), false, true);
-            pvAiItem.setTextAndIcon(LocaleController.getString(R.string.DrGramAiToolsTitle), R.drawable.input_ai);
+            pvAiItem.setTextAndIcon(LocaleController.getString(R.string.LuxGramAiToolsTitle), R.drawable.input_ai);
             pvAiItem.setMinimumWidth(160);
             pvAiItem.setOnClickListener(e -> {
                 finishPreviewFragment();
-                presentFragment(new DrGramAIActivity());
+                presentFragment(new LuxGramAIActivity());
             });
             previewMenu[0].addView(pvAiItem);
         }
@@ -11145,9 +11145,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         MessagesController messagesController = AccountInstance.getInstance(currentAccount).getMessagesController();
         if (dialogsType == DIALOGS_TYPE_DEFAULT) {
-            return org.telegram.messenger.DrGramVault.getInstance(currentAccount).filterDialogs(messagesController.getDialogs(folderId));
+            return org.telegram.messenger.LuxGramVault.getInstance(currentAccount).filterDialogs(messagesController.getDialogs(folderId));
         } else if (dialogsType == DIALOGS_TYPE_WIDGET || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY) {
-            return org.telegram.messenger.DrGramVault.getInstance(currentAccount).filterDialogs(messagesController.dialogsServerOnly);
+            return org.telegram.messenger.LuxGramVault.getInstance(currentAccount).filterDialogs(messagesController.dialogsServerOnly);
         } else if (dialogsType == DIALOGS_TYPE_ADD_USERS_TO) {
             ArrayList<TLRPC.Dialog> dialogs = new ArrayList<>(messagesController.dialogsCanAddUsers.size() + messagesController.dialogsMyChannels.size() + messagesController.dialogsMyGroups.size() + 2);
             if (messagesController.dialogsMyChannels.size() > 0 && allowChannels) {
@@ -13829,23 +13829,23 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return;
         }
 
-        // DrGram uses two branded palettes instead of Telegram's stock day/night themes.
-        // The menu item always switches to the other DrGram mode; it never opens ThemeActivity.
-        final boolean loveMode = DrGramThemeInstaller.isLoveMode();
+        // LuxGram uses two branded palettes instead of Telegram's stock day/night themes.
+        // The menu item always switches to the other LuxGram mode; it never opens ThemeActivity.
+        final boolean loveMode = LuxGramThemeInstaller.isLoveMode();
         io.add(R.drawable.msg_customize,
-                getString(loveMode ? R.string.DrGramSetThemeGold : R.string.DrGramSetThemeRed), () -> {
+                getString(loveMode ? R.string.LuxGramSetThemeGold : R.string.LuxGramSetThemeRed), () -> {
             if (switchingTheme) {
                 return;
             }
             switchingTheme = true;
             try {
-                if (!DrGramThemeInstaller.setLoveMode(!loveMode)) {
+                if (!LuxGramThemeInstaller.setLoveMode(!loveMode)) {
                     Activity themeActivity = getParentActivity();
                     if (themeActivity != null) {
-                        Toast.makeText(themeActivity, getString(R.string.DrGramSetThemeApplyFailed), Toast.LENGTH_LONG).show();
+                        Toast.makeText(themeActivity, getString(R.string.LuxGramSetThemeApplyFailed), Toast.LENGTH_LONG).show();
                     }
                 } else if (parentLayout != null) {
-                    // DrGram Fix 14 (hardening): rebuild off the click stack, guarded.
+                    // LuxGram Fix 14 (hardening): rebuild off the click stack, guarded.
                     AndroidUtilities.runOnUIThread(() -> {
                         try {
                             parentLayout.rebuildAllFragmentViews(true, true);
@@ -13859,9 +13859,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         });
         io.addGap();
-        io.add(R.drawable.drgram_explore, getString(R.string.Explore), () -> presentFragment(new DrGramExploreActivity()));
-        io.add(R.drawable.drgram_dating, getString(R.string.DrGramDatingTitle), () -> getMessagesController().openByUserName("HaQiQatRobot", DialogsActivity.this, 0)); // DrGram Fix 77: button -> @HaQiQatRobot (Truth-or-Dare game bot); People-Nearby machinery removed — Telegram killed the nearby servers Sep 2024
-        io.add(R.drawable.msg_secret, getString(R.string.DrGramToolsDrawer), () -> presentFragment(new DrGramToolsActivity()));
+        io.add(R.drawable.luxgram_explore, getString(R.string.Explore), () -> presentFragment(new LuxGramExploreActivity()));
+        io.add(R.drawable.luxgram_dating, getString(R.string.LuxGramDatingTitle), () -> getMessagesController().openByUserName("HaQiQatRobot", DialogsActivity.this, 0)); // LuxGram Fix 77: button -> @HaQiQatRobot (Truth-or-Dare game bot); People-Nearby machinery removed — Telegram killed the nearby servers Sep 2024
+        io.add(R.drawable.msg_secret, getString(R.string.LuxGramToolsDrawer), () -> presentFragment(new LuxGramToolsActivity()));
         io.add(R.drawable.outline_groups_24, getString(R.string.NewGroup), () -> {
             Bundle args = new Bundle();
             presentFragment(new GroupCreateActivity(args));

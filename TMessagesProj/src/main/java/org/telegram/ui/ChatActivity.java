@@ -1247,12 +1247,12 @@ public class ChatActivity extends BaseFragment implements
 
     public final static int OPTION_VIEW_STATISTICS = 115;
     public final static int OPTION_WELCOME_REVERT = 116;
-    public final static int OPTION_DRGRAM_FAVORITE = 117;
-    public final static int OPTION_DRGRAM_DETAILS = 118;
-    public final static int OPTION_DRGRAM_EXPAND = 119;
-    public final static int OPTION_DRGRAM_ADV_FWD = 120; // DrGram Fix 33: advanced forward from the message menu
-    public final static int OPTION_DRGRAM_AI = 121; // DrGram Fix 33: AI tools from the message menu
-    public final static int OPTION_DRGRAM_ZABANAVIS = 122; // DrGram Fix 38: message annotation styles
+    public final static int OPTION_LUXGRAM_FAVORITE = 117;
+    public final static int OPTION_LUXGRAM_DETAILS = 118;
+    public final static int OPTION_LUXGRAM_EXPAND = 119;
+    public final static int OPTION_LUXGRAM_ADV_FWD = 120; // LuxGram Fix 33: advanced forward from the message menu
+    public final static int OPTION_LUXGRAM_AI = 121; // LuxGram Fix 33: AI tools from the message menu
+    public final static int OPTION_LUXGRAM_ZABANAVIS = 122; // LuxGram Fix 38: message annotation styles
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             NotificationCenter.messagesRead,
@@ -1673,17 +1673,17 @@ public class ChatActivity extends BaseFragment implements
     private final static int view_as_topics = 59;
 
     private final static int search = 40;
-    private final static int drgramSelectMany = 45;
-    private final static int drgramHideChat = 46;
-    private final static int drgramQuickChats = 47;
-    private final static int drgramDrawSend = 48;
-    private final static int drgramQuickReplies = 49;
-    private final static int drgramSmartReplyEntry = 91; // DrGram Fix 71: smart reply
-    private final static int drgramAutoStyle = 92;      // DrGram Fix 71: auto message style
-    private final static int drgramVoiceFx = 93;        // DrGram Fix 71: voice changer
-    private final static int drgramToolsHub = 94;       // DrGram Fix 71: full tools hub
-    private final static int drgramAiSummary = 95;      // DrGram Fix 80: AI chat summary
-    private final static int drgramAutoTranslate = 96;  // DrGram Fix 80: per-chat auto-translate
+    private final static int luxgramSelectMany = 45;
+    private final static int luxgramHideChat = 46;
+    private final static int luxgramQuickChats = 47;
+    private final static int luxgramDrawSend = 48;
+    private final static int luxgramQuickReplies = 49;
+    private final static int luxgramSmartReplyEntry = 91; // LuxGram Fix 71: smart reply
+    private final static int luxgramAutoStyle = 92;      // LuxGram Fix 71: auto message style
+    private final static int luxgramVoiceFx = 93;        // LuxGram Fix 71: voice changer
+    private final static int luxgramToolsHub = 94;       // LuxGram Fix 71: full tools hub
+    private final static int luxgramAiSummary = 95;      // LuxGram Fix 80: AI chat summary
+    private final static int luxgramAutoTranslate = 96;  // LuxGram Fix 80: per-chat auto-translate
 
     private final static int topic_close = 60;
     private final static int open_forum = 61;
@@ -1701,13 +1701,13 @@ public class ChatActivity extends BaseFragment implements
     private final static int open_direct = 70;
     private final static int remove_fee = 71;
     private final static int charge_fee = 72;
-    private final static int drgramAdvForward = 73; // DrGram Fix 27: star-badged Advanced Forward
+    private final static int luxgramAdvForward = 73; // LuxGram Fix 27: star-badged Advanced Forward
 
-    // DrGram Fix 69: true while the destination picker opened by forward-menu
+    // LuxGram Fix 69: true while the destination picker opened by forward-menu
     // option 1 (فوروارد بدون نام فرستنده) is on screen; consumed once in
     // didSelectDialogs — messages are then re-sent WITHOUT the "Forwarded from"
     // header so no sender or channel name ever appears.
-    private boolean drgramCleanForwardPending;
+    private boolean luxgramCleanForwardPending;
 
     private final static int chat_menu_topic_create = 73;
 
@@ -2009,14 +2009,14 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         public void onMessageSend(CharSequence message, boolean notify, int scheduleDate, int scheduleRepeatPeriod, long payStars) {
-            // DrGram premium effect: gold sparks burst at the send button on every real send
-            if (scheduleDate == 0 && SharedConfig.drgramSendSparks && contentView != null && chatActivityEnterView != null) {
+            // LuxGram premium effect: gold sparks burst at the send button on every real send
+            if (scheduleDate == 0 && SharedConfig.luxgramSendSparks && contentView != null && chatActivityEnterView != null) {
                 int[] sparkLocation = new int[2];
                 chatActivityEnterView.getLocationInWindow(sparkLocation);
                 boolean sparkRtl = LocaleController.isRTL;
                 float sparkX = sparkLocation[0] + (sparkRtl ? dp(36) : chatActivityEnterView.getMeasuredWidth() - dp(36));
                 float sparkY = sparkLocation[1] + dp(12);
-                contentView.startDrgramSparks(sparkX, sparkY, 1.75f); // DrGram Fix 15: grand burst
+                contentView.startLuxGramSparks(sparkX, sparkY, 1.75f); // LuxGram Fix 15: grand burst
             }
             if (chatListItemAnimator != null) {
                 chatActivityEnterViewAnimateFromTop = chatActivityEnterView.getBackgroundTop();
@@ -2027,7 +2027,7 @@ public class ChatActivity extends BaseFragment implements
             if (mentionContainer != null && mentionContainer.getAdapter() != null) {
                 mentionContainer.getAdapter().addHashtagsFromMessage(message);
             }
-            org.telegram.messenger.DrGramHashtags.onOutgoingText(currentAccount, message);
+            org.telegram.messenger.LuxGramHashtags.onOutgoingText(currentAccount, message);
             if (scheduleDate != 0) {
                 if (scheduledMessagesCount == -1) {
                     scheduledMessagesCount = 0;
@@ -3785,18 +3785,18 @@ public class ChatActivity extends BaseFragment implements
                     }
                     createDeleteMessagesAlert(null, null);
                 } else if (id == forward) {
-                    // DrGram Fix 33: the forward arrow now opens the 3-way forward menu
+                    // LuxGram Fix 33: the forward arrow now opens the 3-way forward menu
                     // (plain forward / forward with quote / advanced forward)
-                    View drgramFwdAnchor = actionBar.createActionMode().getItem(forward);
-                    drgramShowForwardMenu(drgramFwdAnchor, true);
-                } else if (id == drgramAdvForward) { // DrGram Fix 27
+                    View luxgramFwdAnchor = actionBar.createActionMode().getItem(forward);
+                    luxgramShowForwardMenu(luxgramFwdAnchor, true);
+                } else if (id == luxgramAdvForward) { // LuxGram Fix 27
                     if (getMessagesController().isFrozen()) {
                         AccountFrozenAlert.show(currentAccount);
                     } else {
-                        drgramForwardSelectionAdvanced();
+                        luxgramForwardSelectionAdvanced();
                     }
-                } else if (id == drgramSelectMany) {
-                    drgramSelectRecentMessages();
+                } else if (id == luxgramSelectMany) {
+                    luxgramSelectRecentMessages();
                 } else if (id == share) {
                     share();
                 } else if (id == open_direct) {
@@ -3864,43 +3864,43 @@ public class ChatActivity extends BaseFragment implements
                         return;
                     }
                     showDialog(AlertsCreator.createTTLAlert(getParentActivity(), currentEncryptedChat, themeDelegate).create());
-                } else if (id == drgramHideChat) {
+                } else if (id == luxgramHideChat) {
                     if (getParentActivity() == null) {
                         return;
                     }
-                    AlertDialog.Builder drgramVaultBuilder = new AlertDialog.Builder(getParentActivity(), themeDelegate);
-                    drgramVaultBuilder.setTitle(LocaleController.getString(R.string.DrGramVaultHide));
-                    drgramVaultBuilder.setMessage(LocaleController.getString(R.string.DrGramVaultHideConfirm));
-                    drgramVaultBuilder.setPositiveButton(LocaleController.getString(R.string.DrGramVaultHide), (dialog2, which2) -> {
-                        org.telegram.messenger.DrGramVault.getInstance(currentAccount).hide(getDialogId());
+                    AlertDialog.Builder luxgramVaultBuilder = new AlertDialog.Builder(getParentActivity(), themeDelegate);
+                    luxgramVaultBuilder.setTitle(LocaleController.getString(R.string.LuxGramVaultHide));
+                    luxgramVaultBuilder.setMessage(LocaleController.getString(R.string.LuxGramVaultHideConfirm));
+                    luxgramVaultBuilder.setPositiveButton(LocaleController.getString(R.string.LuxGramVaultHide), (dialog2, which2) -> {
+                        org.telegram.messenger.LuxGramVault.getInstance(currentAccount).hide(getDialogId());
                         finishFragment();
                     });
-                    drgramVaultBuilder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-                    drgramVaultBuilder.show();
-                } else if (id == drgramQuickChats) {
-                    drgramShowQuickChats();
-                } else if (id == drgramDrawSend) {
+                    luxgramVaultBuilder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+                    luxgramVaultBuilder.show();
+                } else if (id == luxgramQuickChats) {
+                    luxgramShowQuickChats();
+                } else if (id == luxgramDrawSend) {
                     if (getParentActivity() != null && getDialogId() != 0) {
-                        presentFragment(new org.telegram.ui.DrGramDrawActivity(getDialogId()));
+                        presentFragment(new org.telegram.ui.LuxGramDrawActivity(getDialogId()));
                     }
-                } else if (id == drgramQuickReplies) {
-                    drgramShowQuickReplies();
-                } else if (id == drgramSmartReplyEntry) { // DrGram Fix 71
-                    presentFragment(new DrGramSmartReplyActivity());
-                } else if (id == drgramAutoStyle) { // DrGram Fix 71
-                    drgramShowAutoStylePicker();
-                } else if (id == drgramVoiceFx) { // DrGram Fix 71
-                    drgramShowVoiceFxPicker();
-                } else if (id == drgramToolsHub) { // DrGram Fix 71
-                    presentFragment(new DrGramToolsActivity());
-                } else if (id == drgramAiSummary) { // DrGram Fix 80
-                    org.telegram.messenger.DrGramChatSummary.summarize(ChatActivity.this, messages);
-                } else if (id == drgramAutoTranslate) { // DrGram Fix 80: toggle per-chat auto-translate
-                    boolean drgramNewState = org.telegram.messenger.DrGramAutoTranslate.toggle(getDialogId());
+                } else if (id == luxgramQuickReplies) {
+                    luxgramShowQuickReplies();
+                } else if (id == luxgramSmartReplyEntry) { // LuxGram Fix 71
+                    presentFragment(new LuxGramSmartReplyActivity());
+                } else if (id == luxgramAutoStyle) { // LuxGram Fix 71
+                    luxgramShowAutoStylePicker();
+                } else if (id == luxgramVoiceFx) { // LuxGram Fix 71
+                    luxgramShowVoiceFxPicker();
+                } else if (id == luxgramToolsHub) { // LuxGram Fix 71
+                    presentFragment(new LuxGramToolsActivity());
+                } else if (id == luxgramAiSummary) { // LuxGram Fix 80
+                    org.telegram.messenger.LuxGramChatSummary.summarize(ChatActivity.this, messages);
+                } else if (id == luxgramAutoTranslate) { // LuxGram Fix 80: toggle per-chat auto-translate
+                    boolean luxgramNewState = org.telegram.messenger.LuxGramAutoTranslate.toggle(getDialogId());
                     try {
                         if (getParentActivity() != null) {
                             android.widget.Toast.makeText(getParentActivity(),
-                                LocaleController.getString(drgramNewState ? R.string.DrGramAutoTranslateOn : R.string.DrGramAutoTranslateOff),
+                                LocaleController.getString(luxgramNewState ? R.string.LuxGramAutoTranslateOn : R.string.LuxGramAutoTranslateOff),
                                 android.widget.Toast.LENGTH_SHORT).show();
                         }
                     } catch (Throwable t) {
@@ -4528,36 +4528,36 @@ public class ChatActivity extends BaseFragment implements
                     LocaleController.getString(UserObject.isBotForum(currentUser) ? R.string.ClearAllHistory : R.string.ClearHistory));
             }
             if (getDialogId() != 0 && (currentUser == null || !UserObject.isUserSelf(currentUser))) {
-                headerItem.lazilyAddSubItem(drgramHideChat, R.drawable.msg_secret,
-                    LocaleController.getString(R.string.DrGramVaultHide));
+                headerItem.lazilyAddSubItem(luxgramHideChat, R.drawable.msg_secret,
+                    LocaleController.getString(R.string.LuxGramVaultHide));
             }
-            if (getDialogId() != 0 && org.telegram.messenger.DrGramChatTools.getInstance(currentAccount).isQuickChatsEnabled()) {
-                headerItem.lazilyAddSubItem(drgramQuickChats, R.drawable.msg_discuss,
-                    LocaleController.getString(R.string.DrGramQuickChats));
+            if (getDialogId() != 0 && org.telegram.messenger.LuxGramChatTools.getInstance(currentAccount).isQuickChatsEnabled()) {
+                headerItem.lazilyAddSubItem(luxgramQuickChats, R.drawable.msg_discuss,
+                    LocaleController.getString(R.string.LuxGramQuickChats));
             }
-            if (getDialogId() != 0 && org.telegram.messenger.DrGramMedia.isDrawSendEnabled()) {
-                headerItem.lazilyAddSubItem(drgramDrawSend, R.drawable.photo_paint_brush,
-                    LocaleController.getString(R.string.DrGramDrawSend));
+            if (getDialogId() != 0 && org.telegram.messenger.LuxGramMedia.isDrawSendEnabled()) {
+                headerItem.lazilyAddSubItem(luxgramDrawSend, R.drawable.photo_paint_brush,
+                    LocaleController.getString(R.string.LuxGramDrawSend));
             }
-            if (getDialogId() != 0) { // DrGram Fix 80: auto-translate this chat
-                headerItem.lazilyAddSubItem(drgramAutoTranslate, R.drawable.msg_translate,
-                    LocaleController.getString(R.string.DrGramAutoTranslateMenu));
+            if (getDialogId() != 0) { // LuxGram Fix 80: auto-translate this chat
+                headerItem.lazilyAddSubItem(luxgramAutoTranslate, R.drawable.msg_translate,
+                    LocaleController.getString(R.string.LuxGramAutoTranslateMenu));
             }
-            if (getDialogId() != 0 && !isSecretChat() && org.telegram.messenger.DrGramQuickReplies.getCount() > 0) {
-                headerItem.lazilyAddSubItem(drgramQuickReplies, R.drawable.msg_add,
-                    LocaleController.getString(R.string.DrGramSetRepliesUse));
+            if (getDialogId() != 0 && !isSecretChat() && org.telegram.messenger.LuxGramQuickReplies.getCount() > 0) {
+                headerItem.lazilyAddSubItem(luxgramQuickReplies, R.drawable.msg_add,
+                    LocaleController.getString(R.string.LuxGramSetRepliesUse));
             }
-            if (getDialogId() != 0 && !isSecretChat()) { // DrGram Fix 71: chat tools in three-dot menu
-                headerItem.lazilyAddSubItem(drgramSmartReplyEntry, R.drawable.msg_bot,
-                    LocaleController.getString(R.string.DrGramSmartReplyTitle));
-                headerItem.lazilyAddSubItem(drgramAutoStyle, R.drawable.msg_translate,
-                    LocaleController.getString(R.string.DrGramAutoStyleMenu));
-                headerItem.lazilyAddSubItem(drgramVoiceFx, R.drawable.msg_premium_voice,
-                    LocaleController.getString(R.string.DrGramVoiceChange));
-                headerItem.lazilyAddSubItem(drgramToolsHub, R.drawable.msg_settings,
-                    LocaleController.getString(R.string.DrGramToolsDrawer));
-                headerItem.lazilyAddSubItem(drgramAiSummary, R.drawable.msg_translate,
-                    LocaleController.getString(R.string.DrGramAiSummaryMenu)); // DrGram Fix 80
+            if (getDialogId() != 0 && !isSecretChat()) { // LuxGram Fix 71: chat tools in three-dot menu
+                headerItem.lazilyAddSubItem(luxgramSmartReplyEntry, R.drawable.msg_bot,
+                    LocaleController.getString(R.string.LuxGramSmartReplyTitle));
+                headerItem.lazilyAddSubItem(luxgramAutoStyle, R.drawable.msg_translate,
+                    LocaleController.getString(R.string.LuxGramAutoStyleMenu));
+                headerItem.lazilyAddSubItem(luxgramVoiceFx, R.drawable.msg_premium_voice,
+                    LocaleController.getString(R.string.LuxGramVoiceChange));
+                headerItem.lazilyAddSubItem(luxgramToolsHub, R.drawable.msg_settings,
+                    LocaleController.getString(R.string.LuxGramToolsDrawer));
+                headerItem.lazilyAddSubItem(luxgramAiSummary, R.drawable.msg_translate,
+                    LocaleController.getString(R.string.LuxGramAiSummaryMenu)); // LuxGram Fix 80
             }
             boolean addedSettings = false;
             if (!isTopic) {
@@ -7086,13 +7086,13 @@ public class ChatActivity extends BaseFragment implements
 
         contentView.addView(chatListView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
-        // DrGram Fix 21: group members bar — a floating avatar strip right under the header
-        if (SharedConfig.drgramMembersBar && currentChat != null && !currentChat.broadcast
+        // LuxGram Fix 21: group members bar — a floating avatar strip right under the header
+        if (SharedConfig.luxgramMembersBar && currentChat != null && !currentChat.broadcast
                 && !ChatObject.isForum(currentChat)
                 && (ChatObject.isMegagroup(currentChat) || !ChatObject.isChannel(currentChat))) {
             try {
-                DrGramMembersBar drgramMembersBar = new DrGramMembersBar(context, currentAccount, currentChat.id, this);
-                contentView.addView(drgramMembersBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 10, 4, 10, 0));
+                LuxGramMembersBar luxgramMembersBar = new LuxGramMembersBar(context, currentAccount, currentChat.id, this);
+                contentView.addView(luxgramMembersBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 10, 4, 10, 0));
             } catch (Throwable e21) {
                 FileLog.e(e21);
             }
@@ -8219,8 +8219,8 @@ public class ChatActivity extends BaseFragment implements
         }
 
         actionsButtonsLayout = new ChatActivityActionsButtonsLayout(context, resourceProvider, blurredBackgroundColorProvider, glassBackgroundDrawableFactory);
-        // DrGram Fix 33: the bottom forward arrow opens the same 3-way forward menu
-        actionsButtonsLayout.setForwardButtonOnClickListener(v -> drgramShowForwardMenu(actionsButtonsLayout != null ? actionsButtonsLayout.getForwardButton() : null, false));
+        // LuxGram Fix 33: the bottom forward arrow opens the same 3-way forward menu
+        actionsButtonsLayout.setForwardButtonOnClickListener(v -> luxgramShowForwardMenu(actionsButtonsLayout != null ? actionsButtonsLayout.getForwardButton() : null, false));
         actionsButtonsLayout.setReplyButtonOnClickListener(v -> {
             MessageObject messageObject = null;
             for (int a = 1; a >= 0; a--) {
@@ -10448,7 +10448,7 @@ public class ChatActivity extends BaseFragment implements
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
             if (!isSavedMessages && getDialogId() != UserObject.VERIFY) {
                 actionModeViews.add(actionMode.addItemWithWidth(forward, R.drawable.msg_forward, dp(48), LocaleController.getString(R.string.Forward)));
-                actionModeViews.add(actionMode.addItemWithWidth(drgramAdvForward, R.drawable.drgram_ic_forward_star, dp(48), LocaleController.getString(R.string.DrGramAdvFwdTitle))); // DrGram Fix 27: star = Advanced Forward
+                actionModeViews.add(actionMode.addItemWithWidth(luxgramAdvForward, R.drawable.luxgram_ic_forward_star, dp(48), LocaleController.getString(R.string.LuxGramAdvFwdTitle))); // LuxGram Fix 27: star = Advanced Forward
             }
             actionModeViews.add(actionMode.addItemWithWidth(share, R.drawable.msg_shareout, dp(48), LocaleController.getString(R.string.ShareFile)));
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(48), LocaleController.getString(R.string.Delete)));
@@ -10458,14 +10458,14 @@ public class ChatActivity extends BaseFragment implements
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(48), LocaleController.getString(R.string.Delete)));
         }
-        actionModeViews.add(actionMode.addItemWithWidth(drgramSelectMany, R.drawable.ic_ab_done, dp(48), LocaleController.getString(R.string.DrGramSelectMany)));
+        actionModeViews.add(actionMode.addItemWithWidth(luxgramSelectMany, R.drawable.ic_ab_done, dp(48), LocaleController.getString(R.string.LuxGramSelectMany)));
         actionMode.setItemVisibility(edit, canEditMessagesCount == 1 && selectedMessagesIds[0].size() + selectedMessagesIds[1].size() == 1 ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(copy, !isPeerNoForwards() && selectedMessagesCanCopyIds[0].size() + selectedMessagesCanCopyIds[1].size() != 0 ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(star, selectedMessagesCanStarIds[0].size() + selectedMessagesCanStarIds[1].size() != 0 ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(delete, cantDeleteMessagesCount == 0 ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(tag_message, getUserConfig().isPremium() ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(share, View.GONE);
-        actionMode.setItemVisibility(drgramAdvForward, selectedMessagesIds[0].size() + selectedMessagesIds[1].size() != 0 ? View.VISIBLE : View.GONE); // DrGram Fix 27
+        actionMode.setItemVisibility(luxgramAdvForward, selectedMessagesIds[0].size() + selectedMessagesIds[1].size() != 0 ? View.VISIBLE : View.GONE); // LuxGram Fix 27
     }
 
     private void hideTagSelector() {
@@ -12448,7 +12448,7 @@ public class ChatActivity extends BaseFragment implements
         if (selectionReactionsOverlay != null && selectionReactionsOverlay.isVisible()) {
             selectionReactionsOverlay.setHiddenByScroll(true);
         }
-        // DrGram Fix 27: plain forward is Telegram-native again — the star button opens Advanced Forward
+        // LuxGram Fix 27: plain forward is Telegram-native again — the star button opens Advanced Forward
         Bundle args = new Bundle();
         args.putBoolean("onlySelect", true);
         args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_FORWARD);
@@ -12461,59 +12461,59 @@ public class ChatActivity extends BaseFragment implements
         presentFragment(fragment);
     }
 
-    // DrGram Fix 27: Advanced Forward straight from the selection toolbar (star icon)
-    private void drgramForwardSelectionAdvanced() {
-        ArrayList<MessageObject> drgramFwd = drgramCollectSelectedMessages();
-        drgramPresentAdvancedForward(drgramFwd);
+    // LuxGram Fix 27: Advanced Forward straight from the selection toolbar (star icon)
+    private void luxgramForwardSelectionAdvanced() {
+        ArrayList<MessageObject> luxgramFwd = luxgramCollectSelectedMessages();
+        luxgramPresentAdvancedForward(luxgramFwd);
     }
 
-    // DrGram Fix 33: shared collector for the selection-mode forward flows
-    private ArrayList<MessageObject> drgramCollectSelectedMessages() {
-        ArrayList<MessageObject> drgramFwd = new ArrayList<>();
+    // LuxGram Fix 33: shared collector for the selection-mode forward flows
+    private ArrayList<MessageObject> luxgramCollectSelectedMessages() {
+        ArrayList<MessageObject> luxgramFwd = new ArrayList<>();
         for (int a = 1; a >= 0; a--) {
-            ArrayList<Integer> drgramIds = new ArrayList<>();
+            ArrayList<Integer> luxgramIds = new ArrayList<>();
             for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
-                drgramIds.add(selectedMessagesIds[a].keyAt(b));
+                luxgramIds.add(selectedMessagesIds[a].keyAt(b));
             }
-            Collections.sort(drgramIds);
-            for (int b = 0; b < drgramIds.size(); b++) {
-                MessageObject mo = selectedMessagesIds[a].get(drgramIds.get(b));
+            Collections.sort(luxgramIds);
+            for (int b = 0; b < luxgramIds.size(); b++) {
+                MessageObject mo = selectedMessagesIds[a].get(luxgramIds.get(b));
                 if (mo != null) {
-                    drgramFwd.add(mo);
+                    luxgramFwd.add(mo);
                 }
             }
         }
-        return drgramFwd;
+        return luxgramFwd;
     }
 
-    // DrGram Fix 69: option 1 — «فوروارد» بدون نقل قول: the user asked for a
+    // LuxGram Fix 69: option 1 — «فوروارد» بدون نقل قول: the user asked for a
     // plain forward where the name of the person or channel NEVER appears.
     // The native picker is reused; didSelectDialogs re-sends the collected
     // messages with forwardFromMyName=true which strips the fwd header.
-    private void drgramForwardSelectionClean(boolean fromActionBar) {
-        drgramCleanForwardPending = true;
+    private void luxgramForwardSelectionClean(boolean fromActionBar) {
+        luxgramCleanForwardPending = true;
         openForward(fromActionBar);
     }
 
-    // DrGram Fix 33: "forward with quote" — opens the advanced editor in quote mode,
+    // LuxGram Fix 33: "forward with quote" — opens the advanced editor in quote mode,
     // which sends the message from the user's own name with a quote header of the source.
-    private void drgramForwardSelectionQuoted() {
-        ArrayList<MessageObject> drgramFwd = drgramCollectSelectedMessages();
-        if (drgramFwd.isEmpty()) {
+    private void luxgramForwardSelectionQuoted() {
+        ArrayList<MessageObject> luxgramFwd = luxgramCollectSelectedMessages();
+        if (luxgramFwd.isEmpty()) {
             return;
         }
-        presentFragment(new DrGramForwardEditor(drgramFwd, true));
+        presentFragment(new LuxGramForwardEditor(luxgramFwd, true));
         clearSelectionMode();
     }
 
     /**
-     * DrGram Fix 33: the 3-way forward menu the user asked for. Tapping the forward
+     * LuxGram Fix 33: the 3-way forward menu the user asked for. Tapping the forward
      * arrow (selection toolbar or the bottom bar) now offers:
      *   1. فوروارد — the plain Telegram-native forward picker
      *   2. هدایت با نقل قول — forward with quote (own name + source quote header)
      *   3. هدایت پیشرفته — the full Advanced Forward editor
      */
-    private void drgramShowForwardMenu(View anchor, boolean fromActionBar) {
+    private void luxgramShowForwardMenu(View anchor, boolean fromActionBar) {
         if (getParentActivity() == null || anchor == null) {
             // graceful fallback: behave like the old plain forward
             openForward(fromActionBar);
@@ -12525,9 +12525,9 @@ public class ChatActivity extends BaseFragment implements
         }
         try {
             ItemOptions.makeOptions(ChatActivity.this, anchor)
-                    .add(R.drawable.msg_forward, LocaleController.getString(R.string.Forward), () -> drgramForwardSelectionClean(fromActionBar))
-                    .add(R.drawable.menu_reply, LocaleController.getString(R.string.DrGramFwdWithQuote), this::drgramForwardSelectionQuoted)
-                    .add(R.drawable.drgram_ic_forward_star, LocaleController.getString(R.string.DrGramAdvFwdTitle), this::drgramForwardSelectionAdvanced)
+                    .add(R.drawable.msg_forward, LocaleController.getString(R.string.Forward), () -> luxgramForwardSelectionClean(fromActionBar))
+                    .add(R.drawable.menu_reply, LocaleController.getString(R.string.LuxGramFwdWithQuote), this::luxgramForwardSelectionQuoted)
+                    .add(R.drawable.luxgram_ic_forward_star, LocaleController.getString(R.string.LuxGramAdvFwdTitle), this::luxgramForwardSelectionAdvanced)
                     .setDrawScrim(false)
                     .show();
         } catch (Throwable t) {
@@ -19268,7 +19268,7 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    private void drgramSelectRecentMessages() {
+    private void luxgramSelectRecentMessages() {
         boolean hitLimit = false;
         for (int i = messages.size() - 1; i >= 0; i--) {
             if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= 100) {
@@ -19287,68 +19287,68 @@ public class ChatActivity extends BaseFragment implements
         updateActionModeTitle();
         updateVisibleRows();
         if (hitLimit && getParentActivity() != null) {
-            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.DrGramSelectManyLimit), android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.LuxGramSelectManyLimit), android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 
-    /** DrGram Fix 72: explicit auto-style picker (switch + live previews). */
-    private void drgramShowAutoStylePicker() {
-        org.telegram.messenger.DrGramZabanavis.showAutoPicker(this, () -> {
+    /** LuxGram Fix 72: explicit auto-style picker (switch + live previews). */
+    private void luxgramShowAutoStylePicker() {
+        org.telegram.messenger.LuxGramZabanavis.showAutoPicker(this, () -> {
             if (getParentActivity() == null) {
                 return;
             }
-            int style = org.telegram.messenger.DrGramZabanavis.getAutoStyle();
+            int style = org.telegram.messenger.LuxGramZabanavis.getAutoStyle();
             String text;
-            if (style == org.telegram.messenger.DrGramZabanavis.STYLE_NORMAL) {
-                text = LocaleController.getString(R.string.DrGramAutoStyleOff);
+            if (style == org.telegram.messenger.LuxGramZabanavis.STYLE_NORMAL) {
+                text = LocaleController.getString(R.string.LuxGramAutoStyleOff);
             } else {
-                text = LocaleController.formatString(R.string.DrGramAutoStyleOn, org.telegram.messenger.DrGramZabanavis.styleNameOf(style));
+                text = LocaleController.formatString(R.string.LuxGramAutoStyleOn, org.telegram.messenger.LuxGramZabanavis.styleNameOf(style));
             }
             BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.contact_check, text).show();
         });
     }
 
-    /** DrGram Fix 72: professional voice preset picker (16 voices, all effects). */
-    private void drgramShowVoiceFxPicker() {
-        org.telegram.messenger.DrGramVoiceChanger.showPresetPicker(this, () -> {
+    /** LuxGram Fix 72: professional voice preset picker (16 voices, all effects). */
+    private void luxgramShowVoiceFxPicker() {
+        org.telegram.messenger.LuxGramVoiceChanger.showPresetPicker(this, () -> {
             if (getParentActivity() == null) {
                 return;
             }
-            int preset = org.telegram.messenger.DrGramVoiceChanger.getPreset();
+            int preset = org.telegram.messenger.LuxGramVoiceChanger.getPreset();
             String text;
             if (preset == 0) {
-                text = LocaleController.getString(R.string.DrGramVoiceChange) + ": " + LocaleController.getString(R.string.DrGramVoiceChangeOff);
+                text = LocaleController.getString(R.string.LuxGramVoiceChange) + ": " + LocaleController.getString(R.string.LuxGramVoiceChangeOff);
             } else {
-                text = LocaleController.getString(R.string.DrGramVoiceChange) + ": " + org.telegram.messenger.DrGramVoiceChanger.presetName(preset);
+                text = LocaleController.getString(R.string.LuxGramVoiceChange) + ": " + org.telegram.messenger.LuxGramVoiceChanger.presetName(preset);
             }
             BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.contact_check, text).show();
         });
     }
 
-    private void drgramShowQuickReplies() {
+    private void luxgramShowQuickReplies() {
         if (getParentActivity() == null) {
             return;
         }
-        ArrayList<org.telegram.messenger.DrGramQuickReplies.Item> drgramReplies = org.telegram.messenger.DrGramQuickReplies.getAll();
-        if (drgramReplies.isEmpty()) {
-            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.DrGramSetRepliesEmpty), android.widget.Toast.LENGTH_SHORT).show();
+        ArrayList<org.telegram.messenger.LuxGramQuickReplies.Item> luxgramReplies = org.telegram.messenger.LuxGramQuickReplies.getAll();
+        if (luxgramReplies.isEmpty()) {
+            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.LuxGramSetRepliesEmpty), android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
-        String[] drgramLabels = new String[drgramReplies.size()];
-        for (int drgramI = 0; drgramI < drgramReplies.size(); drgramI++) {
-            String label = drgramReplies.get(drgramI).text;
+        String[] luxgramLabels = new String[luxgramReplies.size()];
+        for (int luxgramI = 0; luxgramI < luxgramReplies.size(); luxgramI++) {
+            String label = luxgramReplies.get(luxgramI).text;
             if (label != null && label.length() > 80) {
                 label = label.substring(0, 80) + "…";
             }
-            drgramLabels[drgramI] = label;
+            luxgramLabels[luxgramI] = label;
         }
         new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity())
-            .setTitle(LocaleController.getString(R.string.DrGramSetReplies))
-            .setItems(drgramLabels, (dialog, which) -> {
-                if (which < 0 || which >= drgramReplies.size() || chatActivityEnterView == null) {
+            .setTitle(LocaleController.getString(R.string.LuxGramSetReplies))
+            .setItems(luxgramLabels, (dialog, which) -> {
+                if (which < 0 || which >= luxgramReplies.size() || chatActivityEnterView == null) {
                     return;
                 }
-                String insert = drgramReplies.get(which).text;
+                String insert = luxgramReplies.get(which).text;
                 CharSequence existing = chatActivityEnterView.getFieldText();
                 if (android.text.TextUtils.isEmpty(existing)) {
                     chatActivityEnterView.setFieldText(insert);
@@ -19360,161 +19360,161 @@ public class ChatActivity extends BaseFragment implements
             .show();
     }
 
-    private void drgramShowQuickChats() {
+    private void luxgramShowQuickChats() {
         if (getParentActivity() == null) {
             return;
         }
-        android.content.Context drgramCtx = getParentActivity();
-        ArrayList<TLRPC.Dialog> drgramDialogs = org.telegram.messenger.DrGramVault.getInstance(currentAccount).filterDialogs(getMessagesController().getDialogs(0));
-        ArrayList<TLRPC.Dialog> drgramPicked = new ArrayList<>();
-        for (int drgramI = 0; drgramI < drgramDialogs.size() && drgramPicked.size() < 14; drgramI++) {
-            TLRPC.Dialog drgramDialog = drgramDialogs.get(drgramI);
-            if (drgramDialog == null || drgramDialog.id == getDialogId() || drgramDialog instanceof TLRPC.TL_dialogFolder) {
+        android.content.Context luxgramCtx = getParentActivity();
+        ArrayList<TLRPC.Dialog> luxgramDialogs = org.telegram.messenger.LuxGramVault.getInstance(currentAccount).filterDialogs(getMessagesController().getDialogs(0));
+        ArrayList<TLRPC.Dialog> luxgramPicked = new ArrayList<>();
+        for (int luxgramI = 0; luxgramI < luxgramDialogs.size() && luxgramPicked.size() < 14; luxgramI++) {
+            TLRPC.Dialog luxgramDialog = luxgramDialogs.get(luxgramI);
+            if (luxgramDialog == null || luxgramDialog.id == getDialogId() || luxgramDialog instanceof TLRPC.TL_dialogFolder) {
                 continue;
             }
-            drgramPicked.add(drgramDialog);
+            luxgramPicked.add(luxgramDialog);
         }
-        if (drgramPicked.isEmpty()) {
-            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.DrGramQuickEmpty), android.widget.Toast.LENGTH_SHORT).show();
+        if (luxgramPicked.isEmpty()) {
+            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.LuxGramQuickEmpty), android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
-        final org.telegram.ui.ActionBar.BottomSheet[] drgramSheetHolder = new org.telegram.ui.ActionBar.BottomSheet[1];
-        LinearLayout drgramStrip = new LinearLayout(drgramCtx);
-        drgramStrip.setOrientation(LinearLayout.HORIZONTAL);
-        int drgramPad = AndroidUtilities.dp(14);
-        drgramStrip.setPadding(drgramPad, AndroidUtilities.dp(6), drgramPad, drgramPad);
-        for (int drgramI = 0; drgramI < drgramPicked.size(); drgramI++) {
-            TLRPC.Dialog drgramDialog = drgramPicked.get(drgramI);
-            TLRPC.User drgramUser = drgramDialog.id > 0 ? getMessagesController().getUser(drgramDialog.id) : null;
-            TLRPC.Chat drgramChat = drgramDialog.id < 0 ? getMessagesController().getChat(-drgramDialog.id) : null;
-            if (drgramUser == null && drgramChat == null) {
+        final org.telegram.ui.ActionBar.BottomSheet[] luxgramSheetHolder = new org.telegram.ui.ActionBar.BottomSheet[1];
+        LinearLayout luxgramStrip = new LinearLayout(luxgramCtx);
+        luxgramStrip.setOrientation(LinearLayout.HORIZONTAL);
+        int luxgramPad = AndroidUtilities.dp(14);
+        luxgramStrip.setPadding(luxgramPad, AndroidUtilities.dp(6), luxgramPad, luxgramPad);
+        for (int luxgramI = 0; luxgramI < luxgramPicked.size(); luxgramI++) {
+            TLRPC.Dialog luxgramDialog = luxgramPicked.get(luxgramI);
+            TLRPC.User luxgramUser = luxgramDialog.id > 0 ? getMessagesController().getUser(luxgramDialog.id) : null;
+            TLRPC.Chat luxgramChat = luxgramDialog.id < 0 ? getMessagesController().getChat(-luxgramDialog.id) : null;
+            if (luxgramUser == null && luxgramChat == null) {
                 continue;
             }
-            String drgramName = drgramUser != null ? UserObject.getUserName(drgramUser) : drgramChat.title;
-            LinearLayout drgramItem = new LinearLayout(drgramCtx);
-            drgramItem.setOrientation(LinearLayout.VERTICAL);
-            drgramItem.setGravity(Gravity.CENTER_HORIZONTAL);
-            drgramItem.setBackgroundDrawable(Theme.getSelectorDrawable(false));
-            org.telegram.ui.Components.BackupImageView drgramAvatar = new org.telegram.ui.Components.BackupImageView(drgramCtx);
-            org.telegram.ui.Components.AvatarDrawable drgramAvatarDrawable = new org.telegram.ui.Components.AvatarDrawable();
-            drgramAvatar.setForUserOrChat(drgramUser != null ? drgramUser : drgramChat, drgramAvatarDrawable);
-            drgramItem.addView(drgramAvatar, LayoutHelper.createLinear(46, 46, Gravity.CENTER_HORIZONTAL, 4, 6, 4, 4));
-            TextView drgramNameView = new TextView(drgramCtx);
-            drgramNameView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 11);
-            drgramNameView.setMaxLines(1);
-            drgramNameView.setEllipsize(TextUtils.TruncateAt.END);
-            drgramNameView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
-            drgramNameView.setText(drgramName);
-            drgramItem.addView(drgramNameView, LayoutHelper.createLinear(AndroidUtilities.dp(64), LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 3, 0, 2));
-            drgramItem.setOnClickListener(v -> {
+            String luxgramName = luxgramUser != null ? UserObject.getUserName(luxgramUser) : luxgramChat.title;
+            LinearLayout luxgramItem = new LinearLayout(luxgramCtx);
+            luxgramItem.setOrientation(LinearLayout.VERTICAL);
+            luxgramItem.setGravity(Gravity.CENTER_HORIZONTAL);
+            luxgramItem.setBackgroundDrawable(Theme.getSelectorDrawable(false));
+            org.telegram.ui.Components.BackupImageView luxgramAvatar = new org.telegram.ui.Components.BackupImageView(luxgramCtx);
+            org.telegram.ui.Components.AvatarDrawable luxgramAvatarDrawable = new org.telegram.ui.Components.AvatarDrawable();
+            luxgramAvatar.setForUserOrChat(luxgramUser != null ? luxgramUser : luxgramChat, luxgramAvatarDrawable);
+            luxgramItem.addView(luxgramAvatar, LayoutHelper.createLinear(46, 46, Gravity.CENTER_HORIZONTAL, 4, 6, 4, 4));
+            TextView luxgramNameView = new TextView(luxgramCtx);
+            luxgramNameView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 11);
+            luxgramNameView.setMaxLines(1);
+            luxgramNameView.setEllipsize(TextUtils.TruncateAt.END);
+            luxgramNameView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+            luxgramNameView.setText(luxgramName);
+            luxgramItem.addView(luxgramNameView, LayoutHelper.createLinear(AndroidUtilities.dp(64), LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 3, 0, 2));
+            luxgramItem.setOnClickListener(v -> {
                 try {
-                    if (drgramSheetHolder[0] != null) {
-                        drgramSheetHolder[0].dismiss();
+                    if (luxgramSheetHolder[0] != null) {
+                        luxgramSheetHolder[0].dismiss();
                     }
                 } catch (Exception ignore) {
                 }
-                Bundle drgramArgs = new Bundle();
-                drgramArgs.putLong("dialog_id", drgramDialog.id);
-                presentFragment(new ChatActivity(drgramArgs), true, false);
+                Bundle luxgramArgs = new Bundle();
+                luxgramArgs.putLong("dialog_id", luxgramDialog.id);
+                presentFragment(new ChatActivity(luxgramArgs), true, false);
             });
-            drgramStrip.addView(drgramItem);
+            luxgramStrip.addView(luxgramItem);
         }
-        LinearLayout drgramContent = new LinearLayout(drgramCtx);
-        drgramContent.setOrientation(LinearLayout.VERTICAL);
-        TextView drgramTitle = new TextView(drgramCtx);
-        drgramTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 16);
-        drgramTitle.setTypeface(AndroidUtilities.bold());
-        drgramTitle.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
-        drgramTitle.setPadding(AndroidUtilities.dp(18), AndroidUtilities.dp(14), AndroidUtilities.dp(18), 0);
-        drgramTitle.setText(LocaleController.getString(R.string.DrGramQuickChats));
-        drgramContent.addView(drgramTitle);
-        android.widget.HorizontalScrollView drgramScroll = new android.widget.HorizontalScrollView(drgramCtx);
-        drgramScroll.addView(drgramStrip);
-        drgramContent.addView(drgramScroll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-        org.telegram.ui.ActionBar.BottomSheet drgramSheet = new org.telegram.ui.ActionBar.BottomSheet(getParentActivity(), false);
-        drgramSheet.setCustomView(drgramContent);
-        drgramSheetHolder[0] = drgramSheet;
-        showDialog(drgramSheet);
+        LinearLayout luxgramContent = new LinearLayout(luxgramCtx);
+        luxgramContent.setOrientation(LinearLayout.VERTICAL);
+        TextView luxgramTitle = new TextView(luxgramCtx);
+        luxgramTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 16);
+        luxgramTitle.setTypeface(AndroidUtilities.bold());
+        luxgramTitle.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        luxgramTitle.setPadding(AndroidUtilities.dp(18), AndroidUtilities.dp(14), AndroidUtilities.dp(18), 0);
+        luxgramTitle.setText(LocaleController.getString(R.string.LuxGramQuickChats));
+        luxgramContent.addView(luxgramTitle);
+        android.widget.HorizontalScrollView luxgramScroll = new android.widget.HorizontalScrollView(luxgramCtx);
+        luxgramScroll.addView(luxgramStrip);
+        luxgramContent.addView(luxgramScroll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        org.telegram.ui.ActionBar.BottomSheet luxgramSheet = new org.telegram.ui.ActionBar.BottomSheet(getParentActivity(), false);
+        luxgramSheet.setCustomView(luxgramContent);
+        luxgramSheetHolder[0] = luxgramSheet;
+        showDialog(luxgramSheet);
     }
 
-    private void drgramShowMessageDetails(MessageObject mo) {
+    private void luxgramShowMessageDetails(MessageObject mo) {
         if (mo == null || mo.messageOwner == null || getParentActivity() == null) {
             return;
         }
-        StringBuilder drgramBuilder = new StringBuilder();
-        drgramBuilder.append(LocaleController.getString(R.string.DrGramMsgId)).append(": ").append(mo.getId()).append('\n');
-        java.text.SimpleDateFormat drgramFormat = new java.text.SimpleDateFormat("yyyy/MM/dd  HH:mm:ss", java.util.Locale.US);
-        drgramFormat.setTimeZone(java.util.TimeZone.getDefault());
-        drgramBuilder.append(LocaleController.getString(R.string.DrGramMsgDate)).append(": ").append(drgramFormat.format(new java.util.Date(mo.messageOwner.date * 1000L)));
-        TLRPC.Document drgramDoc = mo.getDocument();
-        if (drgramDoc != null && drgramDoc.size > 0) {
-            drgramBuilder.append('\n').append(LocaleController.getString(R.string.DrGramMsgSize)).append(": ").append(AndroidUtilities.formatFileSize(drgramDoc.size));
+        StringBuilder luxgramBuilder = new StringBuilder();
+        luxgramBuilder.append(LocaleController.getString(R.string.LuxGramMsgId)).append(": ").append(mo.getId()).append('\n');
+        java.text.SimpleDateFormat luxgramFormat = new java.text.SimpleDateFormat("yyyy/MM/dd  HH:mm:ss", java.util.Locale.US);
+        luxgramFormat.setTimeZone(java.util.TimeZone.getDefault());
+        luxgramBuilder.append(LocaleController.getString(R.string.LuxGramMsgDate)).append(": ").append(luxgramFormat.format(new java.util.Date(mo.messageOwner.date * 1000L)));
+        TLRPC.Document luxgramDoc = mo.getDocument();
+        if (luxgramDoc != null && luxgramDoc.size > 0) {
+            luxgramBuilder.append('\n').append(LocaleController.getString(R.string.LuxGramMsgSize)).append(": ").append(AndroidUtilities.formatFileSize(luxgramDoc.size));
         }
         if (mo.messageOwner.views > 0) {
-            drgramBuilder.append('\n').append(LocaleController.getString(R.string.DrGramMsgViews)).append(": ").append(mo.messageOwner.views);
+            luxgramBuilder.append('\n').append(LocaleController.getString(R.string.LuxGramMsgViews)).append(": ").append(mo.messageOwner.views);
         }
         if (mo.messageOwner.forwards > 0) {
-            drgramBuilder.append('\n').append(LocaleController.getString(R.string.DrGramMsgForwards)).append(": ").append(mo.messageOwner.forwards);
+            luxgramBuilder.append('\n').append(LocaleController.getString(R.string.LuxGramMsgForwards)).append(": ").append(mo.messageOwner.forwards);
         }
         if (mo.messageOwner.edit_date > 0) {
-            drgramBuilder.append('\n').append(LocaleController.getString(R.string.DrGramMsgEdited)).append(": ").append(drgramFormat.format(new java.util.Date(mo.messageOwner.edit_date * 1000L)));
+            luxgramBuilder.append('\n').append(LocaleController.getString(R.string.LuxGramMsgEdited)).append(": ").append(luxgramFormat.format(new java.util.Date(mo.messageOwner.edit_date * 1000L)));
         }
-        AlertDialog.Builder drgramDialog = new AlertDialog.Builder(getParentActivity(), themeDelegate);
-        drgramDialog.setTitle(LocaleController.getString(R.string.DrGramMsgDetails));
-        drgramDialog.setMessage(drgramBuilder.toString());
-        drgramDialog.setPositiveButton(LocaleController.getString(R.string.DrGramCopyId), (dialog, which) -> {
+        AlertDialog.Builder luxgramDialog = new AlertDialog.Builder(getParentActivity(), themeDelegate);
+        luxgramDialog.setTitle(LocaleController.getString(R.string.LuxGramMsgDetails));
+        luxgramDialog.setMessage(luxgramBuilder.toString());
+        luxgramDialog.setPositiveButton(LocaleController.getString(R.string.LuxGramCopyId), (dialog, which) -> {
             try {
-                android.content.ClipboardManager drgramClipboard = (android.content.ClipboardManager) getParentActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-                if (drgramClipboard != null) {
-                    drgramClipboard.setPrimaryClip(android.content.ClipData.newPlainText("id", String.valueOf(mo.getId())));
+                android.content.ClipboardManager luxgramClipboard = (android.content.ClipboardManager) getParentActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                if (luxgramClipboard != null) {
+                    luxgramClipboard.setPrimaryClip(android.content.ClipData.newPlainText("id", String.valueOf(mo.getId())));
                     android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.TextCopied), android.widget.Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception ignore) {
             }
         });
-        drgramDialog.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        drgramDialog.show();
+        luxgramDialog.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        luxgramDialog.show();
     }
 
-    private void drgramExpandSelected() {
+    private void luxgramExpandSelected() {
         if (selectedObject == null) {
             return;
         }
-        selectedObject.drgramExpanded = true;
+        selectedObject.luxgramExpanded = true;
         selectedObject.resetLayout();
         updateVisibleRows();
     }
 
-    private void drgramToggleFavoriteSelected() {
-        MessageObject drgramMo = selectedObject;
-        if (drgramMo == null || drgramMo.getId() <= 0 || getParentActivity() == null) {
+    private void luxgramToggleFavoriteSelected() {
+        MessageObject luxgramMo = selectedObject;
+        if (luxgramMo == null || luxgramMo.getId() <= 0 || getParentActivity() == null) {
             return;
         }
-        String drgramTitle;
+        String luxgramTitle;
         if (currentChat != null) {
-            drgramTitle = currentChat.title;
+            luxgramTitle = currentChat.title;
         } else if (currentUser != null) {
-            drgramTitle = UserObject.getUserName(currentUser);
+            luxgramTitle = UserObject.getUserName(currentUser);
         } else {
-            drgramTitle = "";
+            luxgramTitle = "";
         }
-        String drgramSnippet = "";
-        CharSequence drgramText = drgramMo.messageText;
-        if (drgramText == null || drgramText.length() == 0) {
-            drgramText = drgramMo.caption;
+        String luxgramSnippet = "";
+        CharSequence luxgramText = luxgramMo.messageText;
+        if (luxgramText == null || luxgramText.length() == 0) {
+            luxgramText = luxgramMo.caption;
         }
-        if (drgramText != null) {
-            drgramSnippet = drgramText.toString();
+        if (luxgramText != null) {
+            luxgramSnippet = luxgramText.toString();
         }
-        if (drgramSnippet.length() > 160) {
-            drgramSnippet = drgramSnippet.substring(0, 160);
+        if (luxgramSnippet.length() > 160) {
+            luxgramSnippet = luxgramSnippet.substring(0, 160);
         }
-        boolean drgramAdded = org.telegram.messenger.DrGramFavorites.getInstance(currentAccount).toggle(getDialogId(), drgramMo.getId(), drgramTitle, drgramSnippet);
-        android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(drgramAdded ? R.string.DrGramFavAdded : R.string.DrGramFavRemoved), android.widget.Toast.LENGTH_SHORT).show();
+        boolean luxgramAdded = org.telegram.messenger.LuxGramFavorites.getInstance(currentAccount).toggle(getDialogId(), luxgramMo.getId(), luxgramTitle, luxgramSnippet);
+        android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(luxgramAdded ? R.string.LuxGramFavAdded : R.string.LuxGramFavRemoved), android.widget.Toast.LENGTH_SHORT).show();
     }
 
-    /** DrGram Fix 38: raw text of a message for the zabanavis annotator. */
-    private String drgramZabanavisRawText(MessageObject mo) {
+    /** LuxGram Fix 38: raw text of a message for the zabanavis annotator. */
+    private String luxgramZabanavisRawText(MessageObject mo) {
         if (mo == null || mo.messageOwner == null) {
             return null;
         }
@@ -23619,42 +23619,42 @@ public class ChatActivity extends BaseFragment implements
                     messageObject.forceUpdate = true;
                     messageObject.reactionsChanged = true;
                     updateMessageAnimated(messageObject, true);
-                    // DrGram premium effects: celebrate reaction updates on visible messages
-                    if (SharedConfig.drgramReactionRain && chatListView != null && contentView != null
+                    // LuxGram premium effects: celebrate reaction updates on visible messages
+                    if (SharedConfig.luxgramReactionRain && chatListView != null && contentView != null
                             && messageObject.messageOwner.reactions != null
                             && messageObject.messageOwner.reactions.results != null
                             && !messageObject.messageOwner.reactions.results.isEmpty()) {
-                        View drgramMsgView = null;
+                        View luxgramMsgView = null;
                         for (int i = 0, n = chatListView.getChildCount(); i < n; i++) {
                             View child = chatListView.getChildAt(i);
                             if (child instanceof ChatMessageCell && ((ChatMessageCell) child).getMessageObject() == messageObject) {
-                                drgramMsgView = child;
+                                luxgramMsgView = child;
                                 break;
                             }
                         }
-                        if (drgramMsgView != null) {
-                            int[] drgramLoc = new int[2];
-                            drgramMsgView.getLocationInWindow(drgramLoc);
-                            float drgramX = drgramLoc[0] + drgramMsgView.getMeasuredWidth() / 2.0f;
-                            float drgramY = drgramLoc[1] + drgramMsgView.getMeasuredHeight() / 2.0f;
+                        if (luxgramMsgView != null) {
+                            int[] luxgramLoc = new int[2];
+                            luxgramMsgView.getLocationInWindow(luxgramLoc);
+                            float luxgramX = luxgramLoc[0] + luxgramMsgView.getMeasuredWidth() / 2.0f;
+                            float luxgramY = luxgramLoc[1] + luxgramMsgView.getMeasuredHeight() / 2.0f;
                             if (messageObject.isOutOwner()) {
                                 // someone reacted to our message -> golden dust rain + grand sparks
-                                contentView.startDrgramGoldRain(drgramX, drgramY);
-                                contentView.startDrgramSparks(drgramX, drgramY, 1.6f);
+                                contentView.startLuxGramGoldRain(luxgramX, luxgramY);
+                                contentView.startLuxGramSparks(luxgramX, luxgramY, 1.6f);
                             } else {
                                 // we reacted to someone's message -> single spark burst
-                                boolean drgramChosen = false;
-                                TLRPC.TL_messageReactions drgramNewReactions = (TLRPC.TL_messageReactions) args[2];
-                                if (drgramNewReactions != null && drgramNewReactions.results != null) {
-                                    for (int i = 0, n = drgramNewReactions.results.size(); i < n; i++) {
-                                        if (drgramNewReactions.results.get(i).chosen) {
-                                            drgramChosen = true;
+                                boolean luxgramChosen = false;
+                                TLRPC.TL_messageReactions luxgramNewReactions = (TLRPC.TL_messageReactions) args[2];
+                                if (luxgramNewReactions != null && luxgramNewReactions.results != null) {
+                                    for (int i = 0, n = luxgramNewReactions.results.size(); i < n; i++) {
+                                        if (luxgramNewReactions.results.get(i).chosen) {
+                                            luxgramChosen = true;
                                             break;
                                         }
                                     }
                                 }
-                                if (drgramChosen) {
-                                    contentView.startDrgramSparks(drgramX, drgramY);
+                                if (luxgramChosen) {
+                                    contentView.startLuxGramSparks(luxgramX, luxgramY);
                                 }
                             }
                         }
@@ -25430,7 +25430,7 @@ public class ChatActivity extends BaseFragment implements
     private Pattern sponsoredUrlPattern;
     private MessageObject botSponsoredMessage;
     private void addSponsoredMessages(boolean animated) {
-        if (SharedConfig.drgramHideChannelAds || sponsoredMessagesAdded || chatMode != 0 || !ChatObject.isChannel(currentChat) && !UserObject.isBot(currentUser) || !forwardEndReached[0] || getUserConfig().isPremium() && getMessagesController().isSponsoredDisabled() || isReport()) {
+        if (SharedConfig.luxgramHideChannelAds || sponsoredMessagesAdded || chatMode != 0 || !ChatObject.isChannel(currentChat) && !UserObject.isBot(currentUser) || !forwardEndReached[0] || getUserConfig().isPremium() && getMessagesController().isSponsoredDisabled() || isReport()) {
             return;
         }
         MessagesController.SponsoredMessagesInfo res = getMessagesController().getSponsoredMessages(dialog_id);
@@ -29641,7 +29641,7 @@ public class ChatActivity extends BaseFragment implements
 
         boolean showRestartTopic = !isInPreviewMode() && forumTopic != null && forumTopic.closed && !forumTopic.hidden && ChatObject.canManageTopic(currentAccount, currentChat, forumTopic);
         boolean showTranslate = (
-            getUserConfig().isPremium() || currentChat != null && currentChat.autotranslation || org.telegram.messenger.DrGramAutoTranslate.isEnabled(getDialogId()) ?
+            getUserConfig().isPremium() || currentChat != null && currentChat.autotranslation || org.telegram.messenger.LuxGramAutoTranslate.isEnabled(getDialogId()) ?
                 getMessagesController().getTranslateController().isDialogTranslatable(getDialogId()) && !getMessagesController().getTranslateController().isTranslateDialogHidden(getDialogId()) :
                 !getMessagesController().premiumFeaturesBlocked() && preferences.getInt("dialog_show_translate_count" + did, 5) <= 0
         ) || DEBUG_TOP_PANELS;
@@ -30282,7 +30282,7 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        org.telegram.messenger.DrGramChatLock.maybeLock(this, getDialogId()); // DrGram Fix 80: two-layer chat lock
+        org.telegram.messenger.LuxGramChatLock.maybeLock(this, getDialogId()); // LuxGram Fix 80: two-layer chat lock
         checkShowBlur(false);
         activityResumeTime = System.currentTimeMillis();
         if (openImport && getSendMessagesHelper().getImportingHistory(dialog_id) != null) {
@@ -33822,11 +33822,11 @@ public class ChatActivity extends BaseFragment implements
         MediaController.saveFile(path, getParentActivity(), messageObject.isVideo() ? 1 : 0, null, null);
     }
 
-    private void drgramPresentAdvancedForward(ArrayList<MessageObject> messages) {
+    private void luxgramPresentAdvancedForward(ArrayList<MessageObject> messages) {
         if (getParentActivity() == null || messages == null || messages.isEmpty()) {
             return;
         }
-        presentFragment(new DrGramForwardEditor(messages));
+        presentFragment(new LuxGramForwardEditor(messages));
         clearSelectionMode();
     }
 
@@ -33872,20 +33872,20 @@ public class ChatActivity extends BaseFragment implements
                 createDeleteMessagesAlert(selectedObject, selectedObjectGroup, true);
                 break;
             }
-            case OPTION_DRGRAM_FAVORITE: {
-                drgramToggleFavoriteSelected();
+            case OPTION_LUXGRAM_FAVORITE: {
+                luxgramToggleFavoriteSelected();
                 break;
             }
-            case OPTION_DRGRAM_DETAILS: {
-                drgramShowMessageDetails(selectedObject);
+            case OPTION_LUXGRAM_DETAILS: {
+                luxgramShowMessageDetails(selectedObject);
                 break;
             }
-            case OPTION_DRGRAM_EXPAND: {
-                drgramExpandSelected();
+            case OPTION_LUXGRAM_EXPAND: {
+                luxgramExpandSelected();
                 break;
             }
             case OPTION_FORWARD: {
-                // DrGram Fix 33: the plain Forward row is the Telegram-native forward again
+                // LuxGram Fix 33: the plain Forward row is the Telegram-native forward again
                 // (with the "Forwarded from" header). The Advanced editor lives on its own row.
                 if (getMessagesController().isFrozen()) {
                     AccountFrozenAlert.show(currentAccount);
@@ -33899,8 +33899,8 @@ public class ChatActivity extends BaseFragment implements
                 openForward(false);
                 break;
             }
-            case OPTION_DRGRAM_ADV_FWD: {
-                // DrGram Fix 33: the Advanced Forward editor straight from the message menu
+            case OPTION_LUXGRAM_ADV_FWD: {
+                // LuxGram Fix 33: the Advanced Forward editor straight from the message menu
                 if (getMessagesController().isFrozen()) {
                     AccountFrozenAlert.show(currentAccount);
                     selectedObject = null;
@@ -33908,42 +33908,42 @@ public class ChatActivity extends BaseFragment implements
                     selectedObjectGroup = null;
                     return;
                 }
-                ArrayList<MessageObject> drgramFwd = new ArrayList<>();
+                ArrayList<MessageObject> luxgramFwd = new ArrayList<>();
                 if (selectedObjectGroup != null) {
-                    drgramFwd.addAll(selectedObjectGroup.messages);
+                    luxgramFwd.addAll(selectedObjectGroup.messages);
                 } else {
-                    drgramFwd.add(selectedObject);
+                    luxgramFwd.add(selectedObject);
                 }
-                drgramPresentAdvancedForward(drgramFwd);
+                luxgramPresentAdvancedForward(luxgramFwd);
                 break;
             }
-            case OPTION_DRGRAM_AI: {
-                // DrGram Fix 33: jump into the AI tools with this message's text ready to paste
+            case OPTION_LUXGRAM_AI: {
+                // LuxGram Fix 33: jump into the AI tools with this message's text ready to paste
                 try {
-                    presentFragment(new DrGramAIActivity());
+                    presentFragment(new LuxGramAIActivity());
                 } catch (Throwable t) {
                     FileLog.e(t);
                 }
                 break;
             }
-            case OPTION_DRGRAM_ZABANAVIS: {
-                // DrGram Fix 38: zabanavis — own messages are edited in place,
+            case OPTION_LUXGRAM_ZABANAVIS: {
+                // LuxGram Fix 38: zabanavis — own messages are edited in place,
                 // foreign messages are transformed to the clipboard
-                final MessageObject drgramZabMo = selectedObject;
-                final String drgramZabRaw = drgramZabanavisRawText(drgramZabMo);
-                if (drgramZabMo != null && drgramZabRaw != null) {
-                    final boolean drgramOwn = drgramZabMo.isOutOwner() && drgramZabMo.getId() > 0;
-                    org.telegram.messenger.DrGramZabanavis.showPicker(ChatActivity.this, -1, style -> {
+                final MessageObject luxgramZabMo = selectedObject;
+                final String luxgramZabRaw = luxgramZabanavisRawText(luxgramZabMo);
+                if (luxgramZabMo != null && luxgramZabRaw != null) {
+                    final boolean luxgramOwn = luxgramZabMo.isOutOwner() && luxgramZabMo.getId() > 0;
+                    org.telegram.messenger.LuxGramZabanavis.showPicker(ChatActivity.this, -1, style -> {
                         if (getParentActivity() == null) {
                             return;
                         }
-                        if (drgramOwn) {
-                            org.telegram.messenger.DrGramZabanavis.Result r = org.telegram.messenger.DrGramZabanavis.apply(style, drgramZabRaw, drgramZabMo.messageOwner != null ? drgramZabMo.messageOwner.entities : null);
-                            SendMessagesHelper.getInstance(currentAccount).editMessage(drgramZabMo, r.text, true, ChatActivity.this, r.entities, 0, 0);
-                            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.DrGramZabanavisApplied), android.widget.Toast.LENGTH_SHORT).show();
+                        if (luxgramOwn) {
+                            org.telegram.messenger.LuxGramZabanavis.Result r = org.telegram.messenger.LuxGramZabanavis.apply(style, luxgramZabRaw, luxgramZabMo.messageOwner != null ? luxgramZabMo.messageOwner.entities : null);
+                            SendMessagesHelper.getInstance(currentAccount).editMessage(luxgramZabMo, r.text, true, ChatActivity.this, r.entities, 0, 0);
+                            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.LuxGramZabanavisApplied), android.widget.Toast.LENGTH_SHORT).show();
                         } else {
-                            String copied = org.telegram.messenger.DrGramZabanavis.copyStyled(getParentActivity(), style, drgramZabRaw, drgramZabMo.messageOwner != null ? drgramZabMo.messageOwner.entities : null);
-                            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(copied != null ? R.string.DrGramZabanavisCopied : R.string.DrGramZabanavisFailed), android.widget.Toast.LENGTH_SHORT).show();
+                            String copied = org.telegram.messenger.LuxGramZabanavis.copyStyled(getParentActivity(), style, luxgramZabRaw, luxgramZabMo.messageOwner != null ? luxgramZabMo.messageOwner.entities : null);
+                            android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(copied != null ? R.string.LuxGramZabanavisCopied : R.string.LuxGramZabanavisFailed), android.widget.Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -34950,11 +34950,11 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public boolean didSelectDialogs(DialogsActivity fragment, ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
-        // DrGram Fix 69: consume the clean-forward flag once, before any early
+        // LuxGram Fix 69: consume the clean-forward flag once, before any early
         // return — a forward-menu option 1 pick re-sends messages WITHOUT the
         // "Forwarded from" header in every path below.
-        final boolean drgramCleanForward = drgramCleanForwardPending;
-        drgramCleanForwardPending = false;
+        final boolean luxgramCleanForward = luxgramCleanForwardPending;
+        luxgramCleanForwardPending = false;
         if ((messagePreviewParams == null && (!fragment.isQuote || replyingMessageObject == null) || fragment.isQuote && replyingMessageObject == null) && forwardingMessage == null && selectedMessagesIds[0].size() == 0 && selectedMessagesIds[1].size() == 0) {
             return false;
         }
@@ -35027,7 +35027,7 @@ public class ChatActivity extends BaseFragment implements
                         params.suggestionParams = messageSuggestionParams;
                         getSendMessagesHelper().sendMessage(params);
                     }
-                    getSendMessagesHelper().sendMessage(fmessages, did, drgramCleanForward, false, notify, scheduleDate, scheduleRepeatPeriod, null, -1, price == null ? 0 : price, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
+                    getSendMessagesHelper().sendMessage(fmessages, did, luxgramCleanForward, false, notify, scheduleDate, scheduleRepeatPeriod, null, -1, price == null ? 0 : price, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
                 }
                 fragment.finishFragment();
                 createUndoView();
@@ -35056,10 +35056,10 @@ public class ChatActivity extends BaseFragment implements
                 updateVisibleRows();
             }
 
-            // DrGram Fix 69: clean forward to a single destination — send
+            // LuxGram Fix 69: clean forward to a single destination — send
             // immediately WITHOUT the "Forwarded from" header, skipping the
             // preview panel whose default flow would re-attach the header.
-            if (drgramCleanForward) {
+            if (luxgramCleanForward) {
                 final long cleanDid = dids.get(0).dialogId;
                 getSendMessagesHelper().sendMessage(fmessages, cleanDid, true, false, true, 0, 0, null, -1, 0, getSendMonoForumPeerId(), getSendMessageSuggestionParams());
                 fragment.finishFragment();
@@ -46758,44 +46758,44 @@ public class ChatActivity extends BaseFragment implements
                     items.add(LocaleController.getString(R.string.Forward));
                     options.add(OPTION_FORWARD);
                     icons.add(R.drawable.msg_forward);
-                    // DrGram Fix 33: the message menu offers Advanced Forward as its own row
+                    // LuxGram Fix 33: the message menu offers Advanced Forward as its own row
                     // (the plain Forward row stays the Telegram-native forward)
-                    items.add(LocaleController.getString(R.string.DrGramAdvFwdTitle));
-                    options.add(OPTION_DRGRAM_ADV_FWD);
-                    icons.add(R.drawable.drgram_ic_forward_star);
+                    items.add(LocaleController.getString(R.string.LuxGramAdvFwdTitle));
+                    options.add(OPTION_LUXGRAM_ADV_FWD);
+                    icons.add(R.drawable.luxgram_ic_forward_star);
                 }
-                // DrGram Fix 33: AI tools row for any message that carries readable text
+                // LuxGram Fix 33: AI tools row for any message that carries readable text
                 if (selectedObject != null && selectedObject.contentType == 0 && !selectedObject.isSponsored()
                     && !TextUtils.isEmpty(selectedObject.getMessageTextToTranslate(selectedObjectGroup, null))
                     && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) {
-                    items.add(LocaleController.getString(R.string.DrGramAiToolsTitle));
-                    options.add(OPTION_DRGRAM_AI);
+                    items.add(LocaleController.getString(R.string.LuxGramAiToolsTitle));
+                    options.add(OPTION_LUXGRAM_AI);
                     icons.add(R.drawable.input_ai);
                 }
-                // DrGram Fix 38: zabanavis — annotate the message with a beautiful style
+                // LuxGram Fix 38: zabanavis — annotate the message with a beautiful style
                 if (selectedObject != null && selectedObject.contentType == 0 && !selectedObject.isSponsored()
                     && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()
-                    && !TextUtils.isEmpty(drgramZabanavisRawText(selectedObject))) {
-                    items.add(LocaleController.getString(R.string.DrGramZabanavisTitle));
-                    options.add(OPTION_DRGRAM_ZABANAVIS);
+                    && !TextUtils.isEmpty(luxgramZabanavisRawText(selectedObject))) {
+                    items.add(LocaleController.getString(R.string.LuxGramZabanavisTitle));
+                    options.add(OPTION_LUXGRAM_ZABANAVIS);
                     icons.add(R.drawable.msg_edit);
                 }
                 if (selectedObject != null && selectedObject.getId() > 0 && selectedObject.contentType == 0 && !selectedObject.isSponsored()) {
-                    items.add(LocaleController.getString(org.telegram.messenger.DrGramFavorites.getInstance(currentAccount).isFavorite(getDialogId(), selectedObject.getId()) ? R.string.DrGramFavRemove : R.string.DrGramFavAdd));
-                    options.add(OPTION_DRGRAM_FAVORITE);
+                    items.add(LocaleController.getString(org.telegram.messenger.LuxGramFavorites.getInstance(currentAccount).isFavorite(getDialogId(), selectedObject.getId()) ? R.string.LuxGramFavRemove : R.string.LuxGramFavAdd));
+                    options.add(OPTION_LUXGRAM_FAVORITE);
                     icons.add(R.drawable.msg_fave);
                 }
                 if (selectedObject != null && selectedObject.getId() > 0 && selectedObject.contentType == 0) {
-                    items.add(LocaleController.getString(R.string.DrGramMsgDetails));
-                    options.add(OPTION_DRGRAM_DETAILS);
+                    items.add(LocaleController.getString(R.string.LuxGramMsgDetails));
+                    options.add(OPTION_LUXGRAM_DETAILS);
                     icons.add(R.drawable.msg_info);
                 }
-                if (selectedObject != null && !selectedObject.drgramExpanded && selectedObject.type == MessageObject.TYPE_TEXT
-                    && selectedObject.messageText != null && selectedObject.messageText.length() >= org.telegram.messenger.DrGramChatTools.COLLAPSE_MIN_CHARS
+                if (selectedObject != null && !selectedObject.luxgramExpanded && selectedObject.type == MessageObject.TYPE_TEXT
+                    && selectedObject.messageText != null && selectedObject.messageText.length() >= org.telegram.messenger.LuxGramChatTools.COLLAPSE_MIN_CHARS
                     && !selectedObject.hasCode && !selectedObject.hasQuote && !selectedObject.hasSingleQuote
-                    && org.telegram.messenger.DrGramChatTools.getInstance(currentAccount).isCollapseEnabled()) {
-                    items.add(LocaleController.getString(R.string.DrGramShowFull));
-                    options.add(OPTION_DRGRAM_EXPAND);
+                    && org.telegram.messenger.LuxGramChatTools.getInstance(currentAccount).isCollapseEnabled()) {
+                    items.add(LocaleController.getString(R.string.LuxGramShowFull));
+                    options.add(OPTION_LUXGRAM_EXPAND);
                     icons.add(R.drawable.msg_zoomin);
                 }
                 if (allowUnpin) {

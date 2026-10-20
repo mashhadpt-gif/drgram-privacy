@@ -11,8 +11,8 @@ import java.util.HashMap;
 
 public class ThemeColors {
 
-    public static final int TELEGRAM_COLOR = 0xFFF5B90D;        // DrGram gold
-    public static final int TELEGRAM_COLOR_TEXT = 0xFFC08A10;   // DrGram gold text
+    public static final int TELEGRAM_COLOR = 0xFFF5B90D;        // LuxGram gold
+    public static final int TELEGRAM_COLOR_TEXT = 0xFFC08A10;   // LuxGram gold text
     public static final int DEFAULT_BLACK_TEXT = 0xFF1A1D21;   // -15065823
 
     private static SparseArray<String> colorKeysMap;
@@ -208,7 +208,7 @@ public class ThemeColors {
         defaultColors[key_actionBarTabActiveText] = TELEGRAM_COLOR_TEXT;
         defaultColors[key_actionBarTabUnactiveText] = 0xff777c7f;
         defaultColors[key_actionBarTabLine] = TELEGRAM_COLOR_TEXT;
-        defaultColors[key_chats_tabUnreadActiveBackground] = 0xFFC08A10; //DrGram gold text
+        defaultColors[key_chats_tabUnreadActiveBackground] = 0xFFC08A10; //LuxGram gold text
         defaultColors[key_chats_tabUnreadUnactiveBackground] = 0xffc5c9cc;
         defaultColors[key_actionBarTabSelector] = 0x121a1d21;
         defaultColors[key_actionBarBrowser] = 0xffffffff;

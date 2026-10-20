@@ -840,9 +840,9 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             return;
         }
 
-        // DrGram Fix 41: story FX never leak into other camera uses
+        // LuxGram Fix 41: story FX never leak into other camera uses
         // (round video messages, QR scanner, …)
-        org.telegram.messenger.DrGramMedia.setCameraFx(0);
+        org.telegram.messenger.LuxGramMedia.setCameraFx(0);
 
         if (privacySheet != null) {
             privacySheet.dismiss();
@@ -2176,7 +2176,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         });
         previewContainer.addView(collageLayoutView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.FILL));
 
-        // DrGram Fix 49: 3x3 composition grid over the story camera
+        // LuxGram Fix 49: 3x3 composition grid over the story camera
         gridOverlay = new View(context) {
             private final android.graphics.Paint gridPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
 
@@ -2196,7 +2196,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         };
         gridOverlay.setClickable(false);
         gridOverlay.setFocusable(false);
-        gridOverlay.setVisibility(org.telegram.messenger.DrGramMedia.storyGrid() ? View.VISIBLE : View.GONE);
+        gridOverlay.setVisibility(org.telegram.messenger.LuxGramMedia.storyGrid() ? View.VISIBLE : View.GONE);
         previewContainer.addView(gridOverlay, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.FILL));
         collageLayoutView.setOnClickListener(v -> {
             if (noCameraPermission) {
@@ -2976,7 +2976,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         flashViews.add(recordControl);
         recordControl.setCollageProgress(collageLayoutView.hasLayout() ? collageLayoutView.getFilledProgress() : 0.0f, true);
 
-        // DrGram Fix 41: Instagram-style live camera FX strip (story photo,
+        // LuxGram Fix 41: Instagram-style live camera FX strip (story photo,
         // story video & live preview). The chosen effect is applied by the
         // CameraView shader in real time, before anything is recorded.
         fxStrip = buildFxStrip(context);
@@ -3041,7 +3041,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
 
             mode = newMode;
             livePeerView.setShowing(mode == MODE_LIVE, true);
-            updateFxStripVisibility(); // DrGram Fix 41
+            updateFxStripVisibility(); // LuxGram Fix 41
             showVideoTimer(mode == MODE_VIDEO && !collageListView.isVisible(), true);
             modeSwitcherView.switchMode(newMode);
             recordControl.startAsVideo(newMode == MODE_VIDEO);
@@ -3413,7 +3413,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
 
                             if (call != null) {
                                 if (LivePlayer.recording != null) {
-                                    // DrGram Fix 49: read the call id BEFORE the
+                                    // LuxGram Fix 49: read the call id BEFORE the
                                     // recording is destroyed and nulled (NPE fix)
                                     long previousCallId = LivePlayer.recording.getCallId();
                                     LivePlayer.recording.destroy();
@@ -3848,17 +3848,17 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         setActionBarButtonVisible(flashButton, currentPage == PAGE_CAMERA && !collageListView.isVisible() && flashButtonMode != null && !inCheck(), animated);
     }
 
-    // DrGram Fix 41: Instagram-style camera FX strip =========================
+    // LuxGram Fix 41: Instagram-style camera FX strip =========================
 
     private static final int[] FX_IDS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
     private static final int[] FX_LABELS = {
-            R.string.DrGramFxNone, R.string.DrGramFxSunset, R.string.DrGramFxCool,
-            R.string.DrGramFxPastel, R.string.DrGramFxVintage, R.string.DrGramFxBlossom,
-            R.string.DrGramFxNoir, R.string.DrGramFxDream, R.string.DrGramFxNeon,
-            R.string.DrGramFxGlitch, R.string.DrGramFxPixel, R.string.DrGramFxMirror,
-            R.string.DrGramFxCartoon, R.string.DrGramFxSoftGlow, R.string.DrGramFxRose,
-            R.string.DrGramFxHoney, R.string.DrGramFxClean, R.string.DrGramFxLatte,
-            R.string.DrGramFxOcean, R.string.DrGramFxPeach, R.string.DrGramFxGlam
+            R.string.LuxGramFxNone, R.string.LuxGramFxSunset, R.string.LuxGramFxCool,
+            R.string.LuxGramFxPastel, R.string.LuxGramFxVintage, R.string.LuxGramFxBlossom,
+            R.string.LuxGramFxNoir, R.string.LuxGramFxDream, R.string.LuxGramFxNeon,
+            R.string.LuxGramFxGlitch, R.string.LuxGramFxPixel, R.string.LuxGramFxMirror,
+            R.string.LuxGramFxCartoon, R.string.LuxGramFxSoftGlow, R.string.LuxGramFxRose,
+            R.string.LuxGramFxHoney, R.string.LuxGramFxClean, R.string.LuxGramFxLatte,
+            R.string.LuxGramFxOcean, R.string.LuxGramFxPeach, R.string.LuxGramFxGlam
     };
 
     private android.widget.HorizontalScrollView fxStrip;
@@ -3875,7 +3875,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         scroll.addView(row, LayoutHelper.createScroll(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT));
 
 
-        // DrGram Fix 49: composition grid chip — rule-of-thirds overlay on the camera
+        // LuxGram Fix 49: composition grid chip — rule-of-thirds overlay on the camera
         TextView gridChip = new TextView(context);
         gridChip.setText("\u25A4 \u06AF\u0631\u06CC\u062F");
         gridChip.setTextSize(13);
@@ -3885,11 +3885,11 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         gridChip.setTextColor(0xFFFFFFFF);
         GradientDrawable gridBg = new GradientDrawable();
         gridBg.setCornerRadius(AndroidUtilities.dp(18));
-        gridBg.setColor(org.telegram.messenger.DrGramMedia.storyGrid() ? 0xCC2F9E6E : 0x66333333);
+        gridBg.setColor(org.telegram.messenger.LuxGramMedia.storyGrid() ? 0xCC2F9E6E : 0x66333333);
         gridChip.setBackground(gridBg);
         gridChip.setOnClickListener(v -> {
-            boolean on = !org.telegram.messenger.DrGramMedia.storyGrid();
-            org.telegram.messenger.DrGramMedia.setStoryGrid(on);
+            boolean on = !org.telegram.messenger.LuxGramMedia.storyGrid();
+            org.telegram.messenger.LuxGramMedia.setStoryGrid(on);
             gridBg.setColor(on ? 0xCC2F9E6E : 0x66333333);
             gridChip.invalidate();
             if (gridOverlay != null) {
@@ -3902,7 +3902,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         gridLp.rightMargin = AndroidUtilities.dp(8);
         row.addView(gridChip, gridLp);
 
-        int current = org.telegram.messenger.DrGramMedia.cameraFx();
+        int current = org.telegram.messenger.LuxGramMedia.cameraFx();
         for (int k = 0; k < FX_IDS.length; k++) {
             final int fxId = FX_IDS[k];
             TextView chip = new TextView(context);
@@ -3916,7 +3916,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             bg.setCornerRadius(AndroidUtilities.dp(18));
             chip.setBackground(bg);
             chip.setOnClickListener(v -> {
-                org.telegram.messenger.DrGramMedia.setCameraFx(fxId);
+                org.telegram.messenger.LuxGramMedia.setCameraFx(fxId);
                 updateFxStripSelection();
             });
             fxChips.add(chip);
@@ -3932,7 +3932,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
     }
 
     private void updateFxStripSelection() {
-        int current = org.telegram.messenger.DrGramMedia.cameraFx();
+        int current = org.telegram.messenger.LuxGramMedia.cameraFx();
         for (int k = 0; k < fxChips.size() && k < FX_IDS.length; k++) {
             TextView chip = fxChips.get(k);
             boolean selected = FX_IDS[k] == current;
@@ -3965,9 +3965,9 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         if (show) {
             fxStrip.setVisibility(View.VISIBLE);
         }
-        // DrGram Fix 49: keep the composition grid in sync with the camera page
+        // LuxGram Fix 49: keep the composition grid in sync with the camera page
         if (gridOverlay != null) {
-            gridOverlay.setVisibility(show && org.telegram.messenger.DrGramMedia.storyGrid() ? View.VISIBLE : View.GONE);
+            gridOverlay.setVisibility(show && org.telegram.messenger.LuxGramMedia.storyGrid() ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -4025,20 +4025,20 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         }
 
 
-        private void applyDrGramPhotoEffects(File photoFile) {
+        private void applyLuxGramPhotoEffects(File photoFile) {
             if (photoFile == null || !photoFile.isFile()) return;
-            boolean enabled = org.telegram.messenger.DrGramMedia.isBeautifyEnabled();
-            float strength = enabled ? org.telegram.messenger.DrGramMedia.beautifyStrength() : 0f;
-            float nose = enabled ? org.telegram.messenger.DrGramMedia.beautifyNose() : 0f;
-            float teeth = enabled ? org.telegram.messenger.DrGramMedia.beautifyTeeth() : 0f;
-            float eyes = enabled ? org.telegram.messenger.DrGramMedia.beautifyEyes() : 0f;
-            float jaw = enabled ? org.telegram.messenger.DrGramMedia.beautifyJaw() : 0f;
-            float bright = enabled ? org.telegram.messenger.DrGramMedia.beautifyBright() : 0f; // DrGram Fix 46
-            float blush = enabled ? org.telegram.messenger.DrGramMedia.beautifyBlush() : 0f; // DrGram Fix 46
-            float lips = enabled ? org.telegram.messenger.DrGramMedia.beautifyLips() : 0f; // DrGram Fix 46
-            float dark = enabled ? org.telegram.messenger.DrGramMedia.beautifyDark() : 0f; // DrGram Fix 47
-            float slim = enabled ? org.telegram.messenger.DrGramMedia.beautifySlim() : 0f; // DrGram Fix 47
-            int fx = org.telegram.messenger.DrGramMedia.cameraFx();
+            boolean enabled = org.telegram.messenger.LuxGramMedia.isBeautifyEnabled();
+            float strength = enabled ? org.telegram.messenger.LuxGramMedia.beautifyStrength() : 0f;
+            float nose = enabled ? org.telegram.messenger.LuxGramMedia.beautifyNose() : 0f;
+            float teeth = enabled ? org.telegram.messenger.LuxGramMedia.beautifyTeeth() : 0f;
+            float eyes = enabled ? org.telegram.messenger.LuxGramMedia.beautifyEyes() : 0f;
+            float jaw = enabled ? org.telegram.messenger.LuxGramMedia.beautifyJaw() : 0f;
+            float bright = enabled ? org.telegram.messenger.LuxGramMedia.beautifyBright() : 0f; // LuxGram Fix 46
+            float blush = enabled ? org.telegram.messenger.LuxGramMedia.beautifyBlush() : 0f; // LuxGram Fix 46
+            float lips = enabled ? org.telegram.messenger.LuxGramMedia.beautifyLips() : 0f; // LuxGram Fix 46
+            float dark = enabled ? org.telegram.messenger.LuxGramMedia.beautifyDark() : 0f; // LuxGram Fix 47
+            float slim = enabled ? org.telegram.messenger.LuxGramMedia.beautifySlim() : 0f; // LuxGram Fix 47
+            int fx = org.telegram.messenger.LuxGramMedia.cameraFx();
             if (strength <= 0.001f && nose <= 0.001f && teeth <= 0.001f && eyes <= 0.001f && jaw <= 0.001f
                     && bright <= 0.001f && blush <= 0.001f && lips <= 0.001f && dark <= 0.001f && slim <= 0.001f && fx == 0) return;
             Bitmap bitmap = null;
@@ -4047,13 +4047,13 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                 bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath(), options);
                 if (bitmap == null) return;
-                org.telegram.messenger.DrGramPhotoBeautify.process(bitmap, null, strength, nose, teeth, fx, eyes, jaw, blush, lips, bright, dark, slim); // DrGram Fix 47
-                if (org.telegram.messenger.DrGramMedia.storyPortraitBg()) {
-                    org.telegram.messenger.DrGramPhotoBeautify.applyPortraitBackgroundBlur(bitmap, 1f); // DrGram Fix 45
+                org.telegram.messenger.LuxGramPhotoBeautify.process(bitmap, null, strength, nose, teeth, fx, eyes, jaw, blush, lips, bright, dark, slim); // LuxGram Fix 47
+                if (org.telegram.messenger.LuxGramMedia.storyPortraitBg()) {
+                    org.telegram.messenger.LuxGramPhotoBeautify.applyPortraitBackgroundBlur(bitmap, 1f); // LuxGram Fix 45
                 }
                 try (FileOutputStream out = new FileOutputStream(photoFile, false)) {
                     if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 98, out)) {
-                        FileLog.e("DrGram photo effects: JPEG compression failed");
+                        FileLog.e("LuxGram photo effects: JPEG compression failed");
                     }
                 }
             } catch (Throwable t) {
@@ -4100,7 +4100,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                     }
                     // CameraController saves the sensor JPEG, not the GL-filtered preview.
                     // Apply the selected look to the real story photo before StoryEntry reads it.
-                    applyDrGramPhotoEffects(outputFile);
+                    applyLuxGramPhotoEffects(outputFile);
                     int w = -1, h = -1;
                     try {
                         BitmapFactory.Options opts = new BitmapFactory.Options();
@@ -4717,7 +4717,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         }
 
         onNavigateStart(oldPage, page);
-        updateFxStripVisibility(); // DrGram Fix 41
+        updateFxStripVisibility(); // LuxGram Fix 41
         if (previewButtons != null) {
             previewButtons.appear(page == PAGE_PREVIEW, animated);
         }

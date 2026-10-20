@@ -4257,23 +4257,23 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     }
 
     public void sendMessage(SendMessageParams sendMessageParams) {
-        // DrGram Fix 72: auto-beautify EVERY outgoing text message (Zabanavis
+        // LuxGram Fix 72: auto-beautify EVERY outgoing text message (Zabanavis
         // auto style) — single choke point for all typed-text sends.
         try {
             if (sendMessageParams.message != null && sendMessageParams.caption == null
                     && (sendMessageParams.entities == null || sendMessageParams.entities.isEmpty())) {
-                DrGramZabanavis.Result drgramAuto = DrGramZabanavis.autoApply(sendMessageParams.message);
-                if (drgramAuto != null) {
-                    sendMessageParams.message = drgramAuto.text;
-                    sendMessageParams.entities = drgramAuto.entities;
+                LuxGramZabanavis.Result luxgramAuto = LuxGramZabanavis.autoApply(sendMessageParams.message);
+                if (luxgramAuto != null) {
+                    sendMessageParams.message = luxgramAuto.text;
+                    sendMessageParams.entities = luxgramAuto.entities;
                 }
             }
         } catch (Throwable ignore) {
         }
-        // DrGram Fix 35: smart-reply group commands are executed here and the
+        // LuxGram Fix 35: smart-reply group commands are executed here and the
         // command text itself is never posted to the chat.
         try {
-            if (DrGramSmartReply.getInstance(currentAccount).onOutgoingCommand(sendMessageParams)) {
+            if (LuxGramSmartReply.getInstance(currentAccount).onOutgoingCommand(sendMessageParams)) {
                 return;
             }
         } catch (Throwable ignore) {

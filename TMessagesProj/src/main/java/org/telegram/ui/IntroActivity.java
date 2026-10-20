@@ -153,12 +153,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public View createView(Context context) {
-        logoDrawable = context.getResources().getDrawable(R.drawable.drgram_intro_logo).mutate();
+        logoDrawable = context.getResources().getDrawable(R.drawable.luxgram_intro_logo).mutate();
         logoDrawable.setBounds(0, dp(8.666f), dp(115), dp(35));
-        // DrGram Fix 8: luxury intro — bold gold "DrGram" wordmark text instead of the
+        // LuxGram Fix 8: luxury intro — bold gold "LuxGram" wordmark text instead of the
         // upstream white "Telegram" wordmark image span
         SpannableStringBuilder ssb = new SpannableStringBuilder(LocaleController.getString(R.string.Page1Title));
-        ssb.setSpan(new android.text.style.ForegroundColorSpan(org.telegram.messenger.DrGramThemeInstaller.accentColor()), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new android.text.style.ForegroundColorSpan(org.telegram.messenger.LuxGramThemeInstaller.accentColor()), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ssb.setSpan(new android.text.style.RelativeSizeSpan(1.18f), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         titles[0] = ssb;
 
@@ -221,11 +221,11 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             DialogsActivity.switchingTheme = true;
 
             // TODO: Generify this part, currently it's a clone of another theme switch toggle
-            // DrGram Fix 8: switch between the two luxury file themes (black-gold / black-red)
-            String dayThemeName = Theme.getTheme(org.telegram.messenger.DrGramThemeInstaller.GOLD_THEME_NAME) != null
-                    ? org.telegram.messenger.DrGramThemeInstaller.GOLD_THEME_NAME : "Gold";
-            String nightThemeName = Theme.getTheme(org.telegram.messenger.DrGramThemeInstaller.RED_THEME_NAME) != null
-                    ? org.telegram.messenger.DrGramThemeInstaller.RED_THEME_NAME : "Night";
+            // LuxGram Fix 8: switch between the two luxury file themes (black-gold / black-red)
+            String dayThemeName = Theme.getTheme(org.telegram.messenger.LuxGramThemeInstaller.GOLD_THEME_NAME) != null
+                    ? org.telegram.messenger.LuxGramThemeInstaller.GOLD_THEME_NAME : "Gold";
+            String nightThemeName = Theme.getTheme(org.telegram.messenger.LuxGramThemeInstaller.RED_THEME_NAME) != null
+                    ? org.telegram.messenger.LuxGramThemeInstaller.RED_THEME_NAME : "Night";
 
             Theme.ThemeInfo themeInfo;
             boolean toDark;
@@ -520,7 +520,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         }
         req.keys.add("ContinueOnThisLanguage");
         String finalSystemLang = systemLang;
-        // DrGram Fix 67: before login there is no connectivity behind Iranian
+        // LuxGram Fix 67: before login there is no connectivity behind Iranian
         // DPI, so the langpack request below can stay unanswered forever and
         // the language-switch button used to stay blank. Show a local label
         // immediately; the server response, when it ever arrives, refines it.
@@ -546,7 +546,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     }
 
     /**
-     * DrGram Fix 67: offline label for the intro language-switch button.
+     * LuxGram Fix 67: offline label for the intro language-switch button.
      * The official text comes from a server langpack request that cannot be
      * answered before login, so a Persian user used to see an empty button
      * with no way to reach فارسی. The fa label is hand-written here and the

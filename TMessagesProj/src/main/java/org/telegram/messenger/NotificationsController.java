@@ -1025,15 +1025,15 @@ public class NotificationsController extends BaseController implements Notificat
         }
 
         try {
-            DrGramSecretary.getInstance(currentAccount).onNewMessages(messageObjects);
+            LuxGramSecretary.getInstance(currentAccount).onNewMessages(messageObjects);
         } catch (Throwable ignore) {
         }
         try {
-            DrGramSmartReply.getInstance(currentAccount).onNewMessages(messageObjects); // DrGram Fix 35: PV command answers
+            LuxGramSmartReply.getInstance(currentAccount).onNewMessages(messageObjects); // LuxGram Fix 35: PV command answers
         } catch (Throwable ignore) {
         }
         try {
-            DrGramAntiDelete.getInstance(currentAccount).onNewMessages(messageObjects); // DrGram Fix 36: anti-delete cache
+            LuxGramAntiDelete.getInstance(currentAccount).onNewMessages(messageObjects); // LuxGram Fix 36: anti-delete cache
         } catch (Throwable ignore) {
         }
 
@@ -4497,9 +4497,9 @@ public class NotificationsController extends BaseController implements Notificat
                 soundPath = customSoundPath;
                 isDefault = false;
             }
-            // DrGram Fix 37: luxury brand chime (gold bell / love glass-harp) when
+            // LuxGram Fix 37: luxury brand chime (gold bell / love glass-harp) when
             // the user has not picked a personal sound — custom choices always win.
-            // DrGram Fix 68: the internal-file flag must follow the actual path
+            // LuxGram Fix 68: the internal-file flag must follow the actual path
             // kind. It was hardcoded false, so a CUSTOM chime (an app-private
             // cache file) hit the raw Uri.parse() branch; SystemUI cannot read
             // another app's private path, every pick fell back to the same
@@ -4507,7 +4507,7 @@ public class NotificationsController extends BaseController implements Notificat
             // Resource URIs (android.resource://) stay non-internal — they play
             // fine as-is; cache files are served through FileProvider + grant.
             if (soundPath != null && (soundPath.equalsIgnoreCase("Default") || soundPath.equals(defaultPath))) {
-                String luxPath = DrGramLuxSounds.channelSound();
+                String luxPath = LuxGramLuxSounds.channelSound();
                 if (luxPath != null) {
                     soundPath = luxPath;
                     isInternalSoundFile = !luxPath.startsWith("android.resource://");

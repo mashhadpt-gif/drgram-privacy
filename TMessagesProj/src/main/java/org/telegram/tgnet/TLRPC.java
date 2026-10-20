@@ -52525,10 +52525,10 @@ public class TLRPC {
         }
     }
 
-    // DrGram Fix 69: request class for the People Nearby revival (دوستیابی).
+    // LuxGram Fix 69: request class for the People Nearby revival (دوستیابی).
     // The response is Updates whose update vector contains TL_updatePeerLocated
     // entries (peer + distance) and whose users vector carries the User objects.
-    // DrGram Fix 74: migrated to the CURRENT layer-225 revision of the method —
+    // LuxGram Fix 74: migrated to the CURRENT layer-225 revision of the method —
     // contacts.getLocated#d348bc44 flags:# background:flags.1?true
     // geo_point:InputGeoPoint self_expires:flags.0?int = Updates;
     // The old revision contacts.getLocated#d348bcba (with "self_only") was

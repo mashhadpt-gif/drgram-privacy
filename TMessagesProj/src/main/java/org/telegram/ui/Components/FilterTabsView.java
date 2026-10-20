@@ -156,7 +156,7 @@ public class FilterTabsView extends FrameLayout {
                 counterResultWidth = !isDefault && isEditing ? dp(TAB_COUNTER_HEIGHT - 5) : 0;
             }
             width += counterResultWidth;
-            width += drgramIconWidth(this); // DrGram Fix 19: special folder icons
+            width += luxgramIconWidth(this); // LuxGram Fix 19: special folder icons
 
             return Math.max(dp(16), width);
         }
@@ -393,11 +393,11 @@ public class FilterTabsView extends FrameLayout {
                 textX = textX * changeProgress + animateFromTextX * (1f - changeProgress);
             }
 
-            // DrGram Fix 19: draw the special folder icon before the title
-            int drgramIconW = drgramIconWidth(currentTab);
-            if (drgramIconW > 0) {
-                drgramDrawTabIcon(canvas, currentTab, textX, getMeasuredHeight() / 2f, textPaint.getColor());
-                textX += drgramIconW;
+            // LuxGram Fix 19: draw the special folder icon before the title
+            int luxgramIconW = luxgramIconWidth(currentTab);
+            if (luxgramIconW > 0) {
+                luxgramDrawTabIcon(canvas, currentTab, textX, getMeasuredHeight() / 2f, textPaint.getColor());
+                textX += luxgramIconW;
             }
 
             if (!TextUtils.equals(currentTab.title, currentText)) {
@@ -924,11 +924,11 @@ public class FilterTabsView extends FrameLayout {
         float rad = AndroidUtilities.dpf2(14);
         selectorDrawable.setCornerRadii(new float[]{rad, rad, rad, rad, rad, rad, rad, rad});
         selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
-        // DrGram Fix 38: brand themes get a glass-gradient active pill
-        if (org.telegram.messenger.DrGramThemeInstaller.isLoveMode() || org.telegram.messenger.DrGramThemeInstaller.isGoldMode()) {
+        // LuxGram Fix 38: brand themes get a glass-gradient active pill
+        if (org.telegram.messenger.LuxGramThemeInstaller.isLoveMode() || org.telegram.messenger.LuxGramThemeInstaller.isGoldMode()) {
             selectorDrawable.setColors(new int[]{
-                    org.telegram.messenger.DrGramThemeInstaller.accentLightColor(),
-                    org.telegram.messenger.DrGramThemeInstaller.accentColor()
+                    org.telegram.messenger.LuxGramThemeInstaller.accentLightColor(),
+                    org.telegram.messenger.LuxGramThemeInstaller.accentColor()
             });
         }
 
@@ -1312,14 +1312,14 @@ public class FilterTabsView extends FrameLayout {
         tabs.add(tab);
     }
 
-    //region DrGram Fix 19: special folder tab icons
-    private android.graphics.Paint drgramIconPaint;
+    //region LuxGram Fix 19: special folder tab icons
+    private android.graphics.Paint luxgramIconPaint;
 
-    private int drgramIconWidth(Tab tab) {
-        return drgramTabIconType(tab) != 0 ? AndroidUtilities.dp(22) : 0;
+    private int luxgramIconWidth(Tab tab) {
+        return luxgramTabIconType(tab) != 0 ? AndroidUtilities.dp(22) : 0;
     }
 
-    private int drgramTabIconType(Tab tab) {
+    private int luxgramTabIconType(Tab tab) {
         if (tab == null) {
             return 0;
         }
@@ -1357,49 +1357,49 @@ public class FilterTabsView extends FrameLayout {
         return 0;
     }
 
-    private void drgramDrawTabIcon(Canvas canvas, Tab tab, float x, float cy, int color) {
-        int type = drgramTabIconType(tab);
+    private void luxgramDrawTabIcon(Canvas canvas, Tab tab, float x, float cy, int color) {
+        int type = luxgramTabIconType(tab);
         if (type == 0) {
             return;
         }
-        if (drgramIconPaint == null) {
-            drgramIconPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            drgramIconPaint.setStyle(android.graphics.Paint.Style.STROKE);
-            drgramIconPaint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
-            drgramIconPaint.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+        if (luxgramIconPaint == null) {
+            luxgramIconPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            luxgramIconPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            luxgramIconPaint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+            luxgramIconPaint.setStrokeCap(android.graphics.Paint.Cap.ROUND);
         }
-        drgramIconPaint.setColor(color);
-        drgramIconPaint.setStrokeWidth(AndroidUtilities.dp(1.7f));
+        luxgramIconPaint.setColor(color);
+        luxgramIconPaint.setStrokeWidth(AndroidUtilities.dp(1.7f));
         float s = AndroidUtilities.dp(17);
         canvas.save();
         canvas.translate(x, cy - s / 2f);
         android.graphics.Path path = new android.graphics.Path();
         switch (type) {
-            case 1: { // heart — filled, the DrGram romantic signature
+            case 1: { // heart — filled, the LuxGram romantic signature
                 path.moveTo(s / 2f, s * 0.86f);
                 path.cubicTo(-s * 0.10f, s * 0.56f, -s * 0.05f, s * 0.12f, s / 2f, s * 0.34f);
                 path.cubicTo(s * 1.05f, s * 0.12f, s * 1.10f, s * 0.56f, s / 2f, s * 0.86f);
                 path.close();
-                drgramIconPaint.setStyle(android.graphics.Paint.Style.FILL);
-                canvas.drawPath(path, drgramIconPaint);
-                drgramIconPaint.setStyle(android.graphics.Paint.Style.STROKE);
+                luxgramIconPaint.setStyle(android.graphics.Paint.Style.FILL);
+                canvas.drawPath(path, luxgramIconPaint);
+                luxgramIconPaint.setStyle(android.graphics.Paint.Style.STROKE);
                 break;
             }
             case 2: { // personal — one person
-                canvas.drawCircle(s / 2f, s * 0.30f, s * 0.20f, drgramIconPaint);
+                canvas.drawCircle(s / 2f, s * 0.30f, s * 0.20f, luxgramIconPaint);
                 path.moveTo(s * 0.12f, s * 0.86f);
                 path.cubicTo(s * 0.12f, s * 0.58f, s * 0.88f, s * 0.58f, s * 0.88f, s * 0.86f);
-                canvas.drawPath(path, drgramIconPaint);
+                canvas.drawPath(path, luxgramIconPaint);
                 break;
             }
             case 3: { // groups — two people
-                canvas.drawCircle(s * 0.36f, s * 0.32f, s * 0.18f, drgramIconPaint);
+                canvas.drawCircle(s * 0.36f, s * 0.32f, s * 0.18f, luxgramIconPaint);
                 path.moveTo(s * 0.08f, s * 0.84f);
                 path.cubicTo(s * 0.08f, s * 0.60f, s * 0.64f, s * 0.60f, s * 0.64f, s * 0.84f);
-                canvas.drawPath(path, drgramIconPaint);
+                canvas.drawPath(path, luxgramIconPaint);
                 path.moveTo(s * 0.66f, s * 0.16f);
                 path.cubicTo(s * 0.92f, s * 0.22f, s * 0.92f, s * 0.52f, s * 0.70f, s * 0.56f);
-                canvas.drawPath(path, drgramIconPaint);
+                canvas.drawPath(path, luxgramIconPaint);
                 break;
             }
             case 4: { // channels — megaphone
@@ -1408,26 +1408,26 @@ public class FilterTabsView extends FrameLayout {
                 path.lineTo(s * 0.62f, s * 0.80f);
                 path.lineTo(s * 0.14f, s * 0.56f);
                 path.close();
-                canvas.drawPath(path, drgramIconPaint);
+                canvas.drawPath(path, luxgramIconPaint);
                 path.moveTo(s * 0.74f, s * 0.30f);
                 path.cubicTo(s * 0.94f, s * 0.36f, s * 0.94f, s * 0.60f, s * 0.74f, s * 0.66f);
-                canvas.drawPath(path, drgramIconPaint);
+                canvas.drawPath(path, luxgramIconPaint);
                 path.moveTo(s * 0.24f, s * 0.56f);
                 path.lineTo(s * 0.24f, s * 0.82f);
                 path.lineTo(s * 0.38f, s * 0.82f);
                 path.lineTo(s * 0.38f, s * 0.62f);
-                canvas.drawPath(path, drgramIconPaint);
+                canvas.drawPath(path, luxgramIconPaint);
                 break;
             }
             case 5: { // bots — robot head
                 android.graphics.RectF rect = new android.graphics.RectF(s * 0.16f, s * 0.30f, s * 0.84f, s * 0.84f);
-                canvas.drawRoundRect(rect, s * 0.14f, s * 0.14f, drgramIconPaint);
-                drgramIconPaint.setStyle(android.graphics.Paint.Style.FILL);
-                canvas.drawCircle(s * 0.37f, s * 0.54f, s * 0.05f, drgramIconPaint);
-                canvas.drawCircle(s * 0.63f, s * 0.54f, s * 0.05f, drgramIconPaint);
-                drgramIconPaint.setStyle(android.graphics.Paint.Style.STROKE);
-                canvas.drawLine(s / 2f, s * 0.30f, s / 2f, s * 0.14f, drgramIconPaint);
-                canvas.drawCircle(s / 2f, s * 0.11f, s * 0.045f, drgramIconPaint);
+                canvas.drawRoundRect(rect, s * 0.14f, s * 0.14f, luxgramIconPaint);
+                luxgramIconPaint.setStyle(android.graphics.Paint.Style.FILL);
+                canvas.drawCircle(s * 0.37f, s * 0.54f, s * 0.05f, luxgramIconPaint);
+                canvas.drawCircle(s * 0.63f, s * 0.54f, s * 0.05f, luxgramIconPaint);
+                luxgramIconPaint.setStyle(android.graphics.Paint.Style.STROKE);
+                canvas.drawLine(s / 2f, s * 0.30f, s / 2f, s * 0.14f, luxgramIconPaint);
+                canvas.drawCircle(s / 2f, s * 0.11f, s * 0.045f, luxgramIconPaint);
                 break;
             }
         }
@@ -1644,13 +1644,13 @@ public class FilterTabsView extends FrameLayout {
 
             final float add = additionalTabWidth / 2f;
 
-            // DrGram Fix 36: the active-tab pill must fill the whole tab height,
+            // LuxGram Fix 36: the active-tab pill must fill the whole tab height,
             // not just the middle 28dp band (user bug report — half-covered bar).
             final int y = dp(9);
             selectorDrawable.setBounds((int) (indicatorX - dp(TAB_INTERNAL_PADDING) - add), y, (int) (indicatorX + indicatorWidth + dp(TAB_INTERNAL_PADDING) + add), height - dp(9));
-            // DrGram Fix 38: the gradient brand pill needs more presence than the
+            // LuxGram Fix 38: the gradient brand pill needs more presence than the
             // stock 12%-alpha line color to read as glass
-            selectorDrawable.setAlpha(org.telegram.messenger.DrGramThemeInstaller.isLoveMode() || org.telegram.messenger.DrGramThemeInstaller.isGoldMode() ? 74 : 31);
+            selectorDrawable.setAlpha(org.telegram.messenger.LuxGramThemeInstaller.isLoveMode() || org.telegram.messenger.LuxGramThemeInstaller.isGoldMode() ? 74 : 31);
             selectorDrawable.draw(canvas);
             canvas.restore();
         }

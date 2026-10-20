@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DrGram Fix 63: verify every .so inside an APK/AAB is 16KB page-size aligned.
+"""LuxGram Fix 63: verify every .so inside an APK/AAB is 16KB page-size aligned.
 
 Google Play hard requirement (since Nov 2025, apps targeting Android 15+):
 all LOAD segments of every native library must be 16KB-aligned.

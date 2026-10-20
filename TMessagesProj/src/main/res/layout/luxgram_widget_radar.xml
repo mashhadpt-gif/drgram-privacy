@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- LuxGram Fix 80: Online Radar widget — watched contacts + live status -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/luxgram_widget_bg">
+
+    <TextView
+        android:id="@+id/luxgram_rw_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFF4D27A"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="6dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="2dp">
+        <TextView
+            android:id="@+id/luxgram_rw_name1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF1EADA"
+            android:textSize="13sp"
+            android:singleLine="true" />
+        <TextView
+            android:id="@+id/luxgram_rw_status1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#99F4D27A"
+            android:textSize="12sp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="2dp">
+        <TextView
+            android:id="@+id/luxgram_rw_name2"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF1EADA"
+            android:textSize="13sp"
+            android:singleLine="true" />
+        <TextView
+            android:id="@+id/luxgram_rw_status2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#99F4D27A"
+            android:textSize="12sp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="2dp">
+        <TextView
+            android:id="@+id/luxgram_rw_name3"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF1EADA"
+            android:textSize="13sp"
+            android:singleLine="true" />
+        <TextView
+            android:id="@+id/luxgram_rw_status3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#99F4D27A"
+            android:textSize="12sp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/luxgram_rw_name4"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF1EADA"
+            android:textSize="13sp"
+            android:singleLine="true" />
+        <TextView
+            android:id="@+id/luxgram_rw_status4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#99F4D27A"
+            android:textSize="12sp"
+            android:singleLine="true" />
+    </LinearLayout>
+</LinearLayout>

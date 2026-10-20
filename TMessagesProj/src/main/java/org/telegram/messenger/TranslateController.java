@@ -91,8 +91,8 @@ public class TranslateController extends BaseController {
     }
 
     public boolean isFeatureAvailable() {
-        // DrGram Fix 80: per-chat auto-translate unlock (Tools toggle / chat menu)
-        return isChatTranslateEnabled() && (UserConfig.getInstance(currentAccount).isPremium() || org.telegram.messenger.DrGramAutoTranslate.isFeatureUnlocked());
+        // LuxGram Fix 80: per-chat auto-translate unlock (Tools toggle / chat menu)
+        return isChatTranslateEnabled() && (UserConfig.getInstance(currentAccount).isPremium() || org.telegram.messenger.LuxGramAutoTranslate.isFeatureUnlocked());
     }
 
     public boolean isFeatureAvailable(long dialogId) {
@@ -103,7 +103,7 @@ public class TranslateController extends BaseController {
         return (
             UserConfig.getInstance(currentAccount).isPremium() ||
             chat != null && chat.autotranslation ||
-            org.telegram.messenger.DrGramAutoTranslate.isEnabled(dialogId) // DrGram Fix 80
+            org.telegram.messenger.LuxGramAutoTranslate.isEnabled(dialogId) // LuxGram Fix 80
         );
     }
 

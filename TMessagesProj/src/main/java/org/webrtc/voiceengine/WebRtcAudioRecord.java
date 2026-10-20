@@ -21,7 +21,7 @@ import android.os.Build;
 import android.os.Process;
 import androidx.annotation.Nullable;
 
-import org.telegram.messenger.DrGramVoiceChanger; // DrGram Fix 40
+import org.telegram.messenger.LuxGramVoiceChanger; // LuxGram Fix 40
 
 import java.lang.System;
 import java.nio.ByteBuffer;
@@ -196,9 +196,9 @@ public class WebRtcAudioRecord {
               byteBuffer.putShort(a * 2, (short) mixed);
             }
           }
-          // DrGram Fix 40: voice changer on the call uplink — the other side hears it
-          if (DrGramVoiceChanger.callActive()) {
-            DrGramVoiceChanger.processCall(byteBuffer, bytesRead);
+          // LuxGram Fix 40: voice changer on the call uplink — the other side hears it
+          if (LuxGramVoiceChanger.callActive()) {
+            LuxGramVoiceChanger.processCall(byteBuffer, bytesRead);
             byteBuffer.clear();
           }
           // It's possible we've been shut down during the read, and stopRecording() tried and
@@ -445,13 +445,13 @@ public class WebRtcAudioRecord {
     }
     audioThread = new AudioRecordThread("AudioRecordJavaThread");
     audioThread.start();
-    DrGramVoiceChanger.beginCallSession(audioRecord.getSampleRate()); // DrGram Fix 40
+    LuxGramVoiceChanger.beginCallSession(audioRecord.getSampleRate()); // LuxGram Fix 40
     return true;
   }
 
   private boolean stopRecording() {
     Logging.d(TAG, "stopRecording");
-    DrGramVoiceChanger.endCallSession(); // DrGram Fix 40
+    LuxGramVoiceChanger.endCallSession(); // LuxGram Fix 40
     assertTrue(audioThread != null);
     audioThread.stopThread();
     if (!ThreadUtils.joinUninterruptibly(audioThread, AUDIO_RECORD_THREAD_JOIN_TIMEOUT_MS)) {

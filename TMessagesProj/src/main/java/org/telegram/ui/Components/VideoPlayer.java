@@ -1457,16 +1457,16 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         }
     }
 
-    private float drgramPitch = 1.0f;
+    private float luxgramPitch = 1.0f;
 
-    /** DrGram Voice FX: re-applies the current playback pitch. */
-    public void setDrgramPitch(float pitch) {
-        drgramPitch = pitch;
+    /** LuxGram Voice FX: re-applies the current playback pitch. */
+    public void setLuxGramPitch(float pitch) {
+        luxgramPitch = pitch;
         try {
             if (player != null) {
                 PlaybackParameters params = player.getPlaybackParameters();
                 float speed = params != null ? params.speed : 1.0f;
-                float target = drgramPitch != 1.0f ? drgramPitch : (speed > 1.0f ? 0.98f : 1.0f);
+                float target = luxgramPitch != 1.0f ? luxgramPitch : (speed > 1.0f ? 0.98f : 1.0f);
                 player.setPlaybackParameters(new PlaybackParameters(speed, target));
             }
         } catch (Exception ignore) {}
@@ -1475,8 +1475,8 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     public void setPlaybackSpeed(float speed) {
         try {
             if (player != null) {
-                if (drgramPitch != 1.0f) {
-                    player.setPlaybackParameters(new PlaybackParameters(speed, drgramPitch));
+                if (luxgramPitch != 1.0f) {
+                    player.setPlaybackParameters(new PlaybackParameters(speed, luxgramPitch));
                 } else {
                     player.setPlaybackParameters(new PlaybackParameters(speed, speed > 1.0f ? 0.98f : 1.0f));
                 }

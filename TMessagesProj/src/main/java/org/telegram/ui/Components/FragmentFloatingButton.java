@@ -163,16 +163,16 @@ public class FragmentFloatingButton extends FrameLayout implements FactorAnimato
         } else {
             imageView.setColorFilter(Theme.getColor(Theme.key_chats_actionIcon, resourcesProvider), PorterDuff.Mode.SRC_IN);
             progressView.setProgressColor(Theme.getColor(Theme.key_chats_actionIcon, resourcesProvider));
-            // DrGram Fix 36: the compose FAB follows the brand palette keys —
+            // LuxGram Fix 36: the compose FAB follows the brand palette keys —
             // onyx fill + gold icon in Gold/LOVE modes — instead of the
             // featuredStickers keys that rendered a solid bright circle.
-            // DrGram Fix 38: brand themes get a glassy diagonal gradient FAB
-            if (org.telegram.messenger.DrGramThemeInstaller.isLoveMode() || org.telegram.messenger.DrGramThemeInstaller.isGoldMode()) {
+            // LuxGram Fix 38: brand themes get a glassy diagonal gradient FAB
+            if (org.telegram.messenger.LuxGramThemeInstaller.isLoveMode() || org.telegram.messenger.LuxGramThemeInstaller.isGoldMode()) {
                 imageView.setColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_IN);
                 progressView.setProgressColor(0xFFFFFFFF);
                 android.graphics.drawable.GradientDrawable grad = new android.graphics.drawable.GradientDrawable(
                         android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
-                        new int[]{org.telegram.messenger.DrGramThemeInstaller.accentLightColor(), org.telegram.messenger.DrGramThemeInstaller.accentColor()});
+                        new int[]{org.telegram.messenger.LuxGramThemeInstaller.accentLightColor(), org.telegram.messenger.LuxGramThemeInstaller.accentColor()});
                 grad.setShape(android.graphics.drawable.GradientDrawable.OVAL);
                 android.graphics.drawable.GradientDrawable pressed = new android.graphics.drawable.GradientDrawable();
                 pressed.setShape(android.graphics.drawable.GradientDrawable.OVAL);

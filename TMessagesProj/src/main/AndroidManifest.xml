@@ -643,9 +643,9 @@
 
         <receiver android:name=".CustomTabsCopyReceiver" android:enabled="true"/>
 
-        <!-- DrGram Fix 36: quick tiles + home-screen widget -->
+        <!-- LuxGram Fix 36: quick tiles + home-screen widget -->
         <service
-            android:name=".messenger.DrGramSecretaryTile"
+            android:name=".messenger.LuxGramSecretaryTile"
             android:icon="@mipmap/ic_launcher"
             android:label="منشی"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
@@ -655,7 +655,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".messenger.DrGramVaultTile"
+            android:name=".messenger.LuxGramVaultTile"
             android:icon="@mipmap/ic_launcher"
             android:label="گنجینه"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
@@ -665,39 +665,39 @@
             </intent-filter>
         </service>
         <receiver
-            android:name=".messenger.DrGramToolsWidget"
+            android:name=".messenger.LuxGramToolsWidget"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="org.telegram.messenger.DRGRAM_TOGGLE_SECRETARY" />
-                <action android:name="org.telegram.messenger.DRGRAM_OPEN_VAULT" />
+                <action android:name="org.telegram.messenger.LUXGRAM_TOGGLE_SECRETARY" />
+                <action android:name="org.telegram.messenger.LUXGRAM_OPEN_VAULT" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/drgram_widget_info" />
+                android:resource="@xml/luxgram_widget_info" />
         </receiver>
         <receiver
-            android:name=".messenger.DrGramQuickChatWidget"
+            android:name=".messenger.LuxGramQuickChatWidget"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="org.telegram.messenger.DRGRAM_OPEN_REPLIES" />
-                <action android:name="org.telegram.messenger.DRGRAM_OPEN_SAVED" />
+                <action android:name="org.telegram.messenger.LUXGRAM_OPEN_REPLIES" />
+                <action android:name="org.telegram.messenger.LUXGRAM_OPEN_SAVED" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/drgram_widget_quickchat_info" />
+                android:resource="@xml/luxgram_widget_quickchat_info" />
         </receiver>
 
         <receiver
-            android:name=".messenger.DrGramRadarWidget"
+            android:name=".messenger.LuxGramRadarWidget"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/drgram_widget_radar_info" />
+                android:resource="@xml/luxgram_widget_radar_info" />
         </receiver>
 
 

@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ContactsController;
-import org.telegram.messenger.DrGramPrivateContacts;
+import org.telegram.messenger.LuxGramPrivateContacts;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
@@ -105,7 +105,7 @@ public class ContactsAdapter extends RecyclerListView.SectionsAdapter {
                         break;
                     }
                 }
-                onlineContacts = DrGramPrivateContacts.filterVisible(currentAccount, onlineContacts);
+                onlineContacts = LuxGramPrivateContacts.filterVisible(currentAccount, onlineContacts);
             }
             sortOnlineContacts();
         } else {
@@ -230,7 +230,7 @@ public class ContactsAdapter extends RecyclerListView.SectionsAdapter {
             return new ArrayList<>();
         }
         ArrayList<TLRPC.TL_contact> source = sections.get(sectionKeys.get(sectionIndex));
-        return DrGramPrivateContacts.filterVisible(currentAccount, source);
+        return LuxGramPrivateContacts.filterVisible(currentAccount, source);
     }
 
     public int getHash(int section, int position) {

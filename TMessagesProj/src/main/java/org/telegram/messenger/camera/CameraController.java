@@ -420,11 +420,11 @@ public class CameraController implements MediaRecorder.OnInfoListener {
                         BitmapFactory.Options options = new BitmapFactory.Options();
                         options.inJustDecodeBounds = true;
                         BitmapFactory.decodeByteArray(data, 0, data.length, options);
-                        // DrGram Fix 41: bound the decode for the beautify pass
+                        // LuxGram Fix 41: bound the decode for the beautify pass
                         // (bounded memory; output stays photo-grade)
                         if (options.outWidth > 0 && options.outHeight > 0
                                 && Math.max(options.outWidth, options.outHeight) > 2560
-                                && org.telegram.messenger.DrGramMedia.cameraBeautyActive()) {
+                                && org.telegram.messenger.LuxGramMedia.cameraBeautyActive()) {
                             options.inSampleSize = Math.max(2, Math.max(options.outWidth, options.outHeight) / 2560);
                             while (options.outWidth / options.inSampleSize > 2560 || options.outHeight / options.inSampleSize > 2560) {
                                 options.inSampleSize *= 2;
@@ -436,40 +436,40 @@ public class CameraController implements MediaRecorder.OnInfoListener {
                     } catch (Throwable e) {
                         FileLog.e(e);
                     }
-                    boolean drgramBeautified = false; // DrGram Fix 41
+                    boolean luxgramBeautified = false; // LuxGram Fix 41
                     try {
                         orientation = getOrientation(data);
-                        // DrGram Fix 45: portrait background blur works independently of the beauty master switch
-                        if (bitmap != null && org.telegram.messenger.DrGramMedia.storyPortraitBg()) {
+                        // LuxGram Fix 45: portrait background blur works independently of the beauty master switch
+                        if (bitmap != null && org.telegram.messenger.LuxGramMedia.storyPortraitBg()) {
                             try {
-                                org.telegram.messenger.DrGramPhotoBeautify.applyPortraitBackgroundBlur(bitmap, 1f);
+                                org.telegram.messenger.LuxGramPhotoBeautify.applyPortraitBackgroundBlur(bitmap, 1f);
                             } catch (Throwable e) {
                                 FileLog.e(e);
                             }
                         }
-                        // DrGram Fix 41: photo beautify (skin / nose / teeth)
-                        // DrGram Fix 47: shutter photos now get the FULL suite
+                        // LuxGram Fix 41: photo beautify (skin / nose / teeth)
+                        // LuxGram Fix 47: shutter photos now get the FULL suite
                         // (eyes / jaw / bright / blush / lips / dark-circles /
                         // slim) so the still photo matches what the preview
                         // showed, instead of only the three Fix 41 effects.
-                        if (bitmap != null && org.telegram.messenger.DrGramMedia.cameraBeautyActive()) {
+                        if (bitmap != null && org.telegram.messenger.LuxGramMedia.cameraBeautyActive()) {
                             try {
-                                Camera.Face[] faces = session.drgramFaces;
-                                bitmap = org.telegram.messenger.DrGramPhotoBeautify.process(
+                                Camera.Face[] faces = session.luxgramFaces;
+                                bitmap = org.telegram.messenger.LuxGramPhotoBeautify.process(
                                         bitmap,
                                         faces,
-                                        org.telegram.messenger.DrGramMedia.beautifyUniform(),
-                                        org.telegram.messenger.DrGramMedia.beautifyNose(),
-                                        org.telegram.messenger.DrGramMedia.beautifyTeeth(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyUniform(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyNose(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyTeeth(),
                                         0,
-                                        org.telegram.messenger.DrGramMedia.beautifyEyesUniform(),
-                                        org.telegram.messenger.DrGramMedia.beautifyJawUniform(),
-                                        org.telegram.messenger.DrGramMedia.beautifyBlushUniform(),
-                                        org.telegram.messenger.DrGramMedia.beautifyLipsUniform(),
-                                        org.telegram.messenger.DrGramMedia.beautifyBrightUniform(),
-                                        org.telegram.messenger.DrGramMedia.beautifyDarkUniform(),
-                                        org.telegram.messenger.DrGramMedia.beautifySlimUniform());
-                                drgramBeautified = true;
+                                        org.telegram.messenger.LuxGramMedia.beautifyEyesUniform(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyJawUniform(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyBlushUniform(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyLipsUniform(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyBrightUniform(),
+                                        org.telegram.messenger.LuxGramMedia.beautifyDarkUniform(),
+                                        org.telegram.messenger.LuxGramMedia.beautifySlimUniform());
+                                luxgramBeautified = true;
                             } catch (Throwable e) {
                                 FileLog.e(e);
                             }
@@ -503,7 +503,7 @@ public class CameraController implements MediaRecorder.OnInfoListener {
                             }
                         }
                         FileOutputStream outputStream = new FileOutputStream(path);
-                        if (drgramBeautified && bitmap != null) { // DrGram Fix 41: save the processed frame
+                        if (luxgramBeautified && bitmap != null) { // LuxGram Fix 41: save the processed frame
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
                         } else {
                             outputStream.write(data);
@@ -621,7 +621,7 @@ public class CameraController implements MediaRecorder.OnInfoListener {
                 }
                 camera.setPreviewTexture(texture);
                 camera.startPreview();
-                drgramStartFaceDetection(camera, session, params); // DrGram Fix 41
+                luxgramStartFaceDetection(camera, session, params); // LuxGram Fix 41
                 if (callback != null) {
                     AndroidUtilities.runOnUIThread(callback);
                 }
@@ -674,14 +674,14 @@ public class CameraController implements MediaRecorder.OnInfoListener {
                 session.configurePhotoCamera();
                 camera.setPreviewTexture(texture);
                 camera.startPreview();
-                drgramStartFaceDetection(camera, session, params); // DrGram Fix 41
+                luxgramStartFaceDetection(camera, session, params); // LuxGram Fix 41
                 if (callback != null) {
                     AndroidUtilities.runOnUIThread(callback);
                 }
             } catch (Exception e) {
-                // DrGram Fix 54: surface camera-open failures to the preview
+                // LuxGram Fix 54: surface camera-open failures to the preview
                 // diagnostic overlay instead of failing silently to black.
-                CameraView.drgramLastOpenFailedAt = android.os.SystemClock.elapsedRealtime();
+                CameraView.luxgramLastOpenFailedAt = android.os.SystemClock.elapsedRealtime();
                 session.cameraInfo.camera = null;
                 if (camera != null) {
                     camera.release();
@@ -691,20 +691,20 @@ public class CameraController implements MediaRecorder.OnInfoListener {
         });
     }
 
-    /** DrGram Fix 41: start Camera1 face detection when beauty processing is on. */
-    private void drgramStartFaceDetection(Camera camera, CameraSession session, Camera.Parameters params) {
+    /** LuxGram Fix 41: start Camera1 face detection when beauty processing is on. */
+    private void luxgramStartFaceDetection(Camera camera, CameraSession session, Camera.Parameters params) {
         try {
-            if (!org.telegram.messenger.DrGramMedia.cameraBeautyActive()) {
+            if (!org.telegram.messenger.LuxGramMedia.cameraBeautyActive()) {
                 return;
             }
             int maxFaces = params.getMaxNumDetectedFaces();
             if (maxFaces <= 0) {
                 return;
             }
-            camera.setFaceDetectionListener(session.drgramFaceListener);
+            camera.setFaceDetectionListener(session.luxgramFaceListener);
             camera.startFaceDetection();
             if (BuildVars.LOGS_ENABLED) {
-                FileLog.d("DrGram face detection started, maxFaces = " + maxFaces);
+                FileLog.d("LuxGram face detection started, maxFaces = " + maxFaces);
             }
         } catch (Throwable t) {
             FileLog.e(t);

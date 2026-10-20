@@ -448,13 +448,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         Theme.createCommonChatResources();
         Theme.createDialogsResources(this);
-        org.telegram.messenger.DrGramScreenshotLock.apply(getWindow()); // DrGram Fix 79: optional app-wide screenshot lock
-        AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.DrGramAutoProxy.onAppOpen(), 6500); // DrGram Fix 26: auto proxy
-        AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.DrGramChannelPromo.maybeShow(this), 9000); // DrGram Fix 68: official channel invite (explicit consent only)
+        org.telegram.messenger.LuxGramScreenshotLock.apply(getWindow()); // LuxGram Fix 79: optional app-wide screenshot lock
+        AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.LuxGramAutoProxy.onAppOpen(), 800); // LuxGram Fix 26+81: auto proxy, instant pre-login
+        AndroidUtilities.runOnUIThread(() -> org.telegram.messenger.LuxGramChannelPromo.maybeShow(this), 9000); // LuxGram Fix 68: official channel invite (explicit consent only)
         AndroidUtilities.runOnUIThread(() -> {
             try {
                 if (UserConfig.getInstance(UserConfig.selectedAccount).isClientActivated()) {
-                    org.telegram.messenger.DrGramWhatsNew.showIfNew(LaunchActivity.this); // DrGram Fix 80: What's New popup on first open after update
+                    org.telegram.messenger.LuxGramWhatsNew.showIfNew(LaunchActivity.this); // LuxGram Fix 80: What's New popup on first open after update
                 }
             } catch (Throwable t) {
                 FileLog.e(t);
@@ -6739,7 +6739,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onPause() {
         super.onPause();
-        org.telegram.messenger.DrGramChatLock.onAppPaused(); // DrGram Fix 80: re-arm two-layer chat locks
+        org.telegram.messenger.LuxGramChatLock.onAppPaused(); // LuxGram Fix 80: re-arm two-layer chat locks
         isResumed = false;
         pipActivityHandler.onPause();
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 4096);
@@ -6973,17 +6973,17 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     View feedbackView;
 
-    /** DrGram Fix 36: opens the vault when the home widget or the quick tile asked for it. */
-    private void drgramHandleOpenVault() {
+    /** LuxGram Fix 36: opens the vault when the home widget or the quick tile asked for it. */
+    private void luxgramHandleOpenVault() {
         try {
             Intent intent = getIntent();
-            if (intent == null || !intent.getBooleanExtra("drgram_open_vault", false)) {
+            if (intent == null || !intent.getBooleanExtra("luxgram_open_vault", false)) {
                 return;
             }
-            intent.removeExtra("drgram_open_vault");
+            intent.removeExtra("luxgram_open_vault");
             AndroidUtilities.runOnUIThread(() -> {
                 try {
-                    presentFragment(new DrGramVaultActivity());
+                    presentFragment(new LuxGramVaultActivity());
                 } catch (Throwable t) {
                     FileLog.e(t);
                 }
@@ -6994,22 +6994,22 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
 
     /**
-     * DrGram Fix 80: deep opens requested by the Quick Chat home widget —
+     * LuxGram Fix 80: deep opens requested by the Quick Chat home widget —
      * jump straight to Quick Replies or to Saved Messages.
      */
-    private void drgramHandleWidgetOpens() {
+    private void luxgramHandleWidgetOpens() {
         try {
             Intent intent = getIntent();
             if (intent == null) {
                 return;
             }
-            final boolean replies = intent.getBooleanExtra("drgram_open_replies", false);
-            final boolean saved = intent.getBooleanExtra("drgram_open_saved", false);
+            final boolean replies = intent.getBooleanExtra("luxgram_open_replies", false);
+            final boolean saved = intent.getBooleanExtra("luxgram_open_saved", false);
             if (!replies && !saved) {
                 return;
             }
-            intent.removeExtra("drgram_open_replies");
-            intent.removeExtra("drgram_open_saved");
+            intent.removeExtra("luxgram_open_replies");
+            intent.removeExtra("luxgram_open_saved");
             AndroidUtilities.runOnUIThread(() -> {
                 try {
                     if (replies) {
@@ -7032,8 +7032,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         super.onResume();
         isResumed = true;
         pipActivityHandler.onResume();
-        drgramHandleOpenVault(); // DrGram Fix 36: widget / quick-tile deep open
-        drgramHandleWidgetOpens(); // DrGram Fix 80: quick chat widget deep opens
+        luxgramHandleOpenVault(); // LuxGram Fix 36: widget / quick-tile deep open
+        luxgramHandleWidgetOpens(); // LuxGram Fix 80: quick chat widget deep opens
         if (onResumeStaticCallback != null) {
             onResumeStaticCallback.run();
             onResumeStaticCallback = null;
@@ -7524,10 +7524,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 DialogsActivity.switchingTheme = false;
             }
             Theme.ThemeInfo theme = (Theme.ThemeInfo) args[0];
-            // DrGram Fix 32: the day/night switch used to activate Telegram's
+            // LuxGram Fix 32: the day/night switch used to activate Telegram's
             // stock theme until the next restart re-asserted the brand look.
-            // Resolve every switch to the active DrGram palette instead.
-            theme = org.telegram.messenger.DrGramThemeInstaller.resolveDayNightTheme(theme);
+            // Resolve every switch to the active LuxGram palette instead.
+            theme = org.telegram.messenger.LuxGramThemeInstaller.resolveDayNightTheme(theme);
             boolean nightTheme = (Boolean) args[1];
             int accentId = (Integer) args[3];
             Runnable calcInBackgroundEnd = args.length > 7 ? (Runnable) args[7] : null;

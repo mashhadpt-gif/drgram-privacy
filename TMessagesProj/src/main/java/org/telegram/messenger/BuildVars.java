@@ -21,22 +21,22 @@ public class BuildVars {
     public static boolean DEBUG_VERSION = BuildConfig.DEBUG_VERSION;
     public static boolean LOGS_ENABLED = BuildConfig.DEBUG_VERSION;
     public static boolean DEBUG_PRIVATE_VERSION = BuildConfig.DEBUG_PRIVATE_VERSION;
-    // DrGram Fix 10: cloud string packs are the OFFICIAL Telegram strings and would
-    // overwrite the DrGram rebrand after a language change or string refresh
-    // DrGram Fix 13: cloud language packs are SAFE to enable now —
+    // LuxGram Fix 10: cloud string packs are the OFFICIAL Telegram strings and would
+    // overwrite the LuxGram rebrand after a language change or string refresh
+    // LuxGram Fix 13: cloud language packs are SAFE to enable now —
     // LocaleController.getStringV2() resolves brand-protected keys from the
     // packaged resources only (see isBrandProtectedKey), so the full official
     // language list (incl. a complete Persian pack) works without ever
     // re-introducing Telegram branding.
     public static boolean USE_CLOUD_STRINGS = true;
-    // DrGram Fix 10: never prompt/check updates pointing at the official Telegram app
+    // LuxGram Fix 10: never prompt/check updates pointing at the official Telegram app
     public static boolean CHECK_UPDATES = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
     public static String BUILD_VERSION_STRING = BuildConfig.BUILD_VERSION_STRING;
 
-    // DrGram Fix 64/65 — ACCOUNT-SAFETY ================================
+    // LuxGram Fix 64/65 — ACCOUNT-SAFETY ================================
     // Fix 65 (v5.34): the app now ships a DEDICATED REGISTERED pair
-    // (api_id 17064702) provided by the DrGram owner — no longer the public
+    // (api_id 17064702) provided by the LuxGram owner — no longer the public
     // Telegram Desktop placeholder (2040 / b18441a1…). Android-fork behavior
     // on a private registered pair does not match the leaked-credential
     // fingerprint that drives Telegram's client-detection ban waves.
@@ -46,15 +46,15 @@ public class BuildVars {
     //   3. keep CREDENTIAL_IS_PUBLIC_PLACEHOLDER = false
     // Reserve pairs (owner-supplied, held OUT of the repo for minimal
     // exposure — see sandbox scripts/.gh_reserve_credentials): 5 more.
-    public static int APP_ID = 17064702; // DrGram Fix 65: dedicated registered pair
+    public static int APP_ID = 17064702; // LuxGram Fix 65: dedicated registered pair
 
-    public static String APP_HASH = "f65880b9eededbee85346f874819bbc5"; // DrGram Fix 65
+    public static String APP_HASH = "f65880b9eededbee85346f874819bbc5"; // LuxGram Fix 65
 
-    /** DrGram Fix 65: the public placeholder no longer ships. */
+    /** LuxGram Fix 65: the public placeholder no longer ships. */
     public static boolean CREDENTIAL_IS_PUBLIC_PLACEHOLDER = false;
 
     /**
-     * DrGram Fix 64: honest self-knowledge for the Tools → Account Safety card.
+     * LuxGram Fix 64: honest self-knowledge for the Tools → Account Safety card.
      * Purely local (no network): true iff the app still runs on the known
      * public pair. Accounts logging in from this state carry the highest
      * client-detection ban risk and the UI says so.
@@ -64,9 +64,9 @@ public class BuildVars {
                 && APP_ID == 2040
                 && "b18441a1ff607e10a989891a5462e627".equals(APP_HASH);
     }
-    // ======================== end DrGram Fix 64 block =======================
+    // ======================== end LuxGram Fix 64 block =======================
 
-    // DrGram Fix 10: SafetyNet DISABLED. Its Google attestation is bound to the
+    // LuxGram Fix 10: SafetyNet DISABLED. Its Google attestation is bound to the
     // official Telegram package+signature and ALWAYS fails for forks, which triggered
     // the "Google Play security error" dialog loop during login. Empty key makes the
     // login flow request a plain SMS/call code with no attestation at all.
@@ -80,7 +80,7 @@ public class BuildVars {
     // You can use this flag to disable Google Play Billing (If you're making fork and want it to be in Google Play)
     public static boolean IS_BILLING_UNAVAILABLE = false;
 
-    // DrGram Fix 10: works only on official app ids, upstream comment says disable on forks
+    // LuxGram Fix 10: works only on official app ids, upstream comment says disable on forks
     public static boolean SUPPORTS_PASSKEYS = false;
 
     static {

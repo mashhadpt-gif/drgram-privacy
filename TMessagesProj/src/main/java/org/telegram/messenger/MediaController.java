@@ -1124,7 +1124,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 buffer.rewind();
                 int len = audioRecorder.read(buffer, buffer.capacity());
                 if (len > 0) {
-                    len = DrGramVoiceChanger.process(buffer, len); // DrGram Fix 37: send-side voice changer
+                    len = LuxGramVoiceChanger.process(buffer, len); // LuxGram Fix 37: send-side voice changer
                     buffer.limit(len);
                     double sum = 0;
                     try {
@@ -3294,7 +3294,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
         if (audioPlayer != null) {
             audioPlayer.setPlaybackSpeed(Math.round(speed * 10f) / 10f);
-            drgramApplyVoiceFx();
+            luxgramApplyVoiceFx();
         } else if (videoPlayer != null) {
             videoPlayer.setPlaybackSpeed(Math.round(speed * 10f) / 10f);
         }
@@ -3308,14 +3308,14 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
     }
 
-    private void drgramApplyVoiceFx() {
+    private void luxgramApplyVoiceFx() {
         try {
             if (audioPlayer == null) {
                 return;
             }
             float pitch = playingMessageObject != null && playingMessageObject.isVoice()
-                    ? org.telegram.messenger.DrGramMedia.voicePitch() : 1.0f;
-            audioPlayer.setDrgramPitch(pitch);
+                    ? org.telegram.messenger.LuxGramMedia.voicePitch() : 1.0f;
+            audioPlayer.setLuxGramPitch(pitch);
         } catch (Exception ignore) {
         }
     }
@@ -3937,7 +3937,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                         AndroidUtilities.runOnUIThread(() -> NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.fileLoaded, FileLoader.getAttachFileName(messageObject.getDocument()), cacheFile));
                     }
                     audioPlayer.preparePlayer(Uri.fromFile(cacheFile), "other");
-                    drgramApplyVoiceFx(); // DrGram Fix 15: pitch on fresh playback
+                    luxgramApplyVoiceFx(); // LuxGram Fix 15: pitch on fresh playback
                     isStreamingCurrentAudio = false;
                 } else {
                     int reference = FileLoader.getInstance(messageObject.currentAccount).getFileReference(messageObject);
@@ -3953,7 +3953,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                             "&reference=" + Utilities.bytesToHex(document.file_reference != null ? document.file_reference : new byte[0]);
                     Uri uri = Uri.parse("tg://" + messageObject.getFileName() + params);
                     audioPlayer.preparePlayer(uri, "other");
-                    drgramApplyVoiceFx(); // DrGram Fix 15: pitch on fresh playback
+                    luxgramApplyVoiceFx(); // LuxGram Fix 15: pitch on fresh playback
                     isStreamingCurrentAudio = true;
                 }
                 if (messageObject.isVoice()) {
@@ -3969,7 +3969,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                     if (Math.abs(currentPlaybackSpeed - 1.0f) > 0.001f) {
                         audioPlayer.setPlaybackSpeed(Math.round(currentPlaybackSpeed * 10f) / 10f);
                     }
-                    drgramApplyVoiceFx();
+                    luxgramApplyVoiceFx();
                     audioInfo = null;
                     if (!saved) {
                         clearPlaylist();
@@ -3991,7 +3991,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                         if (Math.abs(currentMusicPlaybackSpeed - 1.0f) > 0.001f) {
                             audioPlayer.setPlaybackSpeed(Math.round(currentMusicPlaybackSpeed * 10f) / 10f);
                         }
-                        drgramApplyVoiceFx();
+                        luxgramApplyVoiceFx();
                     }
                 }
                 if (messageObject.forceSeekTo >= 0) {
@@ -4023,7 +4023,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 }
                 audioPlayer.setStreamType(useFrontSpeaker ? AudioManager.STREAM_VOICE_CALL : AudioManager.STREAM_MUSIC);
                 audioPlayer.play();
-                drgramApplyVoiceFx(); // DrGram Fix 15: pitch on start/resume
+                luxgramApplyVoiceFx(); // LuxGram Fix 15: pitch on start/resume
                 if (!messageObject.isVoice()) {
                     if (audioVolumeAnimator != null) {
                         audioVolumeAnimator.removeAllListeners();
@@ -4395,7 +4395,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             }
             if (audioPlayer != null) {
                 audioPlayer.play();
-                drgramApplyVoiceFx(); // DrGram Fix 15: pitch on resume
+                luxgramApplyVoiceFx(); // LuxGram Fix 15: pitch on resume
             } else if (videoPlayer != null) {
                 videoPlayer.play();
             }
@@ -4802,7 +4802,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 fileBuffer.rewind();
 
                 audioRecorder.startRecording();
-                DrGramVoiceChanger.beginSession(sampleRate); // DrGram Fix 37: voice changer state
+                LuxGramVoiceChanger.beginSession(sampleRate); // LuxGram Fix 37: voice changer state
             } catch (Exception e) {
                 FileLog.e(e);
                 recordingAudio = null;
@@ -4907,7 +4907,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             }
             fileEncodingQueue.postRunnable(() -> {
                 stopRecord();
-                DrGramVoiceChanger.endSession(); // DrGram Fix 37: drop changer state with the finished take
+                LuxGramVoiceChanger.endSession(); // LuxGram Fix 37: drop changer state with the finished take
                 final File recordingAudioFileToSend = joinRecord(recordingPrevAudioFileToSend_, recordingAudioFileToSend_, audioToSend);
                 if (recordingAudioFileToSend == null) {
                     if (BuildVars.LOGS_ENABLED) {
@@ -6574,7 +6574,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 playMessage(currentMessageObject);
             } else {
                 audioPlayer.play();
-                drgramApplyVoiceFx(); // DrGram Fix 15: pitch after buffering restart
+                luxgramApplyVoiceFx(); // LuxGram Fix 15: pitch after buffering restart
             }
         }
     }

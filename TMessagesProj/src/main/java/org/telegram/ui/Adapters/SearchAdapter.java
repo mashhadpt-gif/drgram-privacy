@@ -25,7 +25,7 @@ import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
-import org.telegram.messenger.DrGramPrivateContacts;
+import org.telegram.messenger.LuxGramPrivateContacts;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
@@ -110,7 +110,7 @@ public class SearchAdapter extends RecyclerListView.SelectionAdapter {
                 ArrayList<TLRPC.TL_contact> contacts = ContactsController.getInstance(currentAccount).contacts;
                 if (contacts != null) {
                     for (TLRPC.TL_contact contact : contacts) {
-                        if (contact != null && DrGramPrivateContacts.isPrivate(currentAccount, contact.user_id)) {
+                        if (contact != null && LuxGramPrivateContacts.isPrivate(currentAccount, contact.user_id)) {
                             excluded.put(contact.user_id, MessagesController.getInstance(currentAccount).getUser(contact.user_id));
                         }
                     }
@@ -192,7 +192,7 @@ public class SearchAdapter extends RecyclerListView.SelectionAdapter {
                     TLRPC.TL_contact contact = contactsCopy.get(a);
                     TLRPC.User user = MessagesController.getInstance(currentAccount).getUser(contact.user_id);
                     if (user == null
-                            || DrGramPrivateContacts.isPrivate(currentAccount, contact.user_id)
+                            || LuxGramPrivateContacts.isPrivate(currentAccount, contact.user_id)
                             || !allowSelf && user.self
                             || onlyMutual && !user.mutual_contact
                             || ignoreUsers != null && ignoreUsers.indexOfKey(contact.user_id) >= 0) {

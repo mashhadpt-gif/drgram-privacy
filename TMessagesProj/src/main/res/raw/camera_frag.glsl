@@ -13,7 +13,7 @@ uniform float shapeFrom, shapeTo, shapeT;
 uniform float dual;
 uniform float blur;
 uniform float beautify;
-// DrGram Fix 41: full beauty suite + Instagram-style camera FX
+// LuxGram Fix 41: full beauty suite + Instagram-style camera FX
 uniform float fxNose;        // 0..1 nose slimming
 uniform float fxTeeth;       // 0..1 teeth whitening
 uniform float fxEyes;        // 0..1 conservative eye enlargement
@@ -23,17 +23,17 @@ uniform float fxFaceCount;   // 0..2
 uniform vec4 fxFaces[2];     // xy = face center (uv), zw = half size (uv)
 uniform vec2 fxNoses[2];     // nose anchor (uv)
 uniform vec2 fxMouths[2];    // mouth anchor (uv)
-// DrGram Fix 46: standalone makeup suite + real eye landmarks
+// LuxGram Fix 46: standalone makeup suite + real eye landmarks
 uniform float fxBlush;       // 0..1 cheek tint
 uniform float fxLips;        // 0..1 lip tint
 uniform float fxBright;      // 0..1 skin brightening
 uniform vec2 fxEyesL[2];     // real left-eye anchor (uv) per face (ML Kit)
 uniform vec2 fxEyesR[2];     // real right-eye anchor (uv) per face (ML Kit)
 uniform float fxEyePrecise;  // 1.0 when real eye anchors are valid
-// DrGram Fix 47: under-eye brightening + cheek slimming
+// LuxGram Fix 47: under-eye brightening + cheek slimming
 uniform float fxDark;        // 0..1 dark-circle brightening
 uniform float fxSlim;        // 0..1 mid-face (cheek) slimming
-// DrGram Fix 51: REAL organ rectangles from the 478-pt mesh. Each vec4 is
+// LuxGram Fix 51: REAL organ rectangles from the 478-pt mesh. Each vec4 is
 // (cx, cy, halfW, halfH) in uv space. The nose rect spans ala-to-ala /
 // nasion-to-columella, so nose work stays ON the nose — no more clown halo.
 uniform vec4 fxNoseRect[2];
@@ -41,7 +41,7 @@ uniform vec4 fxMouthRect[2];
 uniform vec4 fxEyeRectL[2];
 uniform vec4 fxEyeRectR[2];
 uniform float fxOrganPrecise; // 1.0 = rects come from the dense mesh
-// DrGram Fix 57: contour points now travel in a 128x1 RGBA8 texture (unit 2)
+// LuxGram Fix 57: contour points now travel in a 128x1 RGBA8 texture (unit 2)
 // instead of 56 uniform vectors. One texel per point; xy is split into 16-bit
 // hi/lo byte pairs (R=hi_x G=lo_x B=hi_y A=lo_y, quantized to 65520). The
 // sampler is declared highp so the byte values survive lookup: x = R + G/256.
@@ -53,7 +53,7 @@ uniform float fxPolygonPrecise;
 // Fetches one contour point from the polygon texture. Slots: face oval
 // face*16 (0..31), nose ring 32+face*12 (32..55), lips 56+face*12 (56..79),
 // left eye 80+face*8 (80..95), right eye 96+face*8 (96..111).
-highp vec2 drgramMeshPoint(int faceIndex, int pointIndex, int polygonType) {
+highp vec2 luxgramMeshPoint(int faceIndex, int pointIndex, int polygonType) {
   int base;
   if (polygonType == 0) {
     base = faceIndex * 16 + pointIndex;
@@ -73,14 +73,14 @@ highp vec2 drgramMeshPoint(int faceIndex, int pointIndex, int polygonType) {
 // Returns a softly antialiased coverage for a tracked mesh polygon.
 // All math is highp: polygon edges live below mediump resolution, and the
 // previous 1e-6 floors underflowed to zero in mediump (half-float min ~6e-5).
-mediump float drgramMeshPolygonMask(highp vec2 p, int faceIndex, int polygonType) {
+mediump float luxgramMeshPolygonMask(highp vec2 p, int faceIndex, int polygonType) {
   int pointCount = polygonType == 0 ? 16 : ((polygonType == 1 || polygonType == 4) ? 12 : 8);
   bool inside = false;
   highp float edgeDistance = 1.0;
-  highp vec2 previous = drgramMeshPoint(faceIndex, pointCount - 1, polygonType);
+  highp vec2 previous = luxgramMeshPoint(faceIndex, pointCount - 1, polygonType);
   for (int j = 0; j < 16; j++) {
     if (j < pointCount) {
-      highp vec2 current = drgramMeshPoint(faceIndex, j, polygonType);
+      highp vec2 current = luxgramMeshPoint(faceIndex, j, polygonType);
       highp vec2 segment = current - previous;
       highp float segmentLength = max(dot(segment, segment), 1e-4);
       highp float along = clamp(dot(p - previous, segment) / segmentLength, 0.0, 1.0);
@@ -166,7 +166,7 @@ vec4 program() {
     return mix(texture2D(sTexture, uv), makeblur(), blur) * vec4(1., 1., 1., dalpha);
 }
 
-// ===================== DrGram Fix 41: LuxGram camera FX =====================
+// ===================== LuxGram Fix 41: LuxGram camera FX =====================
 // Pipeline: warp (nose slim / fun sampling fx) -> sample -> skin smooth
 // (skin-masked, face-weighted bilateral) -> teeth whitening -> face glow
 // -> colour grade (sunset/pastel/vintage/...). beautify == 0 && fxFx == 0 &&
@@ -186,7 +186,7 @@ mediump float ellipseFalloff(mediump vec2 p, mediump vec2 c, mediump vec2 halfSi
 }
 
 // Face weight: strongest smoothing inside detected faces; 1.0 when no faces.
-mediump vec3 drgramColorFx(mediump vec3 c, mediump vec2 p) {
+mediump vec3 luxgramColorFx(mediump vec3 c, mediump vec2 p) {
   mediump float lum = dot(c, vec3(0.299, 0.587, 0.114));
   if (fxFx > 0.5 && fxFx < 1.5) {
     // sunset — warm gradient + soft lift
@@ -291,7 +291,7 @@ mediump vec3 drgramColorFx(mediump vec3 c, mediump vec2 p) {
 }
 
 // Fun poster/cartoon finish.
-mediump vec3 drgramCartoon(mediump vec3 c) {
+mediump vec3 luxgramCartoon(mediump vec3 c) {
   if (fxFx > 11.5 && fxFx < 12.5) {
     c = floor(c * 6.0 + 0.5) / 6.0;
   }
@@ -299,9 +299,9 @@ mediump vec3 drgramCartoon(mediump vec3 c) {
 }
 
 vec4 beautifySample(vec4 base) {
-  // DrGram Fix 60: face beautification (smoothing, warps, teeth,
+  // LuxGram Fix 60: face beautification (smoothing, warps, teeth,
   // under-eye, blush/lips, brightening) removed on purpose — only the
-  // colour FX (drgramColorFx / glitch / glam / cartoon) remain. All
+  // colour FX (luxgramColorFx / glitch / glam / cartoon) remain. All
   // beauty uniforms stay declared so the Java wiring keeps its
   // guarded no-op paths.
   if (fxFx <= 0.001)
@@ -319,7 +319,7 @@ vec4 beautifySample(vec4 base) {
     C = texture2D(sTexture, p);
   }
   mediump vec3 rgb = C.rgb;
-  rgb = drgramColorFx(rgb, p);
+  rgb = luxgramColorFx(rgb, p);
   // Glam adds restrained cheek and lip tint only when a face is detected.
   if (fxFx > 19.5 && fxFx < 20.5 && fxFaceCount > 0.5) {
     mediump float blush = 0.0;
@@ -331,7 +331,7 @@ vec4 beautifySample(vec4 base) {
         mediump vec2 cheekSize = max(halfSize * vec2(0.22, 0.12), vec2(0.001));
         blush = max(blush, ellipseFalloff(p, center + vec2(-halfSize.x * 0.36, halfSize.y * 0.20), cheekSize));
         blush = max(blush, ellipseFalloff(p, center + vec2( halfSize.x * 0.36, halfSize.y * 0.20), cheekSize));
-        // DrGram Fix 51: same real-lip scoping for the glam preset.
+        // LuxGram Fix 51: same real-lip scoping for the glam preset.
         mediump vec4 mr2 = fxMouthRect[i];
         if (mr2.z > 0.002) {
           lips = max(lips, ellipseFalloff(p, mr2.xy, max(mr2.zw * vec2(1.04, 1.10), vec2(0.001))));
@@ -340,7 +340,7 @@ vec4 beautifySample(vec4 base) {
           if (fxPolygonPrecise > 0.5) {
             mediump vec4 mr = fxMouthRect[i];
             if (mr.z > 0.002 && abs(p.x - mr.x) <= mr.z * 1.10 && abs(p.y - mr.y) <= mr.w * 1.10) {
-              lipRegion = drgramMeshPolygonMask(p, i, 1);
+              lipRegion = luxgramMeshPolygonMask(p, i, 1);
             }
           } else {
             lipRegion = ellipseFalloff(p, fxMouths[i] + vec2(0.0, -halfSize.y * 0.02), max(halfSize * vec2(0.24, 0.075), vec2(0.001)));
@@ -352,7 +352,7 @@ vec4 beautifySample(vec4 base) {
     rgb = mix(rgb, vec3(0.92, 0.36, 0.43), clamp(blush * 0.22, 0.0, 0.22));
     rgb = mix(rgb, vec3(0.72, 0.16, 0.28), clamp(lips * 0.18, 0.0, 0.18));
   }
-  rgb = drgramCartoon(rgb);
+  rgb = luxgramCartoon(rgb);
   return vec4(rgb, C.a);
 }
 void main() {

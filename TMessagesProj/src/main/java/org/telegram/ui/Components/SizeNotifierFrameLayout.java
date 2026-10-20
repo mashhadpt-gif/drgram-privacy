@@ -46,7 +46,7 @@ import androidx.annotation.NonNull;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DispatchQueue;
-import org.telegram.messenger.DrGramThemeInstaller;
+import org.telegram.messenger.LuxGramThemeInstaller;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.SharedConfig;
@@ -92,25 +92,25 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     private boolean animationInProgress;
     private boolean skipBackgroundDrawing;
     SnowflakesEffect snowflakesEffect;
-    private DrGramSparkEffect drgramSparkEffect;
-    private DrGramGoldRainEffect drgramGoldRainEffect;
-    // DrGram Fix 16: LOVE-mode hearts + ambient theme particle waves
-    private DrGramHeartEffect drgramHeartEffect;
-    private DrGramAmbientEffect drgramAmbientEffect;
-    private final Handler drgramAmbientHandler = new Handler(Looper.getMainLooper());
-    private boolean drgramAmbientScheduled;
-    private final Runnable drgramAmbientWave = new Runnable() {
+    private LuxGramSparkEffect luxgramSparkEffect;
+    private LuxGramGoldRainEffect luxgramGoldRainEffect;
+    // LuxGram Fix 16: LOVE-mode hearts + ambient theme particle waves
+    private LuxGramHeartEffect luxgramHeartEffect;
+    private LuxGramAmbientEffect luxgramAmbientEffect;
+    private final Handler luxgramAmbientHandler = new Handler(Looper.getMainLooper());
+    private boolean luxgramAmbientScheduled;
+    private final Runnable luxgramAmbientWave = new Runnable() {
         @Override
         public void run() {
-            drgramAmbientScheduled = false;
+            luxgramAmbientScheduled = false;
             try {
-                if (SharedConfig.drgramSendSparks && isAttachedToWindow()
+                if (SharedConfig.luxgramSendSparks && isAttachedToWindow()
                         && getWindowVisibility() == View.VISIBLE && getMeasuredWidth() > 0) {
-                    if (drgramAmbientEffect == null) {
-                        drgramAmbientEffect = new DrGramAmbientEffect();
+                    if (luxgramAmbientEffect == null) {
+                        luxgramAmbientEffect = new LuxGramAmbientEffect();
                     }
-                    if (drgramAmbientEffect.isEmpty()) {
-                        drgramAmbientEffect.spawnWave(DrGramThemeInstaller.isLoveMode(),
+                    if (luxgramAmbientEffect.isEmpty()) {
+                        luxgramAmbientEffect.spawnWave(LuxGramThemeInstaller.isLoveMode(),
                                 getMeasuredWidth(), getMeasuredHeight());
                         invalidate();
                     }
@@ -118,74 +118,74 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
             } catch (Throwable t) {
                 FileLog.e(t);
             }
-            drgramScheduleAmbient();
+            luxgramScheduleAmbient();
         }
     };
     public View backgroundView;
     boolean attached;
 
     /**
-     * DrGram Fix 16: keeps the ambient particle sky alive. Waves last a few
+     * LuxGram Fix 16: keeps the ambient particle sky alive. Waves last a few
      * seconds, then the canvas goes fully idle until the next scheduled wave,
      * so the effect costs nothing while still making every screen feel alive.
      */
-    private void drgramScheduleAmbient() {
-        if (isAttachedToWindow() && !drgramAmbientScheduled) {
-            drgramAmbientScheduled = true;
-            drgramAmbientHandler.postDelayed(drgramAmbientWave, 15000 + Utilities.random.nextInt(9000));
+    private void luxgramScheduleAmbient() {
+        if (isAttachedToWindow() && !luxgramAmbientScheduled) {
+            luxgramAmbientScheduled = true;
+            luxgramAmbientHandler.postDelayed(luxgramAmbientWave, 15000 + Utilities.random.nextInt(9000));
         }
     }
 
     /**
-     * DrGram premium effect: spawns a gold spark burst at (x, y) drawn over the chat content.
-     * Gated by SharedConfig.drgramSendSparks.
+     * LuxGram premium effect: spawns a gold spark burst at (x, y) drawn over the chat content.
+     * Gated by SharedConfig.luxgramSendSparks.
      */
-    public void startDrgramSparks(float x, float y) {
-        startDrgramSparks(x, y, 1.0f);
+    public void startLuxGramSparks(float x, float y) {
+        startLuxGramSparks(x, y, 1.0f);
     }
 
     /**
-     * DrGram premium effect: spark burst with custom intensity (>= 1.5 = grand mode).
-     * DrGram Fix 16: theme-aware — in LOVE Mode the send burst erupts into
+     * LuxGram premium effect: spark burst with custom intensity (>= 1.5 = grand mode).
+     * LuxGram Fix 16: theme-aware — in LOVE Mode the send burst erupts into
      * glowing hearts instead of gold sparks.
      */
-    public void startDrgramSparks(float x, float y, float intensity) {
-        if (!SharedConfig.drgramSendSparks) {
+    public void startLuxGramSparks(float x, float y, float intensity) {
+        if (!SharedConfig.luxgramSendSparks) {
             return;
         }
-        if (DrGramThemeInstaller.isLoveMode()) {
-            if (drgramHeartEffect == null) {
-                drgramHeartEffect = new DrGramHeartEffect();
+        if (LuxGramThemeInstaller.isLoveMode()) {
+            if (luxgramHeartEffect == null) {
+                luxgramHeartEffect = new LuxGramHeartEffect();
             }
-            drgramHeartEffect.burst(x, y, intensity);
+            luxgramHeartEffect.burst(x, y, intensity);
         } else {
-            if (drgramSparkEffect == null) {
-                drgramSparkEffect = new DrGramSparkEffect();
+            if (luxgramSparkEffect == null) {
+                luxgramSparkEffect = new LuxGramSparkEffect();
             }
-            drgramSparkEffect.burst(x, y, intensity);
+            luxgramSparkEffect.burst(x, y, intensity);
         }
         invalidate();
     }
 
     /**
-     * DrGram premium effect: golden dust rain celebrating a reaction on your message.
-     * Gated by SharedConfig.drgramReactionRain.
-     * DrGram Fix 16: theme-aware — in LOVE Mode hearts rise and drizzle instead.
+     * LuxGram premium effect: golden dust rain celebrating a reaction on your message.
+     * Gated by SharedConfig.luxgramReactionRain.
+     * LuxGram Fix 16: theme-aware — in LOVE Mode hearts rise and drizzle instead.
      */
-    public void startDrgramGoldRain(float x, float y) {
-        if (!SharedConfig.drgramReactionRain) {
+    public void startLuxGramGoldRain(float x, float y) {
+        if (!SharedConfig.luxgramReactionRain) {
             return;
         }
-        if (DrGramThemeInstaller.isLoveMode()) {
-            if (drgramHeartEffect == null) {
-                drgramHeartEffect = new DrGramHeartEffect();
+        if (LuxGramThemeInstaller.isLoveMode()) {
+            if (luxgramHeartEffect == null) {
+                luxgramHeartEffect = new LuxGramHeartEffect();
             }
-            drgramHeartEffect.rain(x, y, getMeasuredWidth());
+            luxgramHeartEffect.rain(x, y, getMeasuredWidth());
         } else {
-            if (drgramGoldRainEffect == null) {
-                drgramGoldRainEffect = new DrGramGoldRainEffect();
+            if (luxgramGoldRainEffect == null) {
+                luxgramGoldRainEffect = new LuxGramGoldRainEffect();
             }
-            drgramGoldRainEffect.rain(x, y, getMeasuredWidth());
+            luxgramGoldRainEffect.rain(x, y, getMeasuredWidth());
         }
         invalidate();
     }
@@ -936,22 +936,22 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
             startBlur();
         }
         super.dispatchDraw(canvas);
-        // DrGram Fix 16: ambient brand particles — golden starfall in Gold Luxe,
+        // LuxGram Fix 16: ambient brand particles — golden starfall in Gold Luxe,
         // drifting hearts in LOVE Mode (low alpha, idle between waves)
-        if (drgramAmbientEffect != null && !drgramAmbientEffect.isEmpty()) {
-            drgramAmbientEffect.onDraw(this, canvas);
+        if (luxgramAmbientEffect != null && !luxgramAmbientEffect.isEmpty()) {
+            luxgramAmbientEffect.onDraw(this, canvas);
         }
-        // DrGram premium sparks overlay (above messages, like confetti)
-        if (drgramSparkEffect != null && !drgramSparkEffect.isEmpty()) {
-            drgramSparkEffect.onDraw(this, canvas);
+        // LuxGram premium sparks overlay (above messages, like confetti)
+        if (luxgramSparkEffect != null && !luxgramSparkEffect.isEmpty()) {
+            luxgramSparkEffect.onDraw(this, canvas);
         }
-        // DrGram Fix 16: heart burst/drizzle overlay (LOVE Mode)
-        if (drgramHeartEffect != null && !drgramHeartEffect.isEmpty()) {
-            drgramHeartEffect.onDraw(this, canvas);
+        // LuxGram Fix 16: heart burst/drizzle overlay (LOVE Mode)
+        if (luxgramHeartEffect != null && !luxgramHeartEffect.isEmpty()) {
+            luxgramHeartEffect.onDraw(this, canvas);
         }
-        // DrGram premium golden rain overlay
-        if (drgramGoldRainEffect != null && !drgramGoldRainEffect.isEmpty()) {
-            drgramGoldRainEffect.onDraw(this, canvas);
+        // LuxGram premium golden rain overlay
+        if (luxgramGoldRainEffect != null && !luxgramGoldRainEffect.isEmpty()) {
+            luxgramGoldRainEffect.onDraw(this, canvas);
         }
     }
 
@@ -959,7 +959,7 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         attached = true;
-        drgramScheduleAmbient(); // DrGram Fix 16: start the ambient particle sky
+        luxgramScheduleAmbient(); // LuxGram Fix 16: start the ambient particle sky
         if (needBlur && !blurIsRunning) {
             blurIsRunning = true;
             invalidateBlur = true;
@@ -982,8 +982,8 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         attached = false;
-        drgramAmbientHandler.removeCallbacks(drgramAmbientWave); // DrGram Fix 16
-        drgramAmbientScheduled = false;
+        luxgramAmbientHandler.removeCallbacks(luxgramAmbientWave); // LuxGram Fix 16
+        luxgramAmbientScheduled = false;
         blurPaintTop.setShader(null);
         blurPaintTop2.setShader(null);
         blurPaintBottom.setShader(null);

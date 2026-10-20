@@ -22,7 +22,7 @@
         <item name="android:colorPrimary">#232d3a</item>
         <item name="android:navigationBarColor">#000000</item>
         <item name="android:forceDarkAllowed">false</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/drgram_splash_gem_anim</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/luxgram_splash_gem_anim</item>
         <item name="android:windowSplashScreenAnimationDuration">800</item>
         <item name="android:windowSplashScreenBackground">#FF0A0906</item>
     </style>

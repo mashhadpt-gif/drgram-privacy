@@ -13,7 +13,7 @@ import android.view.WindowManager;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.DrGramCallBeautyFX;
+import org.telegram.messenger.LuxGramCallBeautyFX;
 import org.telegram.messenger.FileLog;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
@@ -49,7 +49,7 @@ public class VideoCapturerDevice {
 
     private static VideoCapturerDevice[] instance = new VideoCapturerDevice[2];
     private CapturerObserver nativeCapturerObserver;
-    private DrGramCallBeautyFX beautyObserver;
+    private LuxGramCallBeautyFX beautyObserver;
 
     public VideoCapturerDevice(boolean screencast) {
         if (Build.VERSION.SDK_INT < 18) {
@@ -234,9 +234,9 @@ public class VideoCapturerDevice {
                             return;
                         }
                         nativeCapturerObserver = nativeGetJavaVideoCapturerObserver(nativePtr);
-                        // DrGram Fix 49: live / video-call beauty — GL processor between
+                        // LuxGram Fix 49: live / video-call beauty — GL processor between
                         // the capturer and the native source. Pure passthrough while off.
-                        DrGramCallBeautyFX beautyFX = new DrGramCallBeautyFX(nativeCapturerObserver);
+                        LuxGramCallBeautyFX beautyFX = new LuxGramCallBeautyFX(nativeCapturerObserver);
                         beautyObserver = beautyFX;
                         videoCapturer.initialize(videoCapturerSurfaceTextureHelper, ApplicationLoader.applicationContext, beautyFX);
                         FileLog.d("VideoCapturerDevice init(" + ptr + "): videoCapturer.startCapture CAMERA");

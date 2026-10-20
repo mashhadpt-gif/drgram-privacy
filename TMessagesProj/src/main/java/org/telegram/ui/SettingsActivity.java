@@ -83,7 +83,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.SharedPrefsHelper;
 import org.telegram.utils.settings.SharedSettings;
-import org.telegram.messenger.DrGramHiddenAccounts;
+import org.telegram.messenger.LuxGramHiddenAccounts;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.browser.Browser;
@@ -624,7 +624,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         accountNumbers.clear();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             if (UserConfig.getInstance(a).isClientActivated() && currentAccount != a
-                    && !DrGramHiddenAccounts.isHidden(a)) {
+                    && !LuxGramHiddenAccounts.isHidden(a)) {
                 accountNumbers.add(a);
             }
         }

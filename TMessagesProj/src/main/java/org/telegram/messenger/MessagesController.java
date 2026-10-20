@@ -5839,7 +5839,7 @@ public class MessagesController extends BaseController implements NotificationCe
         user.phone = "42777";
         user.id = 777000;
         user.verified = true;
-        user.first_name = "Dr Gram"; // DrGram Fix 19: branding
+        user.first_name = "Dr Gram"; // LuxGram Fix 19: branding
         user.last_name = "Notifications";
         user.status = null;
         user.photo = new TLRPC.TL_userProfilePhotoEmpty();
@@ -21212,7 +21212,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 long key = deletedMessages.keyAt(a);
                 ArrayList<Integer> arrayList = deletedMessages.valueAt(a);
                 try {
-                    DrGramAntiDelete.getInstance(currentAccount).onDeletedBatch(key, arrayList); // DrGram Fix 36: capture before local delete
+                    LuxGramAntiDelete.getInstance(currentAccount).onDeletedBatch(key, arrayList); // LuxGram Fix 36: capture before local delete
                 } catch (Throwable ignore) {
                 }
                 getMessagesStorage().getStorageQueue().postRunnable(() -> {

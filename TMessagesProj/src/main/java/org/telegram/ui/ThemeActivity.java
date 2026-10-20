@@ -236,15 +236,15 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
     private int appIconSelectorRow;
     private int appIconShadowRow;
 
-    // DrGram premium effects section
-    private int drgramHeaderRow;
-    private int drgramSparksRow;
-    private int drgramRainRow;
-    private int drgramGlassRow;
-    private int drgramGoldChatRow;
-    private int drgramFontRow;
-    private int drgramIconsRow;
-    private int drgramInfoRow;
+    // LuxGram premium effects section
+    private int luxgramHeaderRow;
+    private int luxgramSparksRow;
+    private int luxgramRainRow;
+    private int luxgramGlassRow;
+    private int luxgramGoldChatRow;
+    private int luxgramFontRow;
+    private int luxgramIconsRow;
+    private int luxgramInfoRow;
 
     private int rowCount;
 
@@ -619,14 +619,14 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
         appIconHeaderRow = -1;
         appIconSelectorRow = -1;
         appIconShadowRow = -1;
-        drgramHeaderRow = -1;
-        drgramSparksRow = -1;
-        drgramRainRow = -1;
-        drgramGlassRow = -1;
-        drgramGoldChatRow = -1;
-        drgramFontRow = -1;
-        drgramIconsRow = -1;
-        drgramInfoRow = -1;
+        luxgramHeaderRow = -1;
+        luxgramSparksRow = -1;
+        luxgramRainRow = -1;
+        luxgramGlassRow = -1;
+        luxgramGoldChatRow = -1;
+        luxgramFontRow = -1;
+        luxgramIconsRow = -1;
+        luxgramInfoRow = -1;
         lastShadowRow = -1;
 
         defaultThemes.clear();
@@ -693,14 +693,14 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             appIconSelectorRow = rowCount++;
             appIconShadowRow = rowCount++;
 
-            drgramHeaderRow = rowCount++;
-            drgramSparksRow = rowCount++;
-            drgramRainRow = rowCount++;
-            drgramGlassRow = rowCount++;
-            drgramGoldChatRow = rowCount++;
-            drgramFontRow = rowCount++;
-            drgramIconsRow = rowCount++;
-            drgramInfoRow = rowCount++;
+            luxgramHeaderRow = rowCount++;
+            luxgramSparksRow = rowCount++;
+            luxgramRainRow = rowCount++;
+            luxgramGlassRow = rowCount++;
+            luxgramGoldChatRow = rowCount++;
+            luxgramFontRow = rowCount++;
+            luxgramIconsRow = rowCount++;
+            luxgramInfoRow = rowCount++;
 
             swipeGestureHeaderRow = rowCount++;
             swipeGestureRow = rowCount++;
@@ -1163,32 +1163,32 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(SharedConfig.nextMediaTap);
                 }
-            } else if (position == drgramSparksRow) {
-                SharedConfig.toggleDrgramSendSparks();
+            } else if (position == luxgramSparksRow) {
+                SharedConfig.toggleLuxGramSendSparks();
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(SharedConfig.drgramSendSparks);
+                    ((TextCheckCell) view).setChecked(SharedConfig.luxgramSendSparks);
                 }
-            } else if (position == drgramRainRow) {
-                SharedConfig.toggleDrgramReactionRain();
+            } else if (position == luxgramRainRow) {
+                SharedConfig.toggleLuxGramReactionRain();
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(SharedConfig.drgramReactionRain);
+                    ((TextCheckCell) view).setChecked(SharedConfig.luxgramReactionRain);
                 }
-            } else if (position == drgramGlassRow) {
-                SharedConfig.toggleDrgramGlassUI();
+            } else if (position == luxgramGlassRow) {
+                SharedConfig.toggleLuxGramGlassUI();
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(SharedConfig.drgramGlassUI);
+                    ((TextCheckCell) view).setChecked(SharedConfig.luxgramGlassUI);
                 }
-            } else if (position == drgramGoldChatRow) {
-                SharedConfig.toggleDrgramGoldChat();
+            } else if (position == luxgramGoldChatRow) {
+                SharedConfig.toggleLuxGramGoldChat();
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(SharedConfig.drgramGoldChat);
+                    ((TextCheckCell) view).setChecked(SharedConfig.luxgramGoldChat);
                 }
-            } else if (position == drgramFontRow) {
-                SharedConfig.toggleDrgramVazirFont();
+            } else if (position == luxgramFontRow) {
+                SharedConfig.toggleLuxGramVazirFont();
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(SharedConfig.drgramVazirFont);
+                    ((TextCheckCell) view).setChecked(SharedConfig.luxgramVazirFont);
                 }
-            } else if (position == drgramIconsRow) {
+            } else if (position == luxgramIconsRow) {
                 LauncherIconController.LauncherIcon[] icons = LauncherIconController.LauncherIcon.values();
                 LauncherIconController.LauncherIcon current = icons[0];
                 for (LauncherIconController.LauncherIcon icon : icons) {
@@ -2596,7 +2596,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                         cell.setText(getLocationSunString());
                     } else if (position == swipeGestureInfoRow) {
                         cell.setText(getString("ChatListSwipeGestureInfo", R.string.ChatListSwipeGestureInfo));
-                    } else if (position == drgramInfoRow) {
+                    } else if (position == luxgramInfoRow) {
                         cell.setText(getString("SparksOnSendHint", R.string.SparksOnSendHint));
                     } else if (position == liteModeInfoRow) {
                         cell.setText(getString("LiteModeInfo", R.string.LiteModeInfo));
@@ -2650,8 +2650,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                         headerCell.setText(getString("SelectTheme", R.string.SelectTheme));
                     } else if (position == appIconHeaderRow) {
                         headerCell.setText(getString(R.string.AppIcon));
-                    } else if (position == drgramHeaderRow) {
-                        headerCell.setText(getString(R.string.DrGramPremium));
+                    } else if (position == luxgramHeaderRow) {
+                        headerCell.setText(getString(R.string.LuxGramPremium));
                     } else if (position == otherHeaderRow) {
                         headerCell.setText(getString("OtherSettings", R.string.OtherSettings));
                     } else if (position == mediaSoundHeaderRow) {
@@ -2690,16 +2690,16 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                         textCheckCell.setTextAndValueAndCheck(getString(R.string.ShowSensitiveContent), getString(R.string.ShowSensitiveContentInfo), getMessagesController().showSensitiveContent(), true, true);
                     } else if (position == chatBlurRow) {
                         textCheckCell.setTextAndCheck(getString("BlurInChat", R.string.BlurInChat), SharedConfig.chatBlurEnabled(), true);
-                    } else if (position == drgramSparksRow) {
-                        textCheckCell.setTextAndValueAndCheck(getString(R.string.SparksOnSend), getString(R.string.SparksOnSendInfo), SharedConfig.drgramSendSparks, true, true);
-                    } else if (position == drgramRainRow) {
-                        textCheckCell.setTextAndValueAndCheck(getString(R.string.GoldRainOnReactions), getString(R.string.GoldRainOnReactionsInfo), SharedConfig.drgramReactionRain, true, true);
-                    } else if (position == drgramGlassRow) {
-                        textCheckCell.setTextAndValueAndCheck(getString(R.string.DrGramGlassUI), getString(R.string.DrGramGlassUIInfo), SharedConfig.drgramGlassUI, true, true);
-                    } else if (position == drgramGoldChatRow) {
-                        textCheckCell.setTextAndValueAndCheck(getString(R.string.DrGramGoldChat), getString(R.string.DrGramGoldChatInfo), SharedConfig.drgramGoldChat, true, true);
-                    } else if (position == drgramFontRow) {
-                        textCheckCell.setTextAndValueAndCheck(getString(R.string.DrGramVazirFont), getString(R.string.DrGramVazirFontInfo), SharedConfig.drgramVazirFont, true, true);
+                    } else if (position == luxgramSparksRow) {
+                        textCheckCell.setTextAndValueAndCheck(getString(R.string.SparksOnSend), getString(R.string.SparksOnSendInfo), SharedConfig.luxgramSendSparks, true, true);
+                    } else if (position == luxgramRainRow) {
+                        textCheckCell.setTextAndValueAndCheck(getString(R.string.GoldRainOnReactions), getString(R.string.GoldRainOnReactionsInfo), SharedConfig.luxgramReactionRain, true, true);
+                    } else if (position == luxgramGlassRow) {
+                        textCheckCell.setTextAndValueAndCheck(getString(R.string.LuxGramGlassUI), getString(R.string.LuxGramGlassUIInfo), SharedConfig.luxgramGlassUI, true, true);
+                    } else if (position == luxgramGoldChatRow) {
+                        textCheckCell.setTextAndValueAndCheck(getString(R.string.LuxGramGoldChat), getString(R.string.LuxGramGoldChatInfo), SharedConfig.luxgramGoldChat, true, true);
+                    } else if (position == luxgramFontRow) {
+                        textCheckCell.setTextAndValueAndCheck(getString(R.string.LuxGramVazirFont), getString(R.string.LuxGramVazirFontInfo), SharedConfig.luxgramVazirFont, true, true);
                     }
                     break;
                 }
@@ -2760,7 +2760,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                         cell.setSubtitle(null);
                         cell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
                         cell.setTextAndIcon(getString(R.string.CreateNewTheme), R.drawable.msg_colors, false);
-                    } else if (position == drgramIconsRow) {
+                    } else if (position == luxgramIconsRow) {
                         String iconValue = "";
                         for (LauncherIconController.LauncherIcon icon : LauncherIconController.LauncherIcon.values()) {
                             if (LauncherIconController.isEnabled(icon)) {
@@ -2768,7 +2768,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                                 break;
                             }
                         }
-                        cell.setTextAndValue(getString(R.string.DrGramAppIcon), iconValue, false);
+                        cell.setTextAndValue(getString(R.string.LuxGramAppIcon), iconValue, false);
                     } else if (position == liteModeRow) {
                         cell.setColors(Theme.key_dialogIcon, Theme.key_windowBackgroundWhiteBlackText);
                         cell.setTextAndIcon(getString(R.string.LiteMode), R.drawable.msg2_animations, true);
@@ -2823,7 +2823,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                     position == contactsReimportRow || position == contactsSortRow ||
                     position == bluetoothScoRow || position == searchEngineRow) {
                 return TYPE_TEXT_SETTING;
-            } else if (position == automaticBrightnessInfoRow || position == scheduleLocationInfoRow || position == swipeGestureInfoRow || position == stickersInfoRow || position == liteModeInfoRow || position == drgramInfoRow) {
+            } else if (position == automaticBrightnessInfoRow || position == scheduleLocationInfoRow || position == swipeGestureInfoRow || position == stickersInfoRow || position == liteModeInfoRow || position == luxgramInfoRow) {
                 return TYPE_TEXT_INFO_PRIVACY;
             } else if (position == themeInfoRow || position == nightTypeInfoRow || position == scheduleFromToInfoRow ||
                     position == settings2Row || position == newThemeInfoRow || position == chatListInfoRow || position == bubbleRadiusInfoRow ||
@@ -2836,15 +2836,15 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                     position == settingsRow || position == themeHeaderRow || position == textSizeHeaderRow ||
                     position == chatListHeaderRow || position == bubbleRadiusHeaderRow || position == swipeGestureHeaderRow ||
                     position == selectThemeHeaderRow || position == appIconHeaderRow || position == mediaSoundHeaderRow ||
-                    position == otherHeaderRow || position == drgramHeaderRow) {
+                    position == otherHeaderRow || position == luxgramHeaderRow) {
                 return TYPE_HEADER;
             } else if (position == automaticBrightnessRow) {
                 return TYPE_BRIGHTNESS;
             } else if (position == scheduleLocationRow || position == sendByEnterRow ||
                     position == raiseToSpeakRow || position == raiseToListenRow || position == pauseOnRecordRow ||
                     position == directShareRow || position == chatBlurRow || position == pauseOnMediaRow || position == nextMediaTapRow || position == sensitiveContentRow ||
-                    position == drgramSparksRow || position == drgramRainRow ||
-                    position == drgramGlassRow || position == drgramGoldChatRow || position == drgramFontRow) {
+                    position == luxgramSparksRow || position == luxgramRainRow ||
+                    position == luxgramGlassRow || position == luxgramGoldChatRow || position == luxgramFontRow) {
                 return TYPE_TEXT_CHECK;
             } else if (position == textSizeRow) {
                 return TYPE_TEXT_SIZE;

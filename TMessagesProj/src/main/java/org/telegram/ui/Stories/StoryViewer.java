@@ -579,11 +579,11 @@ public class StoryViewer implements NotificationCenter.NotificationCenterDelegat
                 @Override
                 protected void dispatchDraw(Canvas canvas) {
                     float blackoutAlpha = getBlackoutAlpha();
-                    android.graphics.drawable.Drawable drgramStoryBg = org.telegram.messenger.DrGramMedia.getStoryBackground();
-                    if (drgramStoryBg != null) {
-                        drgramStoryBg.setBounds(0, 0, getWidth(), getHeight());
-                        drgramStoryBg.setAlpha((int) (255 * blackoutAlpha));
-                        drgramStoryBg.draw(canvas);
+                    android.graphics.drawable.Drawable luxgramStoryBg = org.telegram.messenger.LuxGramMedia.getStoryBackground();
+                    if (luxgramStoryBg != null) {
+                        luxgramStoryBg.setBounds(0, 0, getWidth(), getHeight());
+                        luxgramStoryBg.setAlpha((int) (255 * blackoutAlpha));
+                        luxgramStoryBg.draw(canvas);
                     } else {
                         canvas.drawColor(ColorUtils.setAlphaComponent(Color.BLACK, (int) (255 * blackoutAlpha)));
                     }

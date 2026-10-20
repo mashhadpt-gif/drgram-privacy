@@ -1,0 +1,266 @@
+# 📱 راهنمای ساخت (Build) پروژه LuxGram — نسخه اندروید
+
+LuxGram فورک لوکس و شخصی‌سازی‌شده تلگرام اندروید است با هویت بصری **مشکی-طلایی متالیک**.
+این سند قدم‌به‌قدم نحوه ساخت APK روی سیستم شخصی خودتان را توضیح می‌دهد.
+
+---
+
+## ۱) پیش‌نیازها
+
+| ابزار | نسخه دقیق | توضیح |
+|---|---|---|
+| Android Studio | **2025.1.4** یا جدیدتر | شامل JDK سازگار |
+| Android SDK | **API 36** | از SDK Manager نصب کنید |
+| Android NDK | **27.2.12479018** | دقیقاً همین نسخه (از SDK Manager → SDK Tools → NDK (Side by side) → Show Package Details) |
+| CMake | **3.22.1** | از SDK Manager |
+| فضای دیسک | حداقل **15GB آزاد** | سورس + ساب‌ماژول‌ها + کش Gradle + خروجی NDK |
+| رم | حداقل **16GB** توصیه می‌شود | بیلد NDK سنگین است |
+
+> 💡 نکته: مخزن فعلی شامل `release.keystore` و `google-services.json` نمایشی (dummy) است؛
+> یعنی برای **تست و بیلد محلی** به هیچ سرویس خارجی نیاز نیست و مستقیم می‌توانید بیلد بگیرید.
+> برای انتشار عمومی باید فایل‌های خودتان را جایگزین کنید.
+
+---
+
+## ۲) دریافت سورس کامل (با ساب‌ماژول‌ها)
+
+پوشه فعلی `telegram-android` در سندباکس **بدون ساب‌ماژول‌ها** است (برای صرفه‌جویی در فضا حذف شده‌اند).
+روی سیستم خودتان یکی از دو راه زیر:
+
+**راه الف — کلون کامل (پیشنهادی):**
+```bash
+git clone --recursive --shallow-submodules https://github.com/DrKLO/Telegram.git LuxGram
+cd LuxGram
+```
+
+**راه ب — اگر سورس را بدون ساب‌ماژول کپی کردید:**
+```bash
+cd LuxGram
+git submodule init
+git submodule update --init --recursive --depth=1
+```
+
+ساب‌ماژول‌های ضروری (۱۵ مورد): `ffmpeg`, `td`, `boringssl`, `libvpx`, `dav1d`, `libyuv`,
+`openh264`, `absl`, `wamr`, `xiph (ogg/opus/opusfile)`, `tlottie`, `media`, `jlatexmath` و...
+
+سپس تغییرات LuxGram را روی آن اعمال کنید (فایل‌های تغییر یافته را از این مخزن کپی کنید —
+لیست کامل در بخش ۵).
+
+---
+
+## ۳) باز کردن و بیلد در Android Studio
+
+1. **File → Open** و پوشه ریشه پروژه را انتخاب کنید (دقت: *Open* نه *Import*).
+2. صبر کنید Gradle Sync تمام شود (بار اول چند دقیقه طول می‌کشد و حجم زیادی دانلود می‌کند).
+3. از منوی **Build Variant** (سمت چپ پایین) ماژول `TMessagesProj_App` را روی
+   یکی از واریانت‌های زیر بگذارید:
+   - `afatDebug` → APK تست با همه معماری‌ها (پیشنهادی برای شروع)
+   - `arm64Debug` → سریع‌ترین بیلد برای گوشی خودتان (فقط arm64)
+   - `afatRelease` → خروجی نهایی امضاشده
+4. گوشی را با USB وصل و **USB Debugging** را فعال کنید → دکمه ▶️ (Run).
+
+**ساخت APK از خط فرمان:**
+```bash
+./gradlew :TMessagesProj_App:assembleAfatDebug
+# خروجی: TMessagesProj_App/build/outputs/apk/afat/debug/app.apk
+```
+
+> ⚠️ اگر رم سیستم ۸GB یا کمتر است، در `gradle.properties` مقدار
+> `org.gradle.jvmargs=-Xmx8g` را به `-Xmx4g` کاهش دهید و `org.gradle.parallel=false` کنید.
+
+---
+
+## ۴) تنظیمات اختصاصی LuxGram (اختیاری اما توصیه‌شده)
+
+### الف) هویت اپ در سرویس‌های تلگرام
+1. از [my.telegram.org](https://my.telegram.org) یک **api_id / api_hash** برای اپ خودتان بگیرید.
+2. در `TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java`
+   مقادیر `TELEGRAM_APP_ID` و `TELEGRAM_APP_HASH` را جایگزین کنید.
+3. در [console.firebase.google.com](https://console.firebase.google.com) یک پروژه بسازید،
+   دو اپ با شناسه‌های `org.telegram.messenger` و `org.telegram.messenger.beta` اضافه کنید،
+   **Firebase Messaging** را فعال کنید و `google-services.json` را در پوشه `TMessagesProj/`
+   جایگزین کنید (برای نوتیفیکیشن پوش لازم است).
+
+### ب) امضای شخصی (Release)
+1. یک keystore بسازید:
+   ```bash
+   keytool -genkey -v -keystore release.keystore -alias luxgram -keyalg RSA -keysize 2048 -validity 10000
+   ```
+2. فایل را در `TMessagesProj/config/` بگذارید و در `gradle.properties` مقادیر
+   `RELEASE_KEY_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_STORE_PASSWORD` را پر کنید.
+
+### ج) تغییر پکیج‌نیم (در صورت تمایل)
+در `gradle.properties` مقدار `APP_PACKAGE=org.telegram.messenger` را می‌توانید به مثلاً
+`com.luxgram.messenger` تغییر دهید (سیستم بیلد تلگرام از همین متغیر استفاده می‌کند).
+⚠️ اگر پکیج را عوض کردید، `google-services.json` و api_id باید با پکیج جدید ساخته شوند.
+
+---
+
+## ۵) تغییرات اعمال‌شده LuxGram (Stage 1)
+
+| فایل | تغییر |
+|---|---|
+| `TMessagesProj/src/main/res/values/strings.xml` | نام اپ → **LuxGram** |
+| `TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ThemeColors.java` | ۲۸ رنگ پیش‌فرض آبی → پالت طلایی متالیک (`#F5B90D` و خانواده آن) |
+| `TMessagesProj/src/main/java/org/telegram/ui/ActionBar/Theme.java` | accent پیش‌فرض تم Blue → طلایی؛ گرادیان پیام‌های خروجی تم‌های Dark Blue/Night → طلایی؛ پس‌زمینه تم Night → مشکی-طلایی |
+| `TMessagesProj/src/main/assets/*.attheme` | ۹۳۴ رنگ در ۵ تم داخلی با تبدیل هوشمند hue از آبی به طلایی (رنگ‌های نمودارها عمداً دست‌نخورده) |
+| `TMessagesProj/src/main/res/mipmap-*/ic_launcher*.png` | آیکون لانچر جدید: **الماس طلایی بر مشکی لوکس** (همه چگالی‌ها) |
+| `TMessagesProj/src/main/res/mipmap-*/icon_foreground*.png` | فورگراند adaptive icon الماس طلایی |
+| `TMessagesProj/src/main/res/drawable/icon_background*.xml` | پس‌زمینه adaptive icon → گرادیان مشکی گرم |
+| `TMessagesProj/src/main/res/drawable/tg_splash_320.xml` | دایره اسپلش آبی → طلایی |
+| `TMessagesProj/src/main/res/values-night/styles.xml` | پس‌زمینه اسپلش شب → مشکی `#050505` |
+
+> 🔄 بازگشت هر تغییر: `git checkout <file>` یا بازگشت کامل به بیلاین با `git reset --hard`
+
+---
+
+## ۶) تغییرات Stage 2 — تم طلایی/قرمز، آیکون‌های جایگزین، ورود انگلیسی
+
+| فایل | تغییر |
+|---|---|
+| `Theme.java` + ۱۴ فایل دیگر | نام تم‌های داخلی: **Blue → Gold**، **Dark Blue → Red** (تم پیش‌فرض طلایی + تم دوم قرمز) |
+| `Theme.java` (بلوک LuxGram) | گرادیان پیام خروجی قرمز + والپیپر مشکی-قرمز برای تم Red |
+| `assets/darkblue.attheme` | بازسازی با hue-remap آبی → قرمز (`#E63B52`) |
+| `res/mipmap-*/icon_{2..6}*` | ۶ آیکون جایگزین: Black Gold / Black Red / Onyx / Royal / Crimson / Eclipse |
+| `LauncherIconController` + `AndroidManifest` | انتخابگر آیکون داخلی اپ (تنظیمات → چت‌ها → App Icon) |
+| `LoginActivity` | دکمه کره زمین برای تغییر زبان در صفحه ورود (پیش‌فرض انگلیسی) |
+
+---
+
+## ۷) تغییرات Stage 3 — افکت جرقه، والپیپر طلایی، CI/CD، فارسی‌سازی
+
+| فایل | تغییر |
+|---|---|
+| `ui/Components/LuxGramSparkEffect.java` | **جدید** — سیستم ذرات جرقه طلایی (ستاره چهارپر + درخشش + رد سرعت، گرانش و تلونکله) — مشابه FireworksEffect تلگرام |
+| `ui/Components/SizeNotifierFrameLayout.java` | `startLuxGramSparks(x,y)` + رسم اورلی جرقه در `dispatchDraw` (روی همه چیز، مثل کانفتی) |
+| `ui/ChatActivity.java` | تریگر انفجار جرقه روی دکمه ارسال در `onMessageSend` (فقط ارسال فوری) |
+| `messenger/SharedConfig.java` | `luxgramSendSparks` (پیش‌فرض روشن) + `toggleLuxGramSendSparks()` |
+| `ui/ThemeActivity.java` | بخش **LuxGram Premium** در تنظیمات چت با سوییچ «جرقه هنگام ارسال» |
+| `ui/ActionBar/Theme.java` | شاخه Gold home: **والپیپر پیش‌فرض مشکی-طلایی** (`#0B0A08 → #171207/#2E220A/#0F0C06`) + حباب خروجی طلایی متالیک؛ رنگ‌های پیش‌نمایش تم Gold/Red مشکی‌شدند |
+| `messenger/LocaleController.java` | گارد برندینگ: رشته‌های `AppName`/`AppNameBeta` هرگز از رشته‌های ابری (تلگرام) بازنویسی نمی‌شوند |
+| `res/values/strings.xml` | رشته‌های جدید: `LuxGramPremium`, `SparksOnSend`, `SparksOnSendInfo`, `SparksOnSendHint` |
+| `res/values-fa/strings.xml` | **جدید** — فارسی‌سازی: برند (درگرم)، پریمیوم، آیکون‌ها، نام تم‌ها، صفحه ورود، منوها و تنظیمات (~۸۵ رشته) |
+| `.github/workflows/build-apk.yml` | **جدید** — بیلد خودکار APK با GitHub Actions (بخش ۸) |
+
+**نحوه کار افکت جرقه:** با هر ارسال پیام متنی، یک انفجار ۲۴–۳۸ ذره‌ای از دکمه ارسال شلیک می‌شود:
+فلش درخشش اولیه + ذرات نقطه‌ای با هاله + ستاره‌های چهارپر چرخان + ردهای سرعت — با گرانش، اصطکاک هوا و چشمک‌زن بودن (twinkle). انیمیشن تا تخلیه کامل ذرات (~۱ ثانیه) ادامه دارد و دقیقاً با الگوی `FireworksEffect` تلگرام روی همان canvas رسم می‌شود. خاموش/روشن از **تنظیمات → چت‌ها → درگرم پریمیوم → جرقه هنگام ارسال**.
+
+---
+
+## ۸) CI/CD — بیلد خودکار APK با GitHub Actions
+
+فایل `.github/workflows/build-apk.yml` به مخزن اضافه شده است.
+
+### راه‌اندازی
+1. سورس (با کامیت‌های LuxGram) را به یک ریپازیتوری GitHub پوش کنید:
+   ```bash
+   cd telegram-android
+   git remote add origin https://github.com/<USER>/<REPO>.git
+   git push -u origin master --tags
+   ```
+   ⚠️ ریپو باید **private** باشد (سورس تلگرام + keystore).
+
+2. دو روش بیلد:
+   - **دستی**: تب Actions → «LuxGram APK Build» → Run workflow → انتخاب `release` یا `debug`
+   - **خودکار با تگ**: هر تگ نسخه‌ای پوش کنید، Release + APK ساخته می‌شود:
+     ```bash
+     git tag v12.10.6-luxgram.3
+     git push origin v12.10.6-luxgram.3
+     ```
+
+### مشخصات بیلد CI
+| مورد | مقدار |
+|---|---|
+| رانر | `ubuntu-latest` |
+| JDK | 17 (Temurin) |
+| SDK | platform 36 + build-tools 36.0.0 |
+| NDK | 27.2.12479018 (نصب خودکار در ورک‌فلو) |
+| CMake | 3.22.1 |
+| زیرماژول‌ها | `submodules: recursive` (ffmpeg, td, boringssl و…) |
+| امضا | `TMessagesProj/config/release.keystore` (موجود در مخزن) |
+| خروجی | `LuxGram-v<نسخه>-afat-release.apk` — ۴ معماری (armv7, arm64, x86, x64) |
+| مدت تقریبی | ۳۵–۷۰ دقیقه (بار اول بیشتر، به‌خاطر کش Gradle سریع‌تر می‌شود) |
+
+دانلود خروجی: تب **Actions** → اجرای بیلد → بخش **Artifacts** (و برای تگ‌ها: بخش **Releases**).
+
+> 💡 keystore پیش‌فرض موجود در مخزن، keystore تستی عمومی تلگرام است؛ برای انتشار عمومی، keystore شخصی بسازید و مقادیر `gradle.properties` را عوض کنید.
+
+---
+
+## ۹) تغییرات Stage 4 — تب نیتیو اکسپلور (Explore)
+
+اکسپلور درگرم، یک تب بومی «آخرین رسانه‌های کانال‌ها» به سبک اکسپلور اینستاگرام است:
+
+- **کنترلر**: `org.telegram.messenger.LuxGramExploreController`
+- **فرگمنت**: `org.telegram.ui.LuxGramExploreActivity` (+ سلول `LuxGramExploreMediaCell`)
+- **نقطه ورود**: آیکون جرقه در هدر چت‌ها + آیتم «اکسپلور» در منوی ⋮
+
+امکانات:
+- شبکه ۳ ستونی (تا ۵ ستون در تبلت) از آخرین عکس‌ها و ویدیوهای کانال‌های عضو شده
+- نوار چیپ کانال‌ها در بالا (فیلتر بر اساس هر کانال) با حلقه طلایی انتخاب
+- اسکرول بی‌نهایت (صفحه‌بندی round-robin بین کانال‌ها)، کش RAM با اعتبار ۵ دقیقه
+- باز شدن در PhotoViewer خود تلگرام با انیمیشن گذار؛ لمس طولانی = باز کردن کانال
+- رشته‌های EN/FA کامل
+
+### ⚖️ پایبندی به قوانین تلگرام (Telegram ToS / API)
+
+این تب **عمداً** طوری طراحی شده که فقط با روش‌های مجاز تلگرام کار کند:
+
+1. **فقط MTProto رسمی**: تمام درخواست‌ها `messages.search` با فیلتر `inputMessagesFilterPhotoVideo` هستند و از طریق `ConnectionsManager` (نشست رسمی حساب کاربر) ارسال می‌شوند.
+2. **فقط محتوای کانال‌های عضو**: منبع داده، لیست دیالوگ‌های خود کاربر است (حداکثر ۵۰ کانالِ آخرین فعالیت). هیچ جست‌وجوی سراسری (global search)، اسکرپینگ یا خزندگی انجام نمی‌شود.
+3. **محدودیت نرخ**: درخواست‌ها به‌صورت ترتیبی با فاصله ≥ ۳۵۰ میلی‌ثانیه، سقف ۳۰ آیتم به‌ازای هر کانال در هر مرحله و کش درون‌حافظه‌ای، تا فشار روی سرورهای تلگرام حداقل شود.
+4. **فقط سرورهای تلگرام**: دانلود تصاویر/ویدیوها با FileLoader خود تلگرام از دیتاسنترهای خود تلگرام انجام می‌شود. هیچ سرور ثالث، پروکسی محتوا یا سرویس خارجی در چرخه دخیل نیست.
+5. **حرمت محتوا**: پخش/ذخیره از طریق رابط رسمی تلگرام (PhotoViewer) است و سیاست‌های محدودسازی محتوا (restriction_reason) رعایت می‌شود.
+
+---
+
+## ۱۰) تغییرات Stage 5 — ذخیره در گالری، جرقهٔ آواتار، فارسی‌سازی کامل، Keystore گوگل
+
+### 🖼 ذخیره در گالری (Save to Gallery) در نمایشگر رسانه
+
+- منوی «...» در PhotoViewer گزینهٔ رسمی **SaveToGallery** را دارد؛ در LuxGram برای رسانه‌های اکسپلور هوشمندتر شده است:
+- اگر فایل هنوز دانلود نشده باشد، به‌جای هشدار بن‌بست، دانلود بلافاصله با `FileLoader` رسمی شروع می‌شود (بولتین «در حال دریافت») و پس از اتمام، **ذخیره به‌طور خودکار** ادامه می‌یابد (`luxgramPendingSave` + `NotificationCenter.fileLoaded`).
+- رسانهٔ ذخیره‌شده در گالری اندروید با بولتین تأیید رسمی تلگرام نشان داده می‌شود.
+- در پیش‌نمایش وب هم دکمهٔ ذخیره با همان متن («ذخیره در گالری / در گالری ذخیره شد») در نمایشگر رسانه اضافه شده است.
+
+### ✨ جرقه با لمس آواتار (معادل تعامل ایموجی پریمیوم تلگرام)
+
+- `ChatAvatarContainer.luxgramSparkAvatar()`: به‌محض لمس آواتار در هدر چت، انفجار جرقهٔ طلایی (شدت 1.35) دور آواتار رسم می‌شود و سپس رفتار عادی (باز شدن پروفایل) ادامه می‌یابد.
+- رسم روی `dispatchDraw` کانتینر انجام می‌شود تا جرقه‌ها روی همهٔ فرزندان بیفتند.
+- کلید تنظیم: `SharedConfig.luxgramSendSparks` (تنظیمات ← LuxGram Premium ← «جرقه هنگام ارسال»).
+- پیش‌نمایش وب همین رفتار را با کامپوننت `Sparks` روی آواتار هدر چت آینه می‌کند.
+
+### 🔤 تکمیل بومی‌سازی فارسی
+
+- بستهٔ `values-fa` از ۹۳ رشته به **۲۱۶ رشته** رسید: کل رشته‌های LuxGram + دستهٔ هسته‌ای UI (نمایشگر رسانه/ذخیره، تنظیمات، اعلان‌ها، جستجو، کانال/گروه، استوری، واکنش‌ها، هشدارهای عمومی).
+- همهٔ کلیدها قبل از افزودن، با `values/strings.xml` اعتبارسنجی شدند (XML parse OK).
+- ترجمه‌های ابری رسمی تلگرام همچنان طبق مشتری رسمی از سرور خود تلگرام بارگذاری می‌شوند.
+
+### 🔑 Keystore اختصاصی گوگل (LuxGram)
+
+- فایل: `TMessagesProj/config/release.keystore` (و نسخهٔ پشتیبان `luxgram-release.jks` در ریشهٔ مخزن)
+- مشخصات: alias `luxgram`، RSA 4096، اعتبار ۱۰٬۰۰۰ روز (تا ~۲۰۵۴)
+- SHA256: `D0:13:F9:5A:C8:FE:04:DA:19:EA:30:F8:10:18:9C:04:3C:05:0D:0A:6B:1B:FF:D7:95:1C:8E:79:6F:2A:50:75`
+- SHA1: `19:2E:CC:F3:DE:10:BA:65:8C:09:05:4A:4B:22:DC:08:92:63:6E:B1`
+- رمزها در `gradle.properties` (`RELEASE_STORE_PASSWORD` / `RELEASE_KEY_PASSWORD` / `RELEASE_KEY_ALIAS=drgram`)
+- ⚠️ **بسیار مهم**: این فایل کلید هویت اپ شماست. از آن **دو نسخهٔ پشتیبان جدا** (مثلاً مدیر رمز + هارد خارجی) نگه دارید. بدون این کلید امکان انتشار آپدیت در گوگل‌پلی وجود ندارد. اگر مخزن عمومی می‌شود، کلید را از git حذف و با GitHub Secrets (`RELEASE_STORE_PASSWORD` و…) جایگزین کنید.
+- برای گوگل‌پلی: اولین AAB/APK را با همین کلید آپلود کنید؛ Play App Signing پس از آن مدیریت امضا را بر عهده می‌گیرد.
+
+### 📦 بیلد نهایی
+
+بیلد نیتیو به SDK/NDK اندروید نیاز دارد؛ در همین مخزن CI آماده است:
+
+1. کد را به GitHub پوش کنید
+2. تب Actions ← «LuxGram APK Build (CI/CD)» ← Run workflow (یا تگ `v1.1.0` بزنید)
+3. APK امضاشدهٔ آمادهٔ نصب: `LuxGram-v<version>-afat-release.apk` (خروجی Actions یا صفحهٔ Releases)
+
+بیلد محلی (Android Studio): `./gradlew :TMessagesProj_App:assembleAfatRelease` — خروجی: `TMessagesProj_App/build/outputs/apk/afat/release/app.apk`
+
+---
+
+## ۱۱) نقشه راه مراحل بعدی (پیشنهاد)
+
+1. **گلس‌مورفیسم اندروید**: پول `LiquidGlassEffect` خود تلگرام را روی نوار اکشن فعال کنید (SharedConfig.useNewBlur)
+2. **افکت‌های بیشتر**: جرقه روی واکنش‌ها، موج طلایی هنگام ارسال استوری
+3. **فارسی‌سازی عمیق‌تر**: تکمیل ترجمه‌ها یا بستن رشته‌های ابری برای کل UI
+4. **F-Droid / توزیع**: انتشار APK از طریق Releases یا مکمن

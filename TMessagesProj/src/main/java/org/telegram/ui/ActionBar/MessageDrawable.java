@@ -853,10 +853,10 @@ public class MessageDrawable extends Drawable {
         Rect lastRect = new Rect();
         boolean lastDrawFullTop;
         boolean lastDrawFullBottom;
-        int lastBubbleRadius = -1; // DrGram Fix 38
+        int lastBubbleRadius = -1; // LuxGram Fix 38
 
         public boolean invalidatePath(Rect bounds, boolean drawFullBottom, boolean drawFullTop) {
-            // DrGram Fix 38: the cached bubble Path must also invalidate when the user
+            // LuxGram Fix 38: the cached bubble Path must also invalidate when the user
             // changes گردی حباب پیام (SharedConfig.bubbleRadius). Previously only bounds
             // were compared, so bubbles could keep a stale path when the fragment
             // rebuild was deferred or skipped.

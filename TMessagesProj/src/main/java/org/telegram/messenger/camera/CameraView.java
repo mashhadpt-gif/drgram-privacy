@@ -417,18 +417,18 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         addView(blurredStubView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
         blurredStubView.setVisibility(View.GONE);
 
-        // DrGram Fix 54: on-device diagnostic overlay. When the preview cannot
+        // LuxGram Fix 54: on-device diagnostic overlay. When the preview cannot
         // start, a solid status panel is painted instead of a silent black
         // frame, so a single screenshot from the user pins the failing layer.
-        drgramDiagView = new android.widget.TextView(context);
-        drgramDiagView.setVisibility(View.GONE);
-        drgramDiagView.setGravity(Gravity.CENTER);
-        drgramDiagView.setTextColor(0xffffffff);
-        drgramDiagView.setTextSize(18f);
-        drgramDiagView.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
-        drgramDiagView.setClickable(false);
-        drgramDiagView.setFocusable(false);
-        addView(drgramDiagView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
+        luxgramDiagView = new android.widget.TextView(context);
+        luxgramDiagView.setVisibility(View.GONE);
+        luxgramDiagView.setGravity(Gravity.CENTER);
+        luxgramDiagView.setTextColor(0xffffffff);
+        luxgramDiagView.setTextSize(18f);
+        luxgramDiagView.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
+        luxgramDiagView.setClickable(false);
+        luxgramDiagView.setFocusable(false);
+        addView(luxgramDiagView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
         focusAreaSize = dp(96);
         outerPaint.setColor(0xffffffff);
         outerPaint.setStyle(Paint.Style.STROKE);
@@ -698,91 +698,91 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
 
     protected CameraGLThread cameraThread;
 
-    // ===== DrGram Fix 54: preview diagnostics =====
+    // ===== LuxGram Fix 54: preview diagnostics =====
     // The GL thread publishes its state here; a lightweight UI watcher paints
-    // drgramDiagView with a solid status panel whenever the preview cannot
+    // luxgramDiagView with a solid status panel whenever the preview cannot
     // start, so one screenshot identifies the failing layer.
-    protected static final int DRGRAM_GL_WAIT = 0;        // thread started, initGL not finished
-    protected static final int DRGRAM_GL_FRAMES = 1;      // camera frames flowing (healthy)
-    protected static final int DRGRAM_GL_NO_FRAMES = 2;   // GL ready but zero frames arrived
-    protected static final int DRGRAM_GL_DRAW_ERROR = 3;  // exception thrown inside onDraw
-    protected static final int DRGRAM_GL_NO_PROGRAM = 4;  // full AND lite programs both failed
-    protected static final int DRGRAM_GL_FAILED = 5;      // Fix 55: initGL failed or crashed — see drgramGlFail
-    private volatile int drgramGlState = DRGRAM_GL_WAIT;
-    private volatile String drgramGlFail;                 // Fix 55: exact initGL failure step + EGL error
-    private volatile long drgramGlReadyAt;
-    private volatile long drgramUiStartAt;
-    public static volatile long drgramLastOpenFailedAt;   // set by CameraController.open() catch
-    private android.widget.TextView drgramDiagView;
+    protected static final int LUXGRAM_GL_WAIT = 0;        // thread started, initGL not finished
+    protected static final int LUXGRAM_GL_FRAMES = 1;      // camera frames flowing (healthy)
+    protected static final int LUXGRAM_GL_NO_FRAMES = 2;   // GL ready but zero frames arrived
+    protected static final int LUXGRAM_GL_DRAW_ERROR = 3;  // exception thrown inside onDraw
+    protected static final int LUXGRAM_GL_NO_PROGRAM = 4;  // full AND lite programs both failed
+    protected static final int LUXGRAM_GL_FAILED = 5;      // Fix 55: initGL failed or crashed — see luxgramGlFail
+    private volatile int luxgramGlState = LUXGRAM_GL_WAIT;
+    private volatile String luxgramGlFail;                 // Fix 55: exact initGL failure step + EGL error
+    private volatile long luxgramGlReadyAt;
+    private volatile long luxgramUiStartAt;
+    public static volatile long luxgramLastOpenFailedAt;   // set by CameraController.open() catch
+    private android.widget.TextView luxgramDiagView;
 
-    private final Runnable drgramDiagWatcher = new Runnable() {
+    private final Runnable luxgramDiagWatcher = new Runnable() {
         @Override
         public void run() {
-            if (drgramDiagView == null || !isAttachedToWindow()) {
+            if (luxgramDiagView == null || !isAttachedToWindow()) {
                 return;
             }
             AndroidUtilities.runOnUIThread(this, 3000);
-            int state = drgramGlState;
+            int state = luxgramGlState;
             long now = android.os.SystemClock.elapsedRealtime();
             String text = null;
             int background = 0;
-            if (state == DRGRAM_GL_DRAW_ERROR) {
-                text = "DRGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 3\nRENDER EXCEPTION";
+            if (state == LUXGRAM_GL_DRAW_ERROR) {
+                text = "LUXGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 3\nRENDER EXCEPTION";
                 background = 0xE60F7A2E; // green
-            } else if (state == DRGRAM_GL_FAILED) {
-                String fail = drgramGlFail;
+            } else if (state == LUXGRAM_GL_FAILED) {
+                String fail = luxgramGlFail;
                 if (fail != null && fail.length() > 110) {
                     fail = fail.substring(0, 110);
                 }
-                text = "DRGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 2\nGL INIT FAILED\n" + (fail == null ? "?" : fail);
+                text = "LUXGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 2\nGL INIT FAILED\n" + (fail == null ? "?" : fail);
                 background = 0xE68C103A; // red
-            } else if (drgramUiStartAt > 0 && drgramLastOpenFailedAt >= drgramUiStartAt) {
-                text = "DRGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 4\nCAMERA OPEN FAILED";
+            } else if (luxgramUiStartAt > 0 && luxgramLastOpenFailedAt >= luxgramUiStartAt) {
+                text = "LUXGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 4\nCAMERA OPEN FAILED";
                 background = 0xE6B25E00; // orange
-            } else if (state == DRGRAM_GL_NO_PROGRAM) {
-                text = "DRGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 5\nNO GL PROGRAM";
+            } else if (state == LUXGRAM_GL_NO_PROGRAM) {
+                text = "LUXGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 5\nNO GL PROGRAM";
                 background = 0xE65B21B0; // purple
-            } else if (state == DRGRAM_GL_NO_FRAMES && now - drgramGlReadyAt > 6000) {
-                text = "DRGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 1\nGL OK — NO CAMERA FRAMES";
+            } else if (state == LUXGRAM_GL_NO_FRAMES && now - luxgramGlReadyAt > 6000) {
+                text = "LUXGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 1\nGL OK — NO CAMERA FRAMES";
                 background = 0xE6103A8C; // blue
-            } else if (state == DRGRAM_GL_WAIT && now - drgramUiStartAt > 8000) {
-                text = "DRGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 2\nGL THREAD NOT READY";
+            } else if (state == LUXGRAM_GL_WAIT && now - luxgramUiStartAt > 8000) {
+                text = "LUXGRAM " + BuildVars.BUILD_VERSION_STRING + " · DIAG 2\nGL THREAD NOT READY";
                 background = 0xE68C103A; // red
             }
             if (text != null) {
-                drgramDiagView.setText(text);
+                luxgramDiagView.setText(text);
                 // Fix 56: long reasons (GPU line + per-stage GLSL logs) need a
                 // smaller typeface to stay fully readable on one screen.
-                drgramDiagView.setTextSize(text.length() > 120 ? 13f : 18f);
-                drgramDiagView.setBackgroundColor(background);
-                drgramDiagView.setVisibility(VISIBLE);
+                luxgramDiagView.setTextSize(text.length() > 120 ? 13f : 18f);
+                luxgramDiagView.setBackgroundColor(background);
+                luxgramDiagView.setVisibility(VISIBLE);
             } else {
-                drgramDiagView.setVisibility(GONE);
+                luxgramDiagView.setVisibility(GONE);
             }
         }
     };
 
-    protected void drgramGlInitFinished(boolean programOk) {
-        drgramGlReadyAt = android.os.SystemClock.elapsedRealtime();
-        drgramGlState = programOk ? DRGRAM_GL_NO_FRAMES : DRGRAM_GL_NO_PROGRAM;
+    protected void luxgramGlInitFinished(boolean programOk) {
+        luxgramGlReadyAt = android.os.SystemClock.elapsedRealtime();
+        luxgramGlState = programOk ? LUXGRAM_GL_NO_FRAMES : LUXGRAM_GL_NO_PROGRAM;
     }
 
-    protected void drgramGlFailed(String reason) {
-        drgramGlFail = reason;
-        drgramGlState = DRGRAM_GL_FAILED;
+    protected void luxgramGlFailed(String reason) {
+        luxgramGlFail = reason;
+        luxgramGlState = LUXGRAM_GL_FAILED;
     }
 
-    // ===== DrGram Fix 56: exact GLSL diagnostics =====
+    // ===== LuxGram Fix 56: exact GLSL diagnostics =====
     // Captures the REAL compiler/linker info logs plus the GPU identity and
     // uniform budget, so a single screenshot of the DIAG overlay pins down
     // exactly why a shader was rejected on a given device.
-    private static volatile String drgramDiagGpu = "";
-    private static volatile String drgramDiagLogs = "";
-    private static volatile String drgramLastShaderLog = "";
-    private static volatile String drgramLastLinkLog = "";
-    private static volatile boolean drgramCoreProgramActive;
+    private static volatile String luxgramDiagGpu = "";
+    private static volatile String luxgramDiagLogs = "";
+    private static volatile String luxgramLastShaderLog = "";
+    private static volatile String luxgramLastLinkLog = "";
+    private static volatile boolean luxgramCoreProgramActive;
 
-    private static String drgramTrimLog(String s, int n) {
+    private static String luxgramTrimLog(String s, int n) {
         if (s == null) {
             return "";
         }
@@ -790,79 +790,79 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         return s.length() > n ? s.substring(0, n) : s;
     }
 
-    private static void drgramDiagPersist(String reason) {
+    private static void luxgramDiagPersist(String reason) {
         try {
-            ApplicationLoader.applicationContext.getSharedPreferences(DRGRAM_PREFS, Context.MODE_PRIVATE)
-                    .edit().putString("gldiag", drgramTrimLog(reason, 600)).apply();
+            ApplicationLoader.applicationContext.getSharedPreferences(LUXGRAM_PREFS, Context.MODE_PRIVATE)
+                    .edit().putString("gldiag", luxgramTrimLog(reason, 600)).apply();
         } catch (Throwable ignore) {}
     }
 
-    private static void drgramDiagQueryGpu() {
+    private static void luxgramDiagQueryGpu() {
         try {
-            String renderer = drgramTrimLog(GLES20.glGetString(GLES20.GL_RENDERER), 24);
-            String version = drgramTrimLog(GLES20.glGetString(GLES20.GL_VERSION), 30);
+            String renderer = luxgramTrimLog(GLES20.glGetString(GLES20.GL_RENDERER), 24);
+            String version = luxgramTrimLog(GLES20.glGetString(GLES20.GL_VERSION), 30);
             int[] maxFu = new int[1];
             int[] maxVu = new int[1];
             GLES20.glGetIntegerv(GLES20.GL_MAX_FRAGMENT_UNIFORM_VECTORS, maxFu, 0);
             GLES20.glGetIntegerv(GLES20.GL_MAX_VERTEX_UNIFORM_VECTORS, maxVu, 0);
-            drgramDiagGpu = renderer + " MAXFU" + maxFu[0] + " MVU" + maxVu[0] + " " + version + "\n";
+            luxgramDiagGpu = renderer + " MAXFU" + maxFu[0] + " MVU" + maxVu[0] + " " + version + "\n";
         } catch (Throwable ignore) {}
     }
-    // ===== end DrGram Fix 56 =====
+    // ===== end LuxGram Fix 56 =====
 
-    // DrGram Fix 55: persistence for the full (polygon) shader verdict so the
+    // LuxGram Fix 55: persistence for the full (polygon) shader verdict so the
     // guaranteed lite program starts the preview on every device and the heavy
     // shader is attempted at most once per install.
     // 0 = never attempted, 1 = full ok (fast), 2 = full failed,
     // 3 = attempted and died mid-way (treated as failed), 4 = ok but slow (stay lite)
-    private static final String DRGRAM_PREFS = "drgramconf";
-    private static volatile int drgramFullShaderState;
-    private static boolean drgramFullShaderStateRead;
+    private static final String LUXGRAM_PREFS = "luxgramconf";
+    private static volatile int luxgramFullShaderState;
+    private static boolean luxgramFullShaderStateRead;
 
-    private static int drgramFullShaderRead() {
-        if (!drgramFullShaderStateRead) {
+    private static int luxgramFullShaderRead() {
+        if (!luxgramFullShaderStateRead) {
             synchronized (CameraView.class) {
-                if (!drgramFullShaderStateRead) {
+                if (!luxgramFullShaderStateRead) {
                     try {
-                        android.content.SharedPreferences drgramPrefs = ApplicationLoader.applicationContext
-                                .getSharedPreferences(DRGRAM_PREFS, Context.MODE_PRIVATE);
-                        // DrGram Fix 59: lite/full/flat carried a genuine GLSL type
+                        android.content.SharedPreferences luxgramPrefs = ApplicationLoader.applicationContext
+                                .getSharedPreferences(LUXGRAM_PREFS, Context.MODE_PRIVATE);
+                        // LuxGram Fix 59: lite/full/flat carried a genuine GLSL type
                         // bug (vec4->vec2 assignment) that failed compilation on
                         // EVERY GPU. Verdicts recorded before the repair (full
                         // failed = 2/3, flat won = 5, slow = 4) are stale now, so
                         // a one-time epoch reset makes every device re-run the
                         // ladder with the fixed shaders and re-record its verdict.
-                        // DrGram Fix 60: another reset — the beauty tiers were
+                        // LuxGram Fix 60: another reset — the beauty tiers were
                         // rewritten (beauty rendering removed) and the ladder
                         // order is fixed, so all old verdicts are meaningless.
-                        if (drgramPrefs.getInt("fullshader_epoch", 0) < 60) {
-                            drgramPrefs.edit().putInt("fullshader_epoch", 60).putInt("fullshader", 0).apply();
-                            drgramFullShaderState = 0;
+                        if (luxgramPrefs.getInt("fullshader_epoch", 0) < 60) {
+                            luxgramPrefs.edit().putInt("fullshader_epoch", 60).putInt("fullshader", 0).apply();
+                            luxgramFullShaderState = 0;
                         } else {
-                            drgramFullShaderState = drgramPrefs.getInt("fullshader", 0);
+                            luxgramFullShaderState = luxgramPrefs.getInt("fullshader", 0);
                         }
                     } catch (Throwable ignore) {}
-                    drgramFullShaderStateRead = true;
+                    luxgramFullShaderStateRead = true;
                 }
             }
         }
-        return drgramFullShaderState;
+        return luxgramFullShaderState;
     }
 
-    private static void drgramFullShaderSave(int state) {
-        drgramFullShaderState = state;
+    private static void luxgramFullShaderSave(int state) {
+        luxgramFullShaderState = state;
         try {
-            ApplicationLoader.applicationContext.getSharedPreferences(DRGRAM_PREFS, Context.MODE_PRIVATE)
+            ApplicationLoader.applicationContext.getSharedPreferences(LUXGRAM_PREFS, Context.MODE_PRIVATE)
                     .edit().putInt("fullshader", state).apply();
         } catch (Throwable ignore) {}
     }
 
-    protected void drgramNoteFrame() {
-        if (drgramGlState != DRGRAM_GL_FRAMES) {
-            drgramGlState = DRGRAM_GL_FRAMES;
+    protected void luxgramNoteFrame() {
+        if (luxgramGlState != LUXGRAM_GL_FRAMES) {
+            luxgramGlState = LUXGRAM_GL_FRAMES;
         }
     }
-    // ===== end DrGram Fix 54 =====
+    // ===== end LuxGram Fix 54 =====
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -874,13 +874,13 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         surfaceHeight = height;
         surfaceWidth = width;
 
-        // DrGram Fix 54: restart the preview diagnostic watcher for this session.
-        drgramUiStartAt = android.os.SystemClock.elapsedRealtime();
-        drgramGlReadyAt = 0;
-        drgramGlState = DRGRAM_GL_WAIT;
-        drgramGlFail = null; // DrGram Fix 55
-        AndroidUtilities.cancelRunOnUIThread(drgramDiagWatcher);
-        AndroidUtilities.runOnUIThread(drgramDiagWatcher, 3000);
+        // LuxGram Fix 54: restart the preview diagnostic watcher for this session.
+        luxgramUiStartAt = android.os.SystemClock.elapsedRealtime();
+        luxgramGlReadyAt = 0;
+        luxgramGlState = LUXGRAM_GL_WAIT;
+        luxgramGlFail = null; // LuxGram Fix 55
+        AndroidUtilities.cancelRunOnUIThread(luxgramDiagWatcher);
+        AndroidUtilities.runOnUIThread(luxgramDiagWatcher, 3000);
 
         if (cameraThread == null && surface != null) {
             if (BuildVars.LOGS_ENABLED) {
@@ -987,7 +987,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
         if (cameraThread != null) {
             cameraThread.shutdown(0);
-            // DrGram Fix 55: the null-out used to be posted to the dying looper —
+            // LuxGram Fix 55: the null-out used to be posted to the dying looper —
             // Looper.quit() discards queued messages, so it never ran and a dead
             // GL thread silently blocked every later surface (re)open.
             cameraThread = null;
@@ -1397,13 +1397,13 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
     private volatile float lastShapeTo;
     private volatile float shapeValue;
 
-    /** DrGram Fix 46: beauty/FX uniform handles for one GL program (shared by preview + recorder). */
-    private static final class DrGramBeautyHandles {
+    /** LuxGram Fix 46: beauty/FX uniform handles for one GL program (shared by preview + recorder). */
+    private static final class LuxGramBeautyHandles {
         int nose, teeth, eyes, jaw, fx, faceCount, faces, noses, mouths;
         int blush, lips, bright, eyesL, eyesR, eyePrecise;
-        int dark, slim; // DrGram Fix 47
-        int noseRects, mouthRects, eyeLRects, eyeRRects, organPrecise; // DrGram Fix 51
-        int polyTexSampler, polygonPrecise; // DrGram Fix 57 (texture instead of 5 uniform arrays)
+        int dark, slim; // LuxGram Fix 47
+        int noseRects, mouthRects, eyeLRects, eyeRRects, organPrecise; // LuxGram Fix 51
+        int polyTexSampler, polygonPrecise; // LuxGram Fix 57 (texture instead of 5 uniform arrays)
         int polyTexture; // GL context-local, lazily created
         java.nio.ByteBuffer polyBuffer;
 
@@ -1423,9 +1423,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             eyesL = GLES20.glGetUniformLocation(program, "fxEyesL");
             eyesR = GLES20.glGetUniformLocation(program, "fxEyesR");
             eyePrecise = GLES20.glGetUniformLocation(program, "fxEyePrecise");
-            dark = GLES20.glGetUniformLocation(program, "fxDark"); // DrGram Fix 47
-            slim = GLES20.glGetUniformLocation(program, "fxSlim"); // DrGram Fix 47
-            noseRects = GLES20.glGetUniformLocation(program, "fxNoseRect");   // DrGram Fix 51
+            dark = GLES20.glGetUniformLocation(program, "fxDark"); // LuxGram Fix 47
+            slim = GLES20.glGetUniformLocation(program, "fxSlim"); // LuxGram Fix 47
+            noseRects = GLES20.glGetUniformLocation(program, "fxNoseRect");   // LuxGram Fix 51
             mouthRects = GLES20.glGetUniformLocation(program, "fxMouthRect");
             eyeLRects = GLES20.glGetUniformLocation(program, "fxEyeRectL");
             eyeRRects = GLES20.glGetUniformLocation(program, "fxEyeRectR");
@@ -1492,9 +1492,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         private int dualHandle;
         private int scaleHandle;
         private int blurHandle;
-        private int beautifyHandle; // DrGram Fix 40
-        // DrGram Fix 41/46: beauty suite + camera FX uniforms
-        private final DrGramBeautyHandles drgramHandles = new DrGramBeautyHandles();
+        private int beautifyHandle; // LuxGram Fix 40
+        // LuxGram Fix 41/46: beauty suite + camera FX uniforms
+        private final LuxGramBeautyHandles luxgramHandles = new LuxGramBeautyHandles();
         private int alphaHandle;
         private int crossfadeHandle;
         private int shapeFromHandle;
@@ -1535,7 +1535,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     FileLog.e("eglGetDisplay failed " + GLUtils.getEGLErrorString(egl10.eglGetError()));
                 }
                 eglDisplay = null;
-                CameraView.this.drgramGlFailed("EGL GETDISPLAY " + drgramEglErr()); // Fix 55
+                CameraView.this.luxgramGlFailed("EGL GETDISPLAY " + luxgramEglErr()); // Fix 55
                 finish();
                 return false;
             }
@@ -1545,7 +1545,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.e("eglInitialize failed " + GLUtils.getEGLErrorString(egl10.eglGetError()));
                 }
-                CameraView.this.drgramGlFailed("EGL INIT " + drgramEglErr()); // Fix 55
+                CameraView.this.luxgramGlFailed("EGL INIT " + luxgramEglErr()); // Fix 55
                 finish();
                 return false;
             }
@@ -1562,7 +1562,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 EGL10.EGL_STENCIL_SIZE, 0,
                 EGL10.EGL_NONE
             };
-            // DrGram Fix 55: strict 8/8/8 config with a relaxed 5/6/5 fallback —
+            // LuxGram Fix 55: strict 8/8/8 config with a relaxed 5/6/5 fallback —
             // some budget GPUs expose no exact match and returned zero configs,
             // which used to kill the GL thread silently (black preview).
             if (!egl10.eglChooseConfig(eglDisplay, configSpec, configs, 1, configsCount) || configsCount[0] <= 0) {
@@ -1581,7 +1581,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     if (BuildVars.LOGS_ENABLED) {
                         FileLog.e("eglChooseConfig failed " + GLUtils.getEGLErrorString(egl10.eglGetError()));
                     }
-                    CameraView.this.drgramGlFailed("EGL CONFIG 0 " + drgramEglErr());
+                    CameraView.this.luxgramGlFailed("EGL CONFIG 0 " + luxgramEglErr());
                     finish();
                     return false;
                 }
@@ -1594,7 +1594,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.e("eglCreateContext failed " + GLUtils.getEGLErrorString(egl10.eglGetError()));
                 }
-                CameraView.this.drgramGlFailed("EGL CONTEXT " + drgramEglErr()); // Fix 55
+                CameraView.this.luxgramGlFailed("EGL CONTEXT " + luxgramEglErr()); // Fix 55
                 finish();
                 return false;
             }
@@ -1602,7 +1602,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             if (surfaceTexture != null) {
                 eglSurface = egl10.eglCreateWindowSurface(eglDisplay, eglConfig, surfaceTexture, null);
             } else {
-                CameraView.this.drgramGlFailed("EGL NO SURFACE"); // Fix 55
+                CameraView.this.luxgramGlFailed("EGL NO SURFACE"); // Fix 55
                 finish();
                 return false;
             }
@@ -1611,7 +1611,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.e("createWindowSurface failed " + GLUtils.getEGLErrorString(egl10.eglGetError()));
                 }
-                CameraView.this.drgramGlFailed("EGL WINSURF " + drgramEglErr()); // Fix 55
+                CameraView.this.luxgramGlFailed("EGL WINSURF " + luxgramEglErr()); // Fix 55
                 finish();
                 return false;
             }
@@ -1619,91 +1619,91 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.e("eglMakeCurrent failed " + GLUtils.getEGLErrorString(egl10.eglGetError()));
                 }
-                CameraView.this.drgramGlFailed("EGL MAKECURRENT " + drgramEglErr()); // Fix 55
+                CameraView.this.luxgramGlFailed("EGL MAKECURRENT " + luxgramEglErr()); // Fix 55
                 finish();
                 return false;
             }
 
             android.opengl.Matrix.setIdentityM(mSTMatrix[0], 0);
 
-            drgramDiagQueryGpu(); // DrGram Fix 56: renderer + uniform budget for the DIAG overlay
+            luxgramDiagQueryGpu(); // LuxGram Fix 56: renderer + uniform budget for the DIAG overlay
 
             int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, AndroidUtilities.readRes(R.raw.camera_vert));
             if (vertexShader == 0) {
-                CameraView.this.drgramGlFailed("SHADER COMPILE VERTEX: " + drgramLastShaderLog); // Fix 55/56
+                CameraView.this.luxgramGlFailed("SHADER COMPILE VERTEX: " + luxgramLastShaderLog); // Fix 55/56
                 finish();
                 return false;
             }
-            // DrGram Fix 55: the guaranteed lite (v5.18) beauty shader is built
+            // LuxGram Fix 55: the guaranteed lite (v5.18) beauty shader is built
             // FIRST so the preview starts on every GPU. The heavy 99-vector
             // polygon shader is only preferred here when it is known to work
             // (persisted verdict), otherwise it is attempted later as an
             // opportunistic upgrade once the preview is already live
-            // (drgramTryUpgradeToFull). Camera start can never hang on (or die
+            // (luxgramTryUpgradeToFull). Camera start can never hang on (or die
             // from) the big shader again.
-            boolean drgramLiteProgram = true;
-            // DrGram Fix 56: final CORE fallback (upstream Telegram camera
+            boolean luxgramLiteProgram = true;
+            // LuxGram Fix 56: final CORE fallback (upstream Telegram camera
             // shader, verbatim, no beauty) — the one shader proven to compile
             // and link on every GPU that runs Telegram, including the budget
-            // PowerVR units that reject both DrGram beauty programs.
-            // DrGram Fix 60: face beautification is gone from every tier, so
+            // PowerVR units that reject both LuxGram beauty programs.
+            // LuxGram Fix 60: face beautification is gone from every tier, so
             // the verdict no longer picks the order — the tiers differ only in
             // robustness now. FULL carries the complete FX set plus the Fix 57
             // mesh infrastructure, so it is always tried FIRST (effects + grid
             // survive on every GPU); FLAT and LITE are lighter fallbacks and
             // CORE stays the last-resort upstream shader. The persisted verdict
             // is still read and reported in the diagnostics snapshot.
-            int drgramVerdict = drgramFullShaderRead();
-            int[] drgramOrder = new int[]{R.raw.camera_frag, R.raw.camera_frag_flat, R.raw.camera_frag_lite, R.raw.camera_frag_core};
-            String[] drgramNames = new String[]{"FULL", "FLAT", "LITE", "CORE"};
-            drgramDiagLogs = "";
-            String drgramActiveName = "";
+            int luxgramVerdict = luxgramFullShaderRead();
+            int[] luxgramOrder = new int[]{R.raw.camera_frag, R.raw.camera_frag_flat, R.raw.camera_frag_lite, R.raw.camera_frag_core};
+            String[] luxgramNames = new String[]{"FULL", "FLAT", "LITE", "CORE"};
+            luxgramDiagLogs = "";
+            String luxgramActiveName = "";
             drawProgram = 0;
-            for (int a = 0; a < drgramOrder.length && drawProgram == 0; a++) {
-                int fs = loadShader(GLES20.GL_FRAGMENT_SHADER, AndroidUtilities.readRes(drgramOrder[a]));
+            for (int a = 0; a < luxgramOrder.length && drawProgram == 0; a++) {
+                int fs = loadShader(GLES20.GL_FRAGMENT_SHADER, AndroidUtilities.readRes(luxgramOrder[a]));
                 if (fs == 0) {
-                    drgramDiagLogs += "FRAG-" + drgramNames[a] + " COMPILE: " + drgramLastShaderLog + "\n";
+                    luxgramDiagLogs += "FRAG-" + luxgramNames[a] + " COMPILE: " + luxgramLastShaderLog + "\n";
                 } else {
-                    drawProgram = drgramBuildProgram(vertexShader, fs);
+                    drawProgram = luxgramBuildProgram(vertexShader, fs);
                     if (drawProgram != 0) {
-                        drgramLiteProgram = drgramOrder[a] != R.raw.camera_frag;
-                        drgramCoreProgramActive = drgramOrder[a] == R.raw.camera_frag_core;
-                        drgramActiveName = drgramNames[a];
-                        if (drgramOrder[a] == R.raw.camera_frag_flat) {
-                            drgramFullShaderSave(5); // Fix 58: remember FLAT is the best this GPU can do
+                        luxgramLiteProgram = luxgramOrder[a] != R.raw.camera_frag;
+                        luxgramCoreProgramActive = luxgramOrder[a] == R.raw.camera_frag_core;
+                        luxgramActiveName = luxgramNames[a];
+                        if (luxgramOrder[a] == R.raw.camera_frag_flat) {
+                            luxgramFullShaderSave(5); // Fix 58: remember FLAT is the best this GPU can do
                         }
                         break;
                     }
-                    drgramDiagLogs += "LINK-" + drgramNames[a] + ": " + drgramLastLinkLog + "\n";
+                    luxgramDiagLogs += "LINK-" + luxgramNames[a] + ": " + luxgramLastLinkLog + "\n";
                     GLES20.glDeleteShader(fs);
                 }
             }
             if (drawProgram == 0) {
                 if (BuildVars.LOGS_ENABLED) {
-                    FileLog.e("failed creating shader: " + drgramDiagLogs);
+                    FileLog.e("failed creating shader: " + luxgramDiagLogs);
                 }
-                String reason = "SHADER COMPILE/LINK ALL4\n" + drgramDiagGpu + drgramDiagLogs; // Fix 58: 4 tiers
-                drgramDiagPersist(reason);
-                CameraView.this.drgramGlFailed(reason); // Fix 55/56
+                String reason = "SHADER COMPILE/LINK ALL4\n" + luxgramDiagGpu + luxgramDiagLogs; // Fix 58: 4 tiers
+                luxgramDiagPersist(reason);
+                CameraView.this.luxgramGlFailed(reason); // Fix 55/56
                 finish();
                 return false;
             }
-            drgramLiteProgramActive = drgramLiteProgram;
-            // DrGram Fix 58: always record which tier is live and whether the
+            luxgramLiteProgramActive = luxgramLiteProgram;
+            // LuxGram Fix 58: always record which tier is live and whether the
             // beauty uniforms exist on it — the Tools > camera shader diag row
             // is now a complete remote snapshot (tier + FX state + GPU + any
             // compile/link logs of the tiers that were skipped).
-            drgramDiagPersist("ACTIVE: " + (drgramActiveName.length() > 0 ? drgramActiveName : "?")
-                    + (drgramCoreProgramActive ? " (FX OFF)" : " (FX ON)")
-                    + " V" + drgramVerdict // Fix 60: legacy verdict, order is fixed now
-                    + "\n" + drgramDiagGpu
-                    + (drgramDiagLogs.length() > 0 ? "failed attempts:\n" + drgramDiagLogs : ""));
-            if (drgramCoreProgramActive && BuildVars.LOGS_ENABLED) {
-                FileLog.e("DrGram preview CORE compat program active; failed attempts: " + drgramDiagLogs);
+            luxgramDiagPersist("ACTIVE: " + (luxgramActiveName.length() > 0 ? luxgramActiveName : "?")
+                    + (luxgramCoreProgramActive ? " (FX OFF)" : " (FX ON)")
+                    + " V" + luxgramVerdict // Fix 60: legacy verdict, order is fixed now
+                    + "\n" + luxgramDiagGpu
+                    + (luxgramDiagLogs.length() > 0 ? "failed attempts:\n" + luxgramDiagLogs : ""));
+            if (luxgramCoreProgramActive && BuildVars.LOGS_ENABLED) {
+                FileLog.e("LuxGram preview CORE compat program active; failed attempts: " + luxgramDiagLogs);
             }
-            drgramFetchHandles(drawProgram);
+            luxgramFetchHandles(drawProgram);
 
-            CameraView.this.drgramGlInitFinished(drawProgram != 0); // DrGram Fix 54
+            CameraView.this.luxgramGlInitFinished(drawProgram != 0); // LuxGram Fix 54
 
             GLES20.glGenTextures(1, cameraTexture[0], 0);
             GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, cameraTexture[0][0]);
@@ -1838,10 +1838,10 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             return true;
         }
 
-        private boolean drgramLiteProgramActive; // Fix 55: drawProgram currently = lite beauty shader
-        private boolean drgramUpgradeChecked;    // Fix 55: full-shader upgrade attempted for this session
+        private boolean luxgramLiteProgramActive; // Fix 55: drawProgram currently = lite beauty shader
+        private boolean luxgramUpgradeChecked;    // Fix 55: full-shader upgrade attempted for this session
 
-        private String drgramEglErr() {
+        private String luxgramEglErr() {
             try {
                 return String.format("0x%04x", egl10.eglGetError());
             } catch (Throwable t) {
@@ -1849,7 +1849,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             }
         }
 
-        private void drgramFetchHandles(int program) {
+        private void luxgramFetchHandles(int program) {
             positionHandle = GLES20.glGetAttribLocation(program, "aPosition");
             textureHandle = GLES20.glGetAttribLocation(program, "aTextureCoord");
             vertexMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
@@ -1862,8 +1862,8 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             dualHandle = GLES20.glGetUniformLocation(program, "dual");
             scaleHandle = GLES20.glGetUniformLocation(program, "scale");
             blurHandle = GLES20.glGetUniformLocation(program, "blur");
-            beautifyHandle = GLES20.glGetUniformLocation(program, "beautify"); // DrGram Fix 40
-            drgramHandles.fetch(program); // DrGram Fix 41/46
+            beautifyHandle = GLES20.glGetUniformLocation(program, "beautify"); // LuxGram Fix 40
+            luxgramHandles.fetch(program); // LuxGram Fix 41/46
             alphaHandle = GLES20.glGetUniformLocation(program, "alpha");
             crossfadeHandle = GLES20.glGetUniformLocation(program, "crossfade");
             shapeFromHandle = GLES20.glGetUniformLocation(program, "shapeFrom");
@@ -1871,18 +1871,18 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             shapeHandle = GLES20.glGetUniformLocation(program, "shapeT");
         }
 
-        // DrGram Fix 55: preview is already live on the lite program —
+        // LuxGram Fix 55: preview is already live on the lite program —
         // opportunistically build the full polygon shader and hot-swap to it.
         // Attempted at most once per install (persisted verdict), so GPUs that
         // compile it slowly or not at all keep the instant lite preview forever.
-        private void drgramTryUpgradeToFull() {
-            if (recording || drawProgram == 0 || !drgramLiteProgramActive) {
+        private void luxgramTryUpgradeToFull() {
+            if (recording || drawProgram == 0 || !luxgramLiteProgramActive) {
                 return;
             }
-            if (drgramFullShaderRead() != 0) {
+            if (luxgramFullShaderRead() != 0) {
                 return; // known ok (built first), known failed, or already attempted
             }
-            drgramFullShaderSave(3); // assume died-mid-way unless proven otherwise
+            luxgramFullShaderSave(3); // assume died-mid-way unless proven otherwise
             try {
                 long t0 = System.currentTimeMillis();
                 int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, AndroidUtilities.readRes(R.raw.camera_vert));
@@ -1894,43 +1894,43 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     if (fullFragment != 0) {
                         GLES20.glDeleteShader(fullFragment);
                     }
-                    drgramFullShaderSave(2);
-                    drgramDiagPersist("UPGRADE COMPILE FAIL\n" + drgramLastShaderLog); // Fix 57
+                    luxgramFullShaderSave(2);
+                    luxgramDiagPersist("UPGRADE COMPILE FAIL\n" + luxgramLastShaderLog); // Fix 57
                     if (BuildVars.LOGS_ENABLED) {
-                        FileLog.e("DrGram full shader upgrade: compile failed, staying lite");
+                        FileLog.e("LuxGram full shader upgrade: compile failed, staying lite");
                     }
                     return;
                 }
-                int fullProgram = drgramBuildProgram(vertexShader, fullFragment);
+                int fullProgram = luxgramBuildProgram(vertexShader, fullFragment);
                 if (fullProgram == 0) {
                     GLES20.glDeleteShader(fullFragment);
-                    drgramFullShaderSave(2);
-                    drgramDiagPersist("UPGRADE LINK FAIL\n" + drgramLastLinkLog); // Fix 57
+                    luxgramFullShaderSave(2);
+                    luxgramDiagPersist("UPGRADE LINK FAIL\n" + luxgramLastLinkLog); // Fix 57
                     if (BuildVars.LOGS_ENABLED) {
-                        FileLog.e("DrGram full shader upgrade: link failed, staying lite");
+                        FileLog.e("LuxGram full shader upgrade: link failed, staying lite");
                     }
                     return;
                 }
                 long ms = System.currentTimeMillis() - t0;
-                drgramFetchHandles(fullProgram);
+                luxgramFetchHandles(fullProgram);
                 int old = drawProgram;
                 drawProgram = fullProgram;
-                drgramLiteProgramActive = false;
+                luxgramLiteProgramActive = false;
                 if (old != 0) {
                     GLES20.glDeleteProgram(old);
                 }
-                drgramFullShaderSave(ms <= 2500 ? 1 : 4); // 1 = fast enough to prefer full on start; 4 = slow, stay lite
+                luxgramFullShaderSave(ms <= 2500 ? 1 : 4); // 1 = fast enough to prefer full on start; 4 = slow, stay lite
                 if (BuildVars.LOGS_ENABLED) {
-                    FileLog.d("DrGram full polygon shader upgrade active in " + ms + "ms");
+                    FileLog.d("LuxGram full polygon shader upgrade active in " + ms + "ms");
                 }
             } catch (Throwable t) {
                 FileLog.e(t);
-                drgramFullShaderSave(2);
+                luxgramFullShaderSave(2);
             }
         }
 
         private void updTex(SurfaceTexture surfaceTexture) {
-            drgramNoteFrame(); // DrGram Fix 54: first camera frame reached the GL thread
+            luxgramNoteFrame(); // LuxGram Fix 54: first camera frame reached the GL thread
             if (surfaceTexture == cameraSurface[0]) {
                 if (!ignoreCamera1Upd && System.currentTimeMillis() > camera1AppearedUntil) {
                     camera1Appeared = true;
@@ -2162,8 +2162,8 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     GLES20.glUniform1f(dualHandle, 1f);
                 }
                 GLES20.glUniform1f(blurHandle, i == 0 ? camera1Blur : 0f);
-                GLES20.glUniform1f(beautifyHandle, org.telegram.messenger.DrGramMedia.beautifyUniform()); // DrGram Fix 40
-                drgramUploadBeauty(currentSession[i], drgramHandles); // DrGram Fix 41/46
+                GLES20.glUniform1f(beautifyHandle, org.telegram.messenger.LuxGramMedia.beautifyUniform()); // LuxGram Fix 40
+                luxgramUploadBeauty(currentSession[i], luxgramHandles); // LuxGram Fix 41/46
                 if (i == 1) {
                     GLES20.glUniform1f(alphaHandle, 1);
                     if (a < 0) {
@@ -2269,23 +2269,23 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 }
             }
 
-            // DrGram Fix 55: preview pipeline is live — try the polygon shader
-            // upgrade once (never blocks camera start, see drgramTryUpgradeToFull).
-            if (!drgramUpgradeChecked) {
-                drgramUpgradeChecked = true;
-                drgramTryUpgradeToFull();
+            // LuxGram Fix 55: preview pipeline is live — try the polygon shader
+            // upgrade once (never blocks camera start, see luxgramTryUpgradeToFull).
+            if (!luxgramUpgradeChecked) {
+                luxgramUpgradeChecked = true;
+                luxgramTryUpgradeToFull();
             }
         }
 
         @Override
         public void run() {
-            // DrGram Fix 55: never let initGL kill the thread silently — record
+            // LuxGram Fix 55: never let initGL kill the thread silently — record
             // the exact failure step, retry once, and always start the looper.
             try {
                 initied = initGL();
             } catch (Throwable t) {
                 FileLog.e(t);
-                CameraView.this.drgramGlFailed("EX " + t.getClass().getSimpleName() + ": " + t.getMessage());
+                CameraView.this.luxgramGlFailed("EX " + t.getClass().getSimpleName() + ": " + t.getMessage());
             }
             if (!initied) {
                 try {
@@ -2295,7 +2295,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     initied = initGL();
                 } catch (Throwable t) {
                     FileLog.e(t);
-                    CameraView.this.drgramGlFailed("EX2 " + t.getClass().getSimpleName() + ": " + t.getMessage());
+                    CameraView.this.luxgramGlFailed("EX2 " + t.getClass().getSimpleName() + ": " + t.getMessage());
                 }
             }
             if (blurSurfaceTexture != null) {
@@ -2317,10 +2317,10 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     try {
                         onDraw(inputMessage.arg1, inputMessage.arg2, inputMessage.obj == updateTexBoth || inputMessage.obj == updateTex1, inputMessage.obj == updateTexBoth || inputMessage.obj == updateTex2);
                     } catch (Throwable t) {
-                        // DrGram Fix 54: a dead GL thread paints a silent black
+                        // LuxGram Fix 54: a dead GL thread paints a silent black
                         // preview forever — keep it alive and surface the state.
                         FileLog.e(t);
-                        drgramGlState = DRGRAM_GL_DRAW_ERROR;
+                        luxgramGlState = LUXGRAM_GL_DRAW_ERROR;
                     }
                     break;
                 case DO_SHUTDOWN_MESSAGE:
@@ -2679,7 +2679,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
     }
 
     /**
-     * DrGram Fix 41/46/50: uploads the beauty-suite uniforms for the current frame.
+     * LuxGram Fix 41/46/50: uploads the beauty-suite uniforms for the current frame.
      * Feed priority (Fix 50): fresh MediaPipe mesh result first (temporal
      * 478-point tracking — stable centre, iris-grade eyes), then Camera1
      * hardware face rectangles (sensor space -1000..1000, normalised to the
@@ -2687,24 +2687,24 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
      * static so both the preview program and the VideoRecorder program share
      * the same mapping.
      */
-    private static void drgramUploadBeauty(CameraSessionWrapper session, DrGramBeautyHandles h) {
-        GLES20.glUniform1f(h.nose, org.telegram.messenger.DrGramMedia.beautifyNoseUniform());
-        GLES20.glUniform1f(h.teeth, org.telegram.messenger.DrGramMedia.beautifyTeethUniform());
-        GLES20.glUniform1f(h.eyes, org.telegram.messenger.DrGramMedia.beautifyEyesUniform());
-        GLES20.glUniform1f(h.jaw, org.telegram.messenger.DrGramMedia.beautifyJawUniform());
-        GLES20.glUniform1f(h.fx, org.telegram.messenger.DrGramMedia.cameraFx());
-        GLES20.glUniform1f(h.blush, org.telegram.messenger.DrGramMedia.beautifyBlushUniform());
-        GLES20.glUniform1f(h.lips, org.telegram.messenger.DrGramMedia.beautifyLipsUniform());
-        GLES20.glUniform1f(h.bright, org.telegram.messenger.DrGramMedia.beautifyBrightUniform());
-        GLES20.glUniform1f(h.dark, org.telegram.messenger.DrGramMedia.beautifyDarkUniform()); // DrGram Fix 47
-        GLES20.glUniform1f(h.slim, org.telegram.messenger.DrGramMedia.beautifySlimUniform()); // DrGram Fix 47
+    private static void luxgramUploadBeauty(CameraSessionWrapper session, LuxGramBeautyHandles h) {
+        GLES20.glUniform1f(h.nose, org.telegram.messenger.LuxGramMedia.beautifyNoseUniform());
+        GLES20.glUniform1f(h.teeth, org.telegram.messenger.LuxGramMedia.beautifyTeethUniform());
+        GLES20.glUniform1f(h.eyes, org.telegram.messenger.LuxGramMedia.beautifyEyesUniform());
+        GLES20.glUniform1f(h.jaw, org.telegram.messenger.LuxGramMedia.beautifyJawUniform());
+        GLES20.glUniform1f(h.fx, org.telegram.messenger.LuxGramMedia.cameraFx());
+        GLES20.glUniform1f(h.blush, org.telegram.messenger.LuxGramMedia.beautifyBlushUniform());
+        GLES20.glUniform1f(h.lips, org.telegram.messenger.LuxGramMedia.beautifyLipsUniform());
+        GLES20.glUniform1f(h.bright, org.telegram.messenger.LuxGramMedia.beautifyBrightUniform());
+        GLES20.glUniform1f(h.dark, org.telegram.messenger.LuxGramMedia.beautifyDarkUniform()); // LuxGram Fix 47
+        GLES20.glUniform1f(h.slim, org.telegram.messenger.LuxGramMedia.beautifySlimUniform()); // LuxGram Fix 47
         android.hardware.Camera.Face[] faces = null;
         try {
             if (session != null && session.camera1Session != null) {
-                faces = session.camera1Session.drgramFaces;
-                // DrGram Fix 46: keep the software detector armed while hardware
+                faces = session.camera1Session.luxgramFaces;
+                // LuxGram Fix 46: keep the software detector armed while hardware
                 // detection is missing or quiet (front cameras often have none).
-                session.camera1Session.drgramSoftwareDetectTick(faces);
+                session.camera1Session.luxgramSoftwareDetectTick(faces);
             }
         } catch (Throwable ignore) {
         }
@@ -2713,12 +2713,12 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         float[] mouthData = new float[4];
         float[] eyeLData = new float[4];
         float[] eyeRData = new float[4];
-        // DrGram Fix 51: real organ rects (vec4[2]: cx, cy, halfW, halfH).
+        // LuxGram Fix 51: real organ rects (vec4[2]: cx, cy, halfW, halfH).
         float[] noseRectData = new float[8];
         float[] mouthRectData = new float[8];
         float[] eyeLRectData = new float[8];
         float[] eyeRRectData = new float[8];
-        // DrGram Fix 52: packed mesh contours (two points per vec4 uniform).
+        // LuxGram Fix 52: packed mesh contours (two points per vec4 uniform).
         float[] faceOvalPolyData = new float[64];
         float[] nosePolyData = new float[48];
         float[] lipOuterPolyData = new float[48];
@@ -2729,7 +2729,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         boolean feedIsSoftware = false;
         boolean organPrecise = false;
         boolean polygonPrecise = false;
-        // DrGram Fix 50: a fresh MediaPipe mesh result LEADS the feed — the
+        // LuxGram Fix 50: a fresh MediaPipe mesh result LEADS the feed — the
         // 478-point temporal mesh (iris-grade anchors, glide-stable centre)
         // is strictly better than the coarse hardware boxes that caused the
         // "face centre keeps changing" complaint. Hardware detection remains
@@ -2737,13 +2737,13 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         boolean softwarePreferred = false;
         try {
             softwarePreferred = session != null && session.camera1Session != null
-                    && session.camera1Session.drgramSoftwarePreferred();
+                    && session.camera1Session.luxgramSoftwarePreferred();
         } catch (Throwable ignore) {
         }
         if (softwarePreferred) {
             try {
-                if (session.camera1Session.drgramSoftFacesFresh(faceData, noseData, mouthData, eyeLData, eyeRData)) {
-                    count = Math.max(1, Math.min(2, session.camera1Session.drgramSoftCount));
+                if (session.camera1Session.luxgramSoftFacesFresh(faceData, noseData, mouthData, eyeLData, eyeRData)) {
+                    count = Math.max(1, Math.min(2, session.camera1Session.luxgramSoftCount));
                     preciseEyes = true;
                     feedIsSoftware = true;
                 }
@@ -2785,7 +2785,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                         // conservative estimate, used only when hardware doesn't expose a nose landmark.
                         noseX = eyeX;
                         noseY = eyeY + (cy + hh * 0.55f - eyeY) * 0.58f;
-                        // DrGram Fix 46: real hardware eye anchors -> precise shader path.
+                        // LuxGram Fix 46: real hardware eye anchors -> precise shader path.
                         eyeLData[count * 2] = leftX;
                         eyeLData[count * 2 + 1] = leftY;
                         eyeRData[count * 2] = rightX;
@@ -2807,10 +2807,10 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             }
         }
         if (count == 0 && session != null && session.camera1Session != null) {
-            // DrGram Fix 46: fall back to the bundled ML Kit software detector.
+            // LuxGram Fix 46: fall back to the bundled ML Kit software detector.
             try {
-                if (session.camera1Session.drgramSoftFacesFresh(faceData, noseData, mouthData, eyeLData, eyeRData)) {
-                    count = Math.max(1, Math.min(2, session.camera1Session.drgramSoftCount));
+                if (session.camera1Session.luxgramSoftFacesFresh(faceData, noseData, mouthData, eyeLData, eyeRData)) {
+                    count = Math.max(1, Math.min(2, session.camera1Session.luxgramSoftCount));
                     preciseEyes = true;
                     feedIsSoftware = true;
                 }
@@ -2826,7 +2826,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 eyeRData[i * 2 + 1] = cy - hh * 0.20f;
             }
         }
-        // DrGram Fix 51: real organ rects. When the software (mesh) feed led
+        // LuxGram Fix 51: real organ rects. When the software (mesh) feed led
         // the pipeline, pull the exact nose/mouth/eye rectangles tracked from
         // the 478-point mesh; otherwise derive TIGHT anatomical estimates from
         // the anchors — never the huge face-box ellipses the shader used
@@ -2835,7 +2835,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             boolean rectsFresh = false;
             if (feedIsSoftware && session != null && session.camera1Session != null) {
                 try {
-                    rectsFresh = session.camera1Session.drgramSoftOrganRectsFresh(
+                    rectsFresh = session.camera1Session.luxgramSoftOrganRectsFresh(
                             noseRectData, mouthRectData, eyeLRectData, eyeRRectData);
                 } catch (Throwable ignore) {
                 }
@@ -2854,7 +2854,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 }
                 if (feedIsSoftware && session != null && session.camera1Session != null) {
                     try {
-                        polygonPrecise = session.camera1Session.drgramSoftPolygonsFresh(
+                        polygonPrecise = session.camera1Session.luxgramSoftPolygonsFresh(
                                 faceOvalPolyData, nosePolyData, lipOuterPolyData, eyeLPolyData, eyeRPolyData);
                     } catch (Throwable ignore) {
                         polygonPrecise = false;
@@ -2894,9 +2894,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         // Stabilize detector jitter before the shader consumes the live masks.
         try {
             if (session != null && session.camera1Session != null) {
-                session.camera1Session.smoothDrgramBeautyLandmarks(faceData, noseData, mouthData, eyeLData, eyeRData, count);
-                session.camera1Session.smoothDrgramOrganRects(noseRectData, mouthRectData, eyeLRectData, eyeRRectData, count);
-                session.camera1Session.smoothDrgramBeautyPolygons(faceOvalPolyData, nosePolyData, lipOuterPolyData,
+                session.camera1Session.smoothLuxGramBeautyLandmarks(faceData, noseData, mouthData, eyeLData, eyeRData, count);
+                session.camera1Session.smoothLuxGramOrganRects(noseRectData, mouthRectData, eyeLRectData, eyeRRectData, count);
+                session.camera1Session.smoothLuxGramBeautyPolygons(faceOvalPolyData, nosePolyData, lipOuterPolyData,
                         eyeLPolyData, eyeRPolyData, polygonPrecise ? count : 0);
             }
         } catch (Throwable ignore) {
@@ -2909,7 +2909,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         GLES20.glUniform2fv(h.eyesL, 2, eyeLData, 0);
         GLES20.glUniform2fv(h.eyesR, 2, eyeRData, 0);
         GLES20.glUniform1f(h.eyePrecise, preciseEyes ? 1f : 0f);
-        // DrGram Fix 51: real organ region rects.
+        // LuxGram Fix 51: real organ region rects.
         GLES20.glUniform4fv(h.noseRects, 2, noseRectData, 0);
         GLES20.glUniform4fv(h.mouthRects, 2, mouthRectData, 0);
         GLES20.glUniform4fv(h.eyeLRects, 2, eyeLRectData, 0);
@@ -2917,7 +2917,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         GLES20.glUniform1f(h.organPrecise, organPrecise ? 1f : 0f);
         // Shared shader uploader is used by live preview and VideoRecorder, so
         // the same exact mesh masks follow every encoded frame as well.
-        // DrGram Fix 57: contour points travel via a 128x1 RGBA8 texture on
+        // LuxGram Fix 57: contour points travel via a 128x1 RGBA8 texture on
         // unit 2 (one texel per point, 16-bit hi/lo split) — the 56-vector
         // uniform block exceeded budget GPUs' link limits.
         if (polygonPrecise && h.polyTexSampler != -1) {
@@ -2937,7 +2937,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             if (h.polyBuffer == null) {
                 h.polyBuffer = java.nio.ByteBuffer.allocateDirect(128 * 4).order(java.nio.ByteOrder.nativeOrder());
             }
-            drgramPackPolyTexture(faceOvalPolyData, nosePolyData, lipOuterPolyData, eyeLPolyData, eyeRPolyData, h.polyBuffer);
+            luxgramPackPolyTexture(faceOvalPolyData, nosePolyData, lipOuterPolyData, eyeLPolyData, eyeRPolyData, h.polyBuffer);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, h.polyTexture);
             GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, 128, 1, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, h.polyBuffer);
@@ -2951,34 +2951,34 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
     // vec4 holding two xy contour points — into 128 RGBA8 texels as 16-bit
     // hi/lo pairs. Decode in shader: x = R + G/256, y = B + A/256, which is
     // exact for values quantized to 65520 (= 255 * 256).
-    private static void drgramPackPolyTexture(float[] oval, float[] nose, float[] lips, float[] eyeL, float[] eyeR, ByteBuffer buf) {
+    private static void luxgramPackPolyTexture(float[] oval, float[] nose, float[] lips, float[] eyeL, float[] eyeR, ByteBuffer buf) {
         buf.rewind();
         for (int face = 0; face < 2; face++) {
             for (int p = 0; p < 16; p++) {
                 int k = face * 32 + (p >> 1) * 4 + (p & 1) * 2;
-                drgramPutPoint(buf, oval[k], oval[k + 1]);
+                luxgramPutPoint(buf, oval[k], oval[k + 1]);
             }
             for (int p = 0; p < 12; p++) {
                 int k = face * 24 + (p >> 1) * 4 + (p & 1) * 2;
-                drgramPutPoint(buf, nose[k], nose[k + 1]);
+                luxgramPutPoint(buf, nose[k], nose[k + 1]);
             }
             for (int p = 0; p < 12; p++) {
                 int k = face * 24 + (p >> 1) * 4 + (p & 1) * 2;
-                drgramPutPoint(buf, lips[k], lips[k + 1]);
+                luxgramPutPoint(buf, lips[k], lips[k + 1]);
             }
             for (int p = 0; p < 8; p++) {
                 int k = face * 16 + (p >> 1) * 4 + (p & 1) * 2;
-                drgramPutPoint(buf, eyeL[k], eyeL[k + 1]);
+                luxgramPutPoint(buf, eyeL[k], eyeL[k + 1]);
             }
             for (int p = 0; p < 8; p++) {
                 int k = face * 16 + (p >> 1) * 4 + (p & 1) * 2;
-                drgramPutPoint(buf, eyeR[k], eyeR[k + 1]);
+                luxgramPutPoint(buf, eyeR[k], eyeR[k + 1]);
             }
         }
         buf.rewind();
     }
 
-    private static void drgramPutPoint(ByteBuffer buf, float x, float y) {
+    private static void luxgramPutPoint(ByteBuffer buf, float x, float y) {
         if (!(x >= 0f && x <= 1f)) {
             x = 0f;
         }
@@ -3000,7 +3000,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         int[] compileStatus = new int[1];
         GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
         if (compileStatus[0] == 0) {
-            drgramLastShaderLog = drgramTrimLog(GLES20.glGetShaderInfoLog(shader), 130); // Fix 56
+            luxgramLastShaderLog = luxgramTrimLog(GLES20.glGetShaderInfoLog(shader), 130); // Fix 56
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.e(GLES20.glGetShaderInfoLog(shader));
             }
@@ -3010,14 +3010,14 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         return shader;
     }
 
-    // DrGram Fix 55: shared program build + link check (used by preview and recorder)
-    private int drgramBuildProgram(int vertexShader, int fragmentShader) {
+    // LuxGram Fix 55: shared program build + link check (used by preview and recorder)
+    private int luxgramBuildProgram(int vertexShader, int fragmentShader) {
         if (vertexShader == 0 || fragmentShader == 0) {
             return 0;
         }
         int program = GLES20.glCreateProgram();
         if (program == 0) {
-            drgramLastLinkLog = "glCreateProgram=0"; // Fix 56
+            luxgramLastLinkLog = "glCreateProgram=0"; // Fix 56
             return 0;
         }
         GLES20.glAttachShader(program, vertexShader);
@@ -3026,9 +3026,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         int[] linkStatus = new int[1];
         GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
         if (linkStatus[0] == 0) {
-            drgramLastLinkLog = drgramTrimLog(GLES20.glGetProgramInfoLog(program), 130); // Fix 56
+            luxgramLastLinkLog = luxgramTrimLog(GLES20.glGetProgramInfoLog(program), 130); // Fix 56
             if (BuildVars.LOGS_ENABLED) {
-                FileLog.e("DrGram shader link failed: " + GLES20.glGetProgramInfoLog(program));
+                FileLog.e("LuxGram shader link failed: " + GLES20.glGetProgramInfoLog(program));
             }
             GLES20.glDeleteProgram(program);
             return 0;
@@ -3174,9 +3174,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         private int alphaHandle;
         private int scaleHandle;
         private int blurHandle;
-        private int beautifyHandle; // DrGram Fix 40
-        // DrGram Fix 41/46: beauty suite + camera FX uniforms (recorder)
-        private final DrGramBeautyHandles drgramHandles = new DrGramBeautyHandles();
+        private int beautifyHandle; // LuxGram Fix 40
+        // LuxGram Fix 41/46: beauty suite + camera FX uniforms (recorder)
+        private final LuxGramBeautyHandles luxgramHandles = new LuxGramBeautyHandles();
         private int zeroTimeStamps;
         private Integer lastCameraId = 0;
 
@@ -3553,8 +3553,8 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 GLES20.glUniformMatrix4fv(textureMatrixHandle, 1, false, mSTMatrix[i], 0);
 
                 GLES20.glUniform1f(blurHandle, 0);
-                GLES20.glUniform1f(beautifyHandle, org.telegram.messenger.DrGramMedia.beautifyUniform()); // DrGram Fix 40
-                drgramUploadBeauty(i == 0 ? cameraSession[i] : null, drgramHandles); // DrGram Fix 41/46
+                GLES20.glUniform1f(beautifyHandle, org.telegram.messenger.LuxGramMedia.beautifyUniform()); // LuxGram Fix 40
+                luxgramUploadBeauty(i == 0 ? cameraSession[i] : null, luxgramHandles); // LuxGram Fix 41/46
                 Size size = previewSize[i];
                 if (size != null && cameraSession[i] != null) {
                     int angle = cameraSession[i].getWorldAngle();
@@ -3896,40 +3896,40 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             textureBuffer.put(texData).position(0);
 
             int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, AndroidUtilities.readRes(R.raw.camera_vert));
-            // DrGram Fix 56: lite beauty program FIRST, polygon shader second,
+            // LuxGram Fix 56: lite beauty program FIRST, polygon shader second,
             // upstream CORE shader as the guaranteed last resort — recording
             // start can never stall on (or die from) the heavy shaders.
-            boolean drgramLiteProgram = true;
-            // DrGram Fix 58: FLAT beauty tier slots in right before CORE.
-            // DrGram Fix 60: recorder matches the preview ladder — FULL first
+            boolean luxgramLiteProgram = true;
+            // LuxGram Fix 58: FLAT beauty tier slots in right before CORE.
+            // LuxGram Fix 60: recorder matches the preview ladder — FULL first
             // (only tier with the complete FX set + mesh grid), CORE last.
-            int[] drgramOrder = new int[]{R.raw.camera_frag, R.raw.camera_frag_flat, R.raw.camera_frag_lite, R.raw.camera_frag_core};
-            String[] drgramNames = new String[]{"FULL", "FLAT", "LITE", "CORE"};
-            for (int a = 0; a < drgramOrder.length && drawProgram == 0; a++) {
-                int fs = loadShader(GLES20.GL_FRAGMENT_SHADER, AndroidUtilities.readRes(drgramOrder[a]));
+            int[] luxgramOrder = new int[]{R.raw.camera_frag, R.raw.camera_frag_flat, R.raw.camera_frag_lite, R.raw.camera_frag_core};
+            String[] luxgramNames = new String[]{"FULL", "FLAT", "LITE", "CORE"};
+            for (int a = 0; a < luxgramOrder.length && drawProgram == 0; a++) {
+                int fs = loadShader(GLES20.GL_FRAGMENT_SHADER, AndroidUtilities.readRes(luxgramOrder[a]));
                 if (fs == 0) {
                     if (BuildVars.LOGS_ENABLED) {
-                        FileLog.e("DrGram recorder FRAG-" + drgramNames[a] + " compile failed: " + drgramLastShaderLog);
+                        FileLog.e("LuxGram recorder FRAG-" + luxgramNames[a] + " compile failed: " + luxgramLastShaderLog);
                     }
                     continue;
                 }
-                drawProgram = drgramBuildProgram(vertexShader, fs);
+                drawProgram = luxgramBuildProgram(vertexShader, fs);
                 if (drawProgram == 0) {
                     if (BuildVars.LOGS_ENABLED) {
-                        FileLog.e("DrGram recorder LINK-" + drgramNames[a] + " failed: " + drgramLastLinkLog);
+                        FileLog.e("LuxGram recorder LINK-" + luxgramNames[a] + " failed: " + luxgramLastLinkLog);
                     }
                     GLES20.glDeleteShader(fs);
                 } else {
-                    drgramLiteProgram = drgramOrder[a] != R.raw.camera_frag;
-                    drgramCoreProgramActive = drgramOrder[a] == R.raw.camera_frag_core;
-                    if (drgramCoreProgramActive && BuildVars.LOGS_ENABLED) {
-                        FileLog.e("DrGram recorder CORE compat program active");
+                    luxgramLiteProgram = luxgramOrder[a] != R.raw.camera_frag;
+                    luxgramCoreProgramActive = luxgramOrder[a] == R.raw.camera_frag_core;
+                    if (luxgramCoreProgramActive && BuildVars.LOGS_ENABLED) {
+                        FileLog.e("LuxGram recorder CORE compat program active");
                     }
                 }
             }
             if (drawProgram != 0) {
-                if (drgramLiteProgram && BuildVars.LOGS_ENABLED) {
-                    FileLog.d("DrGram recorder lite beauty program active");
+                if (luxgramLiteProgram && BuildVars.LOGS_ENABLED) {
+                    FileLog.d("LuxGram recorder lite beauty program active");
                 }
                 positionHandle = GLES20.glGetAttribLocation(drawProgram, "aPosition");
                 textureHandle = GLES20.glGetAttribLocation(drawProgram, "aTextureCoord");
@@ -3943,8 +3943,8 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 dualHandle = GLES20.glGetUniformLocation(drawProgram, "dual");
                 scaleHandle = GLES20.glGetUniformLocation(drawProgram, "scale");
                 blurHandle = GLES20.glGetUniformLocation(drawProgram, "blur");
-                beautifyHandle = GLES20.glGetUniformLocation(drawProgram, "beautify"); // DrGram Fix 40
-                drgramHandles.fetch(drawProgram); // DrGram Fix 41/46
+                beautifyHandle = GLES20.glGetUniformLocation(drawProgram, "beautify"); // LuxGram Fix 40
+                luxgramHandles.fetch(drawProgram); // LuxGram Fix 41/46
                 alphaHandle = GLES20.glGetUniformLocation(drawProgram, "alpha");
                 crossfadeHandle = GLES20.glGetUniformLocation(drawProgram, "crossfade");
                 shapeFromHandle = GLES20.glGetUniformLocation(drawProgram, "shapeFrom");

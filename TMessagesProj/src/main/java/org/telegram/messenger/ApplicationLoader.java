@@ -272,10 +272,10 @@ public class ApplicationLoader extends Application {
             ContactsController.getInstance(a).checkAppAccount();
             DownloadController.getInstance(a);
         }
-        DrGramOnlineGuard.onAppReady();
-        DrGramContactHistory.onAppReady();
-        DrGramAutoForward.onAppReady();
-        DrGramThemeInstaller.onAppReady();
+        LuxGramOnlineGuard.onAppReady();
+        LuxGramContactHistory.onAppReady();
+        LuxGramAutoForward.onAppReady();
+        LuxGramThemeInstaller.onAppReady();
         BillingController.getInstance().startConnection();
     }
 
@@ -294,7 +294,7 @@ public class ApplicationLoader extends Application {
 
         super.onCreate();
 
-        DrGramCrashSaver.install(); // DrGram Fix 29: capture any crash to a shareable log
+        LuxGramCrashSaver.install(); // LuxGram Fix 29: capture any crash to a shareable log
 
         // AndroidUtilities must be initialized before FileLog
         final String helloWorld = AndroidUtilities.getHelloWorld();
@@ -360,7 +360,7 @@ public class ApplicationLoader extends Application {
 
         LauncherIconController.tryFixLauncherIconIfNeeded();
         ProxyRotationController.init();
-        DrGramAutoProxy.startWatchdog(); // DrGram Fix 58: auto proxy when the connection stays down
+        LuxGramAutoProxy.startWatchdog(); // LuxGram Fix 58: auto proxy when the connection stays down
 
         //if (BuildConfig.DEBUG_PRIVATE_VERSION) {
         //    Choreographer60FpsContent.getInstance().addFrameCallback(debugEverySecondChecks, 1);

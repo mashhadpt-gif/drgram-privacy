@@ -7174,11 +7174,11 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
         if (beautyIconView == null) {
             return;
         }
-        int level = org.telegram.messenger.DrGramMedia.callBeautyLevel();
-        if (level == org.telegram.messenger.DrGramMedia.CALL_BEAUTY_STRONG) {
+        int level = org.telegram.messenger.LuxGramMedia.callBeautyLevel();
+        if (level == org.telegram.messenger.LuxGramMedia.CALL_BEAUTY_STRONG) {
             beautyIconView.setAlpha(1.0f);
             beautyIconView.setColorFilter(new PorterDuffColorFilter(0xFFF5C242, PorterDuff.Mode.SRC_IN));
-        } else if (level == org.telegram.messenger.DrGramMedia.CALL_BEAUTY_LIGHT) {
+        } else if (level == org.telegram.messenger.LuxGramMedia.CALL_BEAUTY_LIGHT) {
             beautyIconView.setAlpha(0.9f);
             beautyIconView.setColorFilter(new PorterDuffColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_IN));
         } else {

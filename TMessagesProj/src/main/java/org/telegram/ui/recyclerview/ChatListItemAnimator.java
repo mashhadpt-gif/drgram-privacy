@@ -334,34 +334,34 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
                 ((ChatMessageCell) holder.itemView).getTransitionParams().messageEntering = true;
             }
         }
-        // DrGram Fix 38: glass blur-in entrance for brand themes — the new
+        // LuxGram Fix 38: glass blur-in entrance for brand themes — the new
         // message condenses out of a frosted blur while fading up
-        if (holder.itemView instanceof ChatMessageCell && drgramGlassEnter()) {
-            drgramApplyEnterBlur(holder.itemView, 16f);
-            // DrGram Fix 45: schedule the clear here too — if animateAddImpl is
+        if (holder.itemView instanceof ChatMessageCell && luxgramGlassEnter()) {
+            luxgramApplyEnterBlur(holder.itemView, 16f);
+            // LuxGram Fix 45: schedule the clear here too — if animateAddImpl is
             // never reached (interrupted flush, layout pass), the frost must
             // still dissolve instead of sticking to the bubble forever.
-            drgramStartEnterBlurClear(holder.itemView, getMoveDuration());
+            luxgramStartEnterBlurClear(holder.itemView, getMoveDuration());
         }
         mPendingAdditions.add(holder);
         return true;
     }
 
-    //region DrGram Fix 38 glass enter
+    //region LuxGram Fix 38 glass enter
 
-    // DrGram Fix 45: per-view blur-out animators. The old single static animator
+    // LuxGram Fix 45: per-view blur-out animators. The old single static animator
     // was shared across every cell: a burst of incoming messages cancelled the
     // previous cell's blur-out mid-run and left it permanently frosted, and a
     // recycled-but-rebound view kept its RenderEffect forever.
-    private static final java.util.WeakHashMap<View, ValueAnimator> drgramBlurAnimators = new java.util.WeakHashMap<>();
+    private static final java.util.WeakHashMap<View, ValueAnimator> luxgramBlurAnimators = new java.util.WeakHashMap<>();
 
-    private static boolean drgramGlassEnter() {
+    private static boolean luxgramGlassEnter() {
         return android.os.Build.VERSION.SDK_INT >= 31
             && SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_LOW
-            && (org.telegram.messenger.DrGramThemeInstaller.isLoveMode() || org.telegram.messenger.DrGramThemeInstaller.isGoldMode());
+            && (org.telegram.messenger.LuxGramThemeInstaller.isLoveMode() || org.telegram.messenger.LuxGramThemeInstaller.isGoldMode());
     }
 
-    private static void drgramApplyEnterBlur(View view, float radius) {
+    private static void luxgramApplyEnterBlur(View view, float radius) {
         try {
             if (android.os.Build.VERSION.SDK_INT >= 31) {
                 if (radius <= 0.5f) {
@@ -375,34 +375,34 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
         }
     }
 
-    private static void drgramClearEnterBlur(View view) {
-        drgramRemoveAnimator(view);
-        drgramApplyEnterBlur(view, 0);
+    private static void luxgramClearEnterBlur(View view) {
+        luxgramRemoveAnimator(view);
+        luxgramApplyEnterBlur(view, 0);
     }
 
-    /** DrGram Fix 45b: cancel this view's animator only — never touches other cells. */
-    private static void drgramRemoveAnimator(View view) {
-        ValueAnimator running = drgramBlurAnimators.remove(view);
+    /** LuxGram Fix 45b: cancel this view's animator only — never touches other cells. */
+    private static void luxgramRemoveAnimator(View view) {
+        ValueAnimator running = luxgramBlurAnimators.remove(view);
         if (running != null) {
             running.cancel();
         }
     }
 
-    /** DrGram Fix 45: start (or restart) this view's own blur-out; never touches other cells. */
-    private void drgramStartEnterBlurClear(View view, long duration) {
-        drgramRemoveAnimator(view);
+    /** LuxGram Fix 45: start (or restart) this view's own blur-out; never touches other cells. */
+    private void luxgramStartEnterBlurClear(View view, long duration) {
+        luxgramRemoveAnimator(view);
         ValueAnimator a = ValueAnimator.ofFloat(16f, 0f);
         a.setDuration(duration);
         a.setInterpolator(translationInterpolator);
-        a.addUpdateListener(an -> drgramApplyEnterBlur(view, (Float) an.getAnimatedValue()));
+        a.addUpdateListener(an -> luxgramApplyEnterBlur(view, (Float) an.getAnimatedValue()));
         a.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animator) {
-                drgramBlurAnimators.remove(view);
-                drgramApplyEnterBlur(view, 0);
+                luxgramBlurAnimators.remove(view);
+                luxgramApplyEnterBlur(view, 0);
             }
         });
-        drgramBlurAnimators.put(view, a);
+        luxgramBlurAnimators.put(view, a);
         a.start();
     }
 
@@ -419,13 +419,13 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
         if (!(chatMessageCell != null && chatMessageCell.getTransitionParams().ignoreAlpha)) {
             holder.itemView.setAlpha(1);
         }
-        // DrGram Fix 38: animate the glass blur out — 16px frost -> crisp
-        final boolean drgramHasBlur = chatMessageCell != null && drgramGlassEnter()
+        // LuxGram Fix 38: animate the glass blur out — 16px frost -> crisp
+        final boolean luxgramHasBlur = chatMessageCell != null && luxgramGlassEnter()
             && !(activity != null && activity.animatingMessageObjects.contains(chatMessageCell.getMessageObject()));
-        if (drgramHasBlur && !drgramBlurAnimators.containsKey(view)) {
-            // DrGram Fix 45: per-view animator; do NOT cancel other cells' runs
-            drgramApplyEnterBlur(view, 16f);
-            drgramStartEnterBlurClear(view, getMoveDuration());
+        if (luxgramHasBlur && !luxgramBlurAnimators.containsKey(view)) {
+            // LuxGram Fix 45: per-view animator; do NOT cancel other cells' runs
+            luxgramApplyEnterBlur(view, 16f);
+            luxgramStartEnterBlurClear(view, getMoveDuration());
         }
         if (activity != null && chatMessageCell != null && activity.animatingMessageObjects.contains(chatMessageCell.getMessageObject())) {
             activity.animatingMessageObjects.remove(chatMessageCell.getMessageObject());
@@ -458,8 +458,8 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
                         if (view instanceof ChatMessageCell) {
                             ((ChatMessageCell) view).getTransitionParams().messageEntering = false;
                         }
-                        // DrGram Fix 38: never leave frost on a cancelled cell
-                        drgramClearEnterBlur(view);
+                        // LuxGram Fix 38: never leave frost on a cancelled cell
+                        luxgramClearEnterBlur(view);
                     }
 
                     @Override
@@ -467,8 +467,8 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
                         if (view instanceof ChatMessageCell) {
                             ((ChatMessageCell) view).getTransitionParams().messageEntering = false;
                         }
-                        // DrGram Fix 38: crisp end state
-                        drgramClearEnterBlur(view);
+                        // LuxGram Fix 38: crisp end state
+                        luxgramClearEnterBlur(view);
                         animation.setListener(null);
                         if (mAddAnimations.remove(holder)) {
                             dispatchAddFinished(holder);

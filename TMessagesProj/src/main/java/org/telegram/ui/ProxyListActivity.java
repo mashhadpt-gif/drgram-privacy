@@ -101,8 +101,8 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
     private int rotationRow;
     private int rotationTimeoutRow;
     private int rotationTimeoutInfoRow;
-    private int autoSwitchRow; // DrGram Fix 40
-    private int vpnOffRow; // DrGram Fix 40
+    private int autoSwitchRow; // LuxGram Fix 40
+    private int vpnOffRow; // LuxGram Fix 40
     private int deleteAllRow;
 
     private ItemTouchHelper itemTouchHelper;
@@ -394,16 +394,16 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener((view, position) -> {
-            if (position == autoSwitchRow) { // DrGram Fix 40
+            if (position == autoSwitchRow) { // LuxGram Fix 40
                 try {
-                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, AndroidUtilities.replaceTags("<b>" + getString(R.string.DrGramProxyAutoSwitch) + "</b> — " + getString(R.string.DrGramProxySwitching))).show();
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, AndroidUtilities.replaceTags("<b>" + getString(R.string.LuxGramProxyAutoSwitch) + "</b> — " + getString(R.string.LuxGramProxySwitching))).show();
                 } catch (Throwable ignore) {}
-                org.telegram.messenger.DrGramAutoProxy.forceSwitch();
+                org.telegram.messenger.LuxGramAutoProxy.forceSwitch();
                 return;
-            } else if (position == vpnOffRow) { // DrGram Fix 40
-                SharedConfig.toggleDrgramAutoProxyVpnOff();
+            } else if (position == vpnOffRow) { // LuxGram Fix 40
+                SharedConfig.toggleLuxGramAutoProxyVpnOff();
                 TextCheckCell checkCell = (TextCheckCell) view;
-                checkCell.setChecked(SharedConfig.drgramAutoProxyVpnOff);
+                checkCell.setChecked(SharedConfig.luxgramAutoProxyVpnOff);
                 return;
             }
             if (position == useProxyRow) {
@@ -628,8 +628,8 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
         } else {
             useProxyShadowRow = -1;
         }
-        autoSwitchRow = rowCount++; // DrGram Fix 40: pick + connect the best auto-found proxy now
-        vpnOffRow = rowCount++; // DrGram Fix 40: drop the auto proxy while a VPN is up
+        autoSwitchRow = rowCount++; // LuxGram Fix 40: pick + connect the best auto-found proxy now
+        vpnOffRow = rowCount++; // LuxGram Fix 40: drop the auto proxy while a VPN is up
         connectionsHeaderRow = rowCount++;
 
         if (notify) {
@@ -855,8 +855,8 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                 case VIEW_TYPE_TEXT_SETTING: {
                     TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-                    if (position == autoSwitchRow) { // DrGram Fix 40
-                        textCell.setText(getString(R.string.DrGramProxyAutoSwitch), true);
+                    if (position == autoSwitchRow) { // LuxGram Fix 40
+                        textCell.setText(getString(R.string.LuxGramProxyAutoSwitch), true);
                     } else if (position == proxyAddRow) {
                         textCell.setText(getString(R.string.AddProxy), deleteAllRow != -1);
                     } else if (position == deleteAllRow) {
@@ -878,8 +878,8 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                         checkCell.setTextAndCheck(getString(R.string.UseProxySettings), useProxySettings, rotationRow != -1);
                     } else if (position == rotationRow) {
                         checkCell.setTextAndCheck(getString(R.string.UseProxyRotation), SharedConfig.proxyRotationEnabled, true);
-                    } else if (position == vpnOffRow) { // DrGram Fix 40
-                        checkCell.setTextAndCheck(getString(R.string.DrGramProxyVpnOff), SharedConfig.drgramAutoProxyVpnOff, false);
+                    } else if (position == vpnOffRow) { // LuxGram Fix 40
+                        checkCell.setTextAndCheck(getString(R.string.LuxGramProxyVpnOff), SharedConfig.luxgramAutoProxyVpnOff, false);
                     }
                     break;
                 }
@@ -951,8 +951,8 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                     checkCell.setChecked(useProxySettings);
                 } else if (position == rotationRow) {
                     checkCell.setChecked(SharedConfig.proxyRotationEnabled);
-                } else if (position == vpnOffRow) { // DrGram Fix 40
-                    checkCell.setChecked(SharedConfig.drgramAutoProxyVpnOff);
+                } else if (position == vpnOffRow) { // LuxGram Fix 40
+                    checkCell.setChecked(SharedConfig.luxgramAutoProxyVpnOff);
                 }
             }
         }
@@ -1017,9 +1017,9 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
             } else if (position == rotationRow) {
                 return -9;
             } else if (position == autoSwitchRow) {
-                return -14; // DrGram Fix 40
+                return -14; // LuxGram Fix 40
             } else if (position == vpnOffRow) {
-                return -15; // DrGram Fix 40
+                return -15; // LuxGram Fix 40
             } else if (position == rotationTimeoutRow) {
                 return -10;
             } else if (position == rotationTimeoutInfoRow) {

@@ -335,14 +335,14 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
         telegramLogoView = new ImageView(context);
         telegramLogoView.setContentDescription(getString(R.string.AppName));
         telegramLogoView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        // DrGram Fix 31: the upstream "Telegram" wordmark image is replaced with a
-        // locale-aware DrGram wordmark rendered at runtime. Glyphs are drawn white
+        // LuxGram Fix 31: the upstream "Telegram" wordmark image is replaced with a
+        // locale-aware LuxGram wordmark rendered at runtime. Glyphs are drawn white
         // so the existing MULTIPLY color filter keeps tinting them for both themes.
         // Scrolling still collapses the header exactly as before — the brand just
         // never says "Telegram" anymore.
-        android.graphics.Bitmap drgramWordmark = drgramWordmarkBitmap(LocaleController.getString(R.string.AppName));
-        if (drgramWordmark != null) {
-            telegramLogoView.setImageDrawable(new android.graphics.drawable.BitmapDrawable(getResources(), drgramWordmark));
+        android.graphics.Bitmap luxgramWordmark = luxgramWordmarkBitmap(LocaleController.getString(R.string.AppName));
+        if (luxgramWordmark != null) {
+            telegramLogoView.setImageDrawable(new android.graphics.drawable.BitmapDrawable(getResources(), luxgramWordmark));
         } else {
             telegramLogoView.setImageResource(R.drawable.telegram_logo_2);
         }
@@ -1155,11 +1155,11 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
     }
 
     /**
-     * DrGram Fix 31: renders the LuxGram wordmark ("LuxGram" / "لوکس‌گرام" — the
+     * LuxGram Fix 31: renders the LuxGram wordmark ("LuxGram" / "لوکس‌گرام" — the
      * localized AppName) into a bitmap for the chat-list header. White glyphs on a
      * transparent background, sized for the 90x22dp logo slot.
      */
-    private static android.graphics.Bitmap drgramWordmarkBitmap(String text) {
+    private static android.graphics.Bitmap luxgramWordmarkBitmap(String text) {
         try {
             if (text == null || text.length() == 0) {
                 return null;
@@ -1650,7 +1650,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
                         name = name.substring(0, index);
                     }
                     if (user.id == 777000) {
-                        // DrGram Fix 19: brand the official service story cell
+                        // LuxGram Fix 19: brand the official service story cell
                         name = "fa".equals(LocaleController.getInstance().getCurrentLocale().getLanguage()) ? "لوکس‌گرام" : "LuxGram";
                     }
                     if (user.verified) {

@@ -272,8 +272,8 @@ public class AndroidUtilities {
 
     private static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();
 
-    // DrGram Fix 38: full font-cache invalidation so the Vazir toggle applies live
-    public static void drgramClearTypefaceCache() {
+    // LuxGram Fix 38: full font-cache invalidation so the Vazir toggle applies live
+    public static void luxgramClearTypefaceCache() {
         mediumTypeface = null;
         synchronized (typefaceCache) {
             typefaceCache.clear();
@@ -2397,8 +2397,8 @@ public class AndroidUtilities {
         return result;
     }
 
-    public static String drgramResolveFontPath(String assetPath) {
-        if (assetPath == null || !SharedConfig.drgramVazirFont) {
+    public static String luxgramResolveFontPath(String assetPath) {
+        if (assetPath == null || !SharedConfig.luxgramVazirFont) {
             return assetPath;
         }
         String lang = java.util.Locale.getDefault().getLanguage();
@@ -2420,11 +2420,11 @@ public class AndroidUtilities {
     }
 
     public static Typeface getTypeface(String assetPath) {
-        // DrGram Fix 38: capture italic intent BEFORE path resolution — Vazir has no
+        // LuxGram Fix 38: capture italic intent BEFORE path resolution — Vazir has no
         // italic asset, so rmediumitalic/ritalic resolve to vazirmatn_regular and the
         // resolved path no longer contains "italic". Synthetic italic via builder.
-        final boolean drgramWantItalic = assetPath != null && assetPath.contains("italic");
-        assetPath = drgramResolveFontPath(assetPath);
+        final boolean luxgramWantItalic = assetPath != null && assetPath.contains("italic");
+        assetPath = luxgramResolveFontPath(assetPath);
         synchronized (typefaceCache) {
             if (!typefaceCache.containsKey(assetPath)) {
                 try {
@@ -2434,7 +2434,7 @@ public class AndroidUtilities {
                         if (assetPath.contains("vazirmatn_bold")) {
                             builder.setWeight(700);
                         } else if (assetPath.contains("vazirmatn_medium")) {
-                            // DrGram Fix 38: keep true 500 weight — the legacy
+                            // LuxGram Fix 38: keep true 500 weight — the legacy
                             // contains("medium") rule below used to override this to 700
                             builder.setWeight(500);
                         } else if (assetPath.contains("vazirmatn")) {
@@ -2445,7 +2445,7 @@ public class AndroidUtilities {
                         if (!assetPath.contains("vazirmatn") && (assetPath.contains("medium") || assetPath.contains("rbold"))) {
                             builder.setWeight(700);
                         }
-                        if (drgramWantItalic || assetPath.contains("italic")) {
+                        if (luxgramWantItalic || assetPath.contains("italic")) {
                             builder.setItalic(true);
                         }
                         t = builder.build();

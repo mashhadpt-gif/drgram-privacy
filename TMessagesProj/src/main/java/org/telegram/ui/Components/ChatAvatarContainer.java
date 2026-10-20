@@ -41,7 +41,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DialogObject;
-import org.telegram.messenger.DrGramThemeInstaller;
+import org.telegram.messenger.LuxGramThemeInstaller;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLoader;
@@ -83,11 +83,11 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     private int avatarSizeInDp = 42;
     public BackupImageView avatarImageView;
     private boolean avatarImageIsHidden;
-    // DrGram premium effect: gold spark burst fired when the avatar is touched
-    // (DrGram's answer to Telegram's premium emoji interactions)
-    private DrGramSparkEffect drgramAvatarSparks;
-    // DrGram Fix 16: LOVE-mode avatar burst — glowing hearts instead of sparks
-    private DrGramHeartEffect drgramAvatarHearts;
+    // LuxGram premium effect: gold spark burst fired when the avatar is touched
+    // (LuxGram's answer to Telegram's premium emoji interactions)
+    private LuxGramSparkEffect luxgramAvatarSparks;
+    // LuxGram Fix 16: LOVE-mode avatar burst — glowing hearts instead of sparks
+    private LuxGramHeartEffect luxgramAvatarHearts;
     private SimpleTextView titleTextView;
     private AtomicReference<SimpleTextView> titleTextLargerCopyView = new AtomicReference<>();
     private SimpleTextView subtitleTextView;
@@ -281,11 +281,11 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                     openProfile(true);
                 }
             });
-            // DrGram premium effect: spark burst the instant the avatar is pressed,
+            // LuxGram premium effect: spark burst the instant the avatar is pressed,
             // so the burst is visible before the profile transition starts
             avatarImageView.setOnTouchListener((v, event) -> {
                 if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                    drgramSparkAvatar();
+                    luxgramSparkAvatar();
                 }
                 return false;
             });
@@ -379,9 +379,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             }
 
             TLRPC.Chat chat = parentFragment.getCurrentChat();
-            // DrGram Fix 38: love mode types with beating hearts
-            statusDrawables[0] = org.telegram.messenger.DrGramThemeInstaller.isLoveMode()
-                    ? new DrGramHeartDotsDrawable(true)
+            // LuxGram Fix 38: love mode types with beating hearts
+            statusDrawables[0] = org.telegram.messenger.LuxGramThemeInstaller.isLoveMode()
+                    ? new LuxGramHeartDotsDrawable(true)
                     : new TypingDotsDrawable(true);
             statusDrawables[1] = new RecordStatusDrawable(true);
             statusDrawables[2] = new SendingFileDrawable(true);
@@ -440,42 +440,42 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         final float s = bounce.getScale(.02f);
         canvas.scale(s, s, getPivotX(), getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
         super.dispatchDraw(canvas);
-        // DrGram: draw the avatar spark burst on top of the container's children
-        if (drgramAvatarSparks != null && !drgramAvatarSparks.isEmpty()) {
-            drgramAvatarSparks.onDraw(this, canvas);
+        // LuxGram: draw the avatar spark burst on top of the container's children
+        if (luxgramAvatarSparks != null && !luxgramAvatarSparks.isEmpty()) {
+            luxgramAvatarSparks.onDraw(this, canvas);
             invalidate();
         }
-        // DrGram Fix 16: draw the LOVE-mode avatar hearts on top as well
-        if (drgramAvatarHearts != null && !drgramAvatarHearts.isEmpty()) {
-            drgramAvatarHearts.onDraw(this, canvas);
+        // LuxGram Fix 16: draw the LOVE-mode avatar hearts on top as well
+        if (luxgramAvatarHearts != null && !luxgramAvatarHearts.isEmpty()) {
+            luxgramAvatarHearts.onDraw(this, canvas);
             invalidate();
         }
         canvas.restore();
     }
 
     /**
-     * DrGram premium effect: gold spark burst centered on the avatar, fired on
+     * LuxGram premium effect: gold spark burst centered on the avatar, fired on
      * touch-down (equivalent of Telegram's premium emoji interactions).
-     * Gated by SharedConfig.drgramSendSparks.
-     * DrGram Fix 16: theme-aware — in LOVE Mode the avatar touch releases
+     * Gated by SharedConfig.luxgramSendSparks.
+     * LuxGram Fix 16: theme-aware — in LOVE Mode the avatar touch releases
      * glowing hearts, in Gold Luxe it releases golden sparks.
      */
-    private void drgramSparkAvatar() {
-        if (!SharedConfig.drgramSendSparks || avatarImageView == null || avatarImageView.getVisibility() != VISIBLE) {
+    private void luxgramSparkAvatar() {
+        if (!SharedConfig.luxgramSendSparks || avatarImageView == null || avatarImageView.getVisibility() != VISIBLE) {
             return;
         }
         float cx = avatarImageView.getX() + avatarImageView.getMeasuredWidth() / 2.0f;
         float cy = avatarImageView.getY() + avatarImageView.getMeasuredHeight() / 2.0f;
-        if (DrGramThemeInstaller.isLoveMode()) {
-            if (drgramAvatarHearts == null) {
-                drgramAvatarHearts = new DrGramHeartEffect();
+        if (LuxGramThemeInstaller.isLoveMode()) {
+            if (luxgramAvatarHearts == null) {
+                luxgramAvatarHearts = new LuxGramHeartEffect();
             }
-            drgramAvatarHearts.burst(cx, cy, 1.35f);
+            luxgramAvatarHearts.burst(cx, cy, 1.35f);
         } else {
-            if (drgramAvatarSparks == null) {
-                drgramAvatarSparks = new DrGramSparkEffect();
+            if (luxgramAvatarSparks == null) {
+                luxgramAvatarSparks = new LuxGramSparkEffect();
             }
-            drgramAvatarSparks.burst(cx, cy, 1.35f);
+            luxgramAvatarSparks.burst(cx, cy, 1.35f);
         }
         invalidate();
     }

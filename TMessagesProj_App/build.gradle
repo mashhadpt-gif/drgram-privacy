@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.telegram.build-app-plugin'
 
-// DrGram Fix 6: ABI set is configurable via -PAPP_ABIS (comma-separated). Default: all four.
+// LuxGram Fix 6: ABI set is configurable via -PAPP_ABIS (comma-separated). Default: all four.
 def GRAM_ABIS = (project.findProperty('APP_ABIS') ?: 'armeabi-v7a,arm64-v8a,x86,x86_64').split(',').collect { it.trim() }
 
-// DrGram Fix 63: keystore rotation. The committed release.keystore burned when the
+// LuxGram Fix 63: keystore rotation. The committed release.keystore burned when the
 // repository was briefly public, so CI now signs with a rotated key delivered via
 // GitHub Actions secrets (RELEASE_KEYSTORE_B64 = base64 of the new keystore file).
 // Local builds without those env vars keep using the committed keystore.
@@ -69,8 +69,8 @@ android {
 
         release {
             if (CI_KEYSTORE_B64) {
-                // DrGram Fix 63: rotated CI signing key (never committed to git)
-                def ciKs = new File(buildDir, "ci-drgram-release.keystore")
+                // LuxGram Fix 63: rotated CI signing key (never committed to git)
+                def ciKs = new File(buildDir, "ci-luxgram-release.keystore")
                 ciKs.parentFile.mkdirs()
                 ciKs.bytes = CI_KEYSTORE_B64.decodeBase64()
                 storeFile ciKs
@@ -115,7 +115,7 @@ android {
             debuggable false
             jniDebuggable false
             signingConfig signingConfigs.release
-            // DrGram Fix 12: two consecutive CI runs were killed by the runner
+            // LuxGram Fix 12: two consecutive CI runs were killed by the runner
             // shutdown signal exactly inside minifyAfatReleaseWithR8. Disable
             // shrinking (functionally identical APK, ~+15MB, ~20min faster) so
             // phase 2 cannot stall/die there again.
@@ -143,9 +143,9 @@ android {
 
     productFlavors {
         bundleAfat {
-            // DrGram Fix 63: Play distribution -> anti-delete and similar
-            // policy-sensitive features are runtime-disabled (see drgram_play_mode)
-            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [drgramPlayMode: 'true']
+            // LuxGram Fix 63: Play distribution -> anti-delete and similar
+            // policy-sensitive features are runtime-disabled (see luxgram_play_mode)
+            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [luxgramPlayMode: 'true']
             ndk {
                 GRAM_ABIS.each { abiFilters(it) }
             }
@@ -155,7 +155,7 @@ android {
             buildConfigField "boolean", "BUNDLE", "true"
         }
         bundleAfat_SDK23 {
-            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [drgramPlayMode: 'true']
+            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [luxgramPlayMode: 'true']
             ndk {
                 GRAM_ABIS.each { abiFilters(it) }
             }
@@ -172,7 +172,7 @@ android {
             buildConfigField "boolean", "BUNDLE", "true"
         }
         afat {
-            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [drgramPlayMode: 'false']
+            manifestPlaceholders = (manifestPlaceholders ?: [:]) + [luxgramPlayMode: 'false']
             ndk {
                 GRAM_ABIS.each { abiFilters(it) }
             }

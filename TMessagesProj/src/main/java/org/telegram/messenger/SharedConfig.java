@@ -354,26 +354,26 @@ public class SharedConfig {
     public static boolean dontAskManageStorage;
     public static boolean multipleReactionsPromoShowed;
 
-    // DrGram premium effects
-    public static boolean drgramSendSparks = true;
-    public static boolean drgramReactionRain = true;
-    public static boolean drgramGlassUI = true;
-    public static boolean drgramGoldChat = true;
-    public static boolean drgramAutoProxy = true; // DrGram Fix 26: auto MTProto proxy (telegramvpn.org)
-    public static boolean drgramAutoProxyVpnOff = true; // DrGram Fix 40: drop the auto proxy while a VPN is up
-    public static boolean drgramVazirFont = true;
+    // LuxGram premium effects
+    public static boolean luxgramSendSparks = true;
+    public static boolean luxgramReactionRain = true;
+    public static boolean luxgramGlassUI = true;
+    public static boolean luxgramGoldChat = true;
+    public static boolean luxgramAutoProxy = true; // LuxGram Fix 26: auto MTProto proxy (telegramvpn.org)
+    public static boolean luxgramAutoProxyVpnOff = true; // LuxGram Fix 40: drop the auto proxy while a VPN is up
+    public static boolean luxgramVazirFont = true;
 
-    // DrGram settings center
-    public static boolean drgramAutoForward = true;
-    public static boolean drgramHideChannelAds = true;
-    public static boolean drgramDeclineSecretChats = false;
-    public static long drgramSpecialContact = 0;
-    // DrGram luxury theme (Fix 8)
-    public static boolean drgramThemeApplied = false;
-    public static boolean drgramThemeRed = false;
-    // DrGram Fix 21
-    public static boolean drgramMembersBar = true;
-    public static boolean drgramJalaliDates = true;
+    // LuxGram settings center
+    public static boolean luxgramAutoForward = true;
+    public static boolean luxgramHideChannelAds = true;
+    public static boolean luxgramDeclineSecretChats = false;
+    public static long luxgramSpecialContact = 0;
+    // LuxGram luxury theme (Fix 8)
+    public static boolean luxgramThemeApplied = false;
+    public static boolean luxgramThemeRed = false;
+    // LuxGram Fix 21
+    public static boolean luxgramMembersBar = true;
+    public static boolean luxgramJalaliDates = true;
 
     public static boolean isFloatingDebugActive;
     public static LiteMode liteMode;
@@ -687,22 +687,22 @@ public class SharedConfig {
             storiesColumnsCount = preferences.getInt("storiesColumnsCount", 3);
             fastScrollHintCount = preferences.getInt("fastScrollHintCount", 3);
             dontAskManageStorage = preferences.getBoolean("dontAskManageStorage", false);
-            drgramSendSparks = preferences.getBoolean("drgramSendSparks", true);
-            drgramReactionRain = preferences.getBoolean("drgramReactionRain", true);
-            drgramGlassUI = preferences.getBoolean("drgramGlassUI", true);
-            drgramGoldChat = preferences.getBoolean("drgramGoldChat", true);
-            drgramAutoProxy = preferences.getBoolean("drgramAutoProxy", true); // DrGram Fix 26
-            drgramAutoProxyVpnOff = preferences.getBoolean("drgramAutoProxyVpnOff", true); // DrGram Fix 40
-            drgramVazirFont = preferences.getBoolean("drgramVazirFont", true);
-            drgramAutoForward = preferences.getBoolean("drgramAutoForward", true);
-            drgramHideChannelAds = preferences.getBoolean("drgramHideChannelAds", true);
-            drgramDeclineSecretChats = preferences.getBoolean("drgramDeclineSecretChats", false);
-            drgramSpecialContact = preferences.getLong("drgramSpecialContact", 0);
-            drgramThemeApplied = preferences.getBoolean("drgramThemeApplied", false);
-            drgramThemeRed = preferences.getBoolean("drgramThemeRed", false);
-            // DrGram Fix 21
-            drgramMembersBar = preferences.getBoolean("drgramMembersBar", true);
-            drgramJalaliDates = preferences.getBoolean("drgramJalaliDates", true);
+            luxgramSendSparks = preferences.getBoolean("luxgramSendSparks", true);
+            luxgramReactionRain = preferences.getBoolean("luxgramReactionRain", true);
+            luxgramGlassUI = preferences.getBoolean("luxgramGlassUI", true);
+            luxgramGoldChat = preferences.getBoolean("luxgramGoldChat", true);
+            luxgramAutoProxy = preferences.getBoolean("luxgramAutoProxy", true); // LuxGram Fix 26
+            luxgramAutoProxyVpnOff = preferences.getBoolean("luxgramAutoProxyVpnOff", true); // LuxGram Fix 40
+            luxgramVazirFont = preferences.getBoolean("luxgramVazirFont", true);
+            luxgramAutoForward = preferences.getBoolean("luxgramAutoForward", true);
+            luxgramHideChannelAds = preferences.getBoolean("luxgramHideChannelAds", true);
+            luxgramDeclineSecretChats = preferences.getBoolean("luxgramDeclineSecretChats", false);
+            luxgramSpecialContact = preferences.getLong("luxgramSpecialContact", 0);
+            luxgramThemeApplied = preferences.getBoolean("luxgramThemeApplied", false);
+            luxgramThemeRed = preferences.getBoolean("luxgramThemeRed", false);
+            // LuxGram Fix 21
+            luxgramMembersBar = preferences.getBoolean("luxgramMembersBar", true);
+            luxgramJalaliDates = preferences.getBoolean("luxgramJalaliDates", true);
             hasEmailLogin = preferences.getBoolean("hasEmailLogin", false);
             isFloatingDebugActive = preferences.getBoolean("floatingDebugActive", false);
             updateStickersOrderOnSend = preferences.getBoolean("updateStickersOrderOnSend", true);
@@ -1296,102 +1296,102 @@ public class SharedConfig {
         editor.apply();
     }
 
-    public static void toggleDrgramSendSparks() {
-        drgramSendSparks = !drgramSendSparks;
+    public static void toggleLuxGramSendSparks() {
+        luxgramSendSparks = !luxgramSendSparks;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramSendSparks", drgramSendSparks).apply();
+                .edit().putBoolean("luxgramSendSparks", luxgramSendSparks).apply();
     }
 
-    public static void toggleDrgramGlassUI() {
-        drgramGlassUI = !drgramGlassUI;
+    public static void toggleLuxGramGlassUI() {
+        luxgramGlassUI = !luxgramGlassUI;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramGlassUI", drgramGlassUI).apply();
+                .edit().putBoolean("luxgramGlassUI", luxgramGlassUI).apply();
     }
 
-    public static void toggleDrgramGoldChat() {
-        drgramGoldChat = !drgramGoldChat;
+    public static void toggleLuxGramGoldChat() {
+        luxgramGoldChat = !luxgramGoldChat;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramGoldChat", drgramGoldChat).apply();
+                .edit().putBoolean("luxgramGoldChat", luxgramGoldChat).apply();
     }
 
-    public static void toggleDrgramAutoProxy() { // DrGram Fix 26
-        drgramAutoProxy = !drgramAutoProxy;
+    public static void toggleLuxGramAutoProxy() { // LuxGram Fix 26
+        luxgramAutoProxy = !luxgramAutoProxy;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramAutoProxy", drgramAutoProxy).apply();
+                .edit().putBoolean("luxgramAutoProxy", luxgramAutoProxy).apply();
     }
 
-    public static void toggleDrgramAutoProxyVpnOff() { // DrGram Fix 40
-        drgramAutoProxyVpnOff = !drgramAutoProxyVpnOff;
+    public static void toggleLuxGramAutoProxyVpnOff() { // LuxGram Fix 40
+        luxgramAutoProxyVpnOff = !luxgramAutoProxyVpnOff;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramAutoProxyVpnOff", drgramAutoProxyVpnOff).apply();
+                .edit().putBoolean("luxgramAutoProxyVpnOff", luxgramAutoProxyVpnOff).apply();
     }
 
-    public static void setDrgramThemeApplied(boolean value) {
-        drgramThemeApplied = value;
+    public static void setLuxGramThemeApplied(boolean value) {
+        luxgramThemeApplied = value;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramThemeApplied", value).apply();
+                .edit().putBoolean("luxgramThemeApplied", value).apply();
     }
 
-    public static void setDrgramThemeRed(boolean value) {
-        drgramThemeRed = value;
+    public static void setLuxGramThemeRed(boolean value) {
+        luxgramThemeRed = value;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramThemeRed", value).apply();
+                .edit().putBoolean("luxgramThemeRed", value).apply();
     }
 
-    public static void toggleDrgramVazirFont() {
-        drgramVazirFont = !drgramVazirFont;
+    public static void toggleLuxGramVazirFont() {
+        luxgramVazirFont = !luxgramVazirFont;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramVazirFont", drgramVazirFont).apply();
-        // DrGram Fix 38: make the toggle apply LIVE — previously nothing was invalidated,
+                .edit().putBoolean("luxgramVazirFont", luxgramVazirFont).apply();
+        // LuxGram Fix 38: make the toggle apply LIVE — previously nothing was invalidated,
         // so cached TextPaints kept the old font and only newly created views switched.
         try {
-            AndroidUtilities.drgramClearTypefaceCache();
+            AndroidUtilities.luxgramClearTypefaceCache();
             Theme.chat_msgTextPaint = null;
             Theme.createCommonMessageResources();
         } catch (Throwable ignore) {}
     }
 
-    public static void toggleDrgramAutoForward() {
-        drgramAutoForward = !drgramAutoForward;
+    public static void toggleLuxGramAutoForward() {
+        luxgramAutoForward = !luxgramAutoForward;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramAutoForward", drgramAutoForward).apply();
+                .edit().putBoolean("luxgramAutoForward", luxgramAutoForward).apply();
     }
 
-    public static void toggleDrgramHideChannelAds() {
-        drgramHideChannelAds = !drgramHideChannelAds;
+    public static void toggleLuxGramHideChannelAds() {
+        luxgramHideChannelAds = !luxgramHideChannelAds;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramHideChannelAds", drgramHideChannelAds).apply();
+                .edit().putBoolean("luxgramHideChannelAds", luxgramHideChannelAds).apply();
     }
 
-    public static void toggleDrgramDeclineSecretChats() {
-        drgramDeclineSecretChats = !drgramDeclineSecretChats;
+    public static void toggleLuxGramDeclineSecretChats() {
+        luxgramDeclineSecretChats = !luxgramDeclineSecretChats;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramDeclineSecretChats", drgramDeclineSecretChats).apply();
+                .edit().putBoolean("luxgramDeclineSecretChats", luxgramDeclineSecretChats).apply();
     }
 
-    public static void setDrgramSpecialContact(long dialogId) {
-        drgramSpecialContact = dialogId;
+    public static void setLuxGramSpecialContact(long dialogId) {
+        luxgramSpecialContact = dialogId;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putLong("drgramSpecialContact", drgramSpecialContact).apply();
+                .edit().putLong("luxgramSpecialContact", luxgramSpecialContact).apply();
     }
 
-    public static void toggleDrgramReactionRain() {
-        drgramReactionRain = !drgramReactionRain;
+    public static void toggleLuxGramReactionRain() {
+        luxgramReactionRain = !luxgramReactionRain;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramReactionRain", drgramReactionRain).apply();
+                .edit().putBoolean("luxgramReactionRain", luxgramReactionRain).apply();
     }
 
-    // DrGram Fix 21
-    public static void toggleDrgramMembersBar() {
-        drgramMembersBar = !drgramMembersBar;
+    // LuxGram Fix 21
+    public static void toggleLuxGramMembersBar() {
+        luxgramMembersBar = !luxgramMembersBar;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramMembersBar", drgramMembersBar).apply();
+                .edit().putBoolean("luxgramMembersBar", luxgramMembersBar).apply();
     }
 
-    public static void toggleDrgramJalaliDates() {
-        drgramJalaliDates = !drgramJalaliDates;
+    public static void toggleLuxGramJalaliDates() {
+        luxgramJalaliDates = !luxgramJalaliDates;
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE)
-                .edit().putBoolean("drgramJalaliDates", drgramJalaliDates).apply();
+                .edit().putBoolean("luxgramJalaliDates", luxgramJalaliDates).apply();
     }
 
     public static void toggleRaiseToListen() {
@@ -1864,7 +1864,7 @@ public class SharedConfig {
     }
 
     public static boolean canBlurChat() {
-        // DrGram Fix 62: Glass UI no longer force-enables chat blur on every
+        // LuxGram Fix 62: Glass UI no longer force-enables chat blur on every
         // Android 12+ device — that made chats look blurry on weaker GPUs
         // (user report: «مشکل بلور شدن چت‌ها»). Blur is now strictly
         // performance-gated; it can still be toggled in chat settings.

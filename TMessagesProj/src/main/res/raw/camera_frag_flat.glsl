@@ -13,7 +13,7 @@ uniform float shapeFrom, shapeTo, shapeT;
 uniform float dual;
 uniform float blur;
 uniform float beautify;
-// DrGram Fix 58: FLAT beauty tier — the full DrGram beauty suite (same uniform
+// LuxGram Fix 58: FLAT beauty tier — the full LuxGram beauty suite (same uniform
 // names as the lite program so the Java wiring is unchanged) rewritten with
 // NO loops, NO highp, NO macros and NO dynamic array indexing. Every per-face
 // block is hand-expanded for face 0 / face 1 with literal constant indices.
@@ -114,7 +114,7 @@ vec4 program() {
     return mix(texture2D(sTexture, uv), makeblur(), blur) * vec4(1., 1., 1., dalpha);
 }
 
-// ===================== DrGram Fix 58: flat beauty helpers =====================
+// ===================== LuxGram Fix 58: flat beauty helpers =====================
 
 mediump float hash21(mediump vec2 p) {
   p = fract(p * vec2(443.897, 441.423));
@@ -127,7 +127,7 @@ mediump float ellipseFalloff(mediump vec2 p, mediump vec2 c, mediump vec2 halfSi
   return 1.0 - smoothstep(0.75, 1.35, length(q));
 }
 
-mediump vec3 drgramColorFx(mediump vec3 c, mediump vec2 p) {
+mediump vec3 luxgramColorFx(mediump vec3 c, mediump vec2 p) {
   mediump float lum = dot(c, vec3(0.299, 0.587, 0.114));
   if (fxFx > 0.5 && fxFx < 1.5) {
     mediump float g = 1.0 - p.y;
@@ -213,7 +213,7 @@ mediump vec3 drgramColorFx(mediump vec3 c, mediump vec2 p) {
   return clamp(c, 0.0, 1.0);
 }
 
-mediump vec3 drgramCartoon(mediump vec3 c) {
+mediump vec3 luxgramCartoon(mediump vec3 c) {
   if (fxFx > 11.5 && fxFx < 12.5) {
     c = floor(c * 6.0 + 0.5) / 6.0;
   }
@@ -221,7 +221,7 @@ mediump vec3 drgramCartoon(mediump vec3 c) {
 }
 
 // Under-eye brightening zones — 4 literal blocks (2 faces x 2 eyes).
-void drgramBlushLips0(mediump vec2 p, inout mediump float blush, inout mediump float lips) {
+void luxgramBlushLips0(mediump vec2 p, inout mediump float blush, inout mediump float lips) {
   mediump vec2 center = fxFaces[0].xy;
   mediump vec2 halfSize = fxFaces[0].zw;
   mediump vec2 cheekSize = max(halfSize * vec2(0.24, 0.13), vec2(0.001));
@@ -234,7 +234,7 @@ void drgramBlushLips0(mediump vec2 p, inout mediump float blush, inout mediump f
     lips = max(lips, ellipseFalloff(p, fxMouths[0] + vec2(0.0, -halfSize.y * 0.02), max(halfSize * vec2(0.25, 0.085), vec2(0.001))));
   }
 }
-void drgramBlushLips1(mediump vec2 p, inout mediump float blush, inout mediump float lips) {
+void luxgramBlushLips1(mediump vec2 p, inout mediump float blush, inout mediump float lips) {
   mediump vec2 center = fxFaces[1].xy;
   mediump vec2 halfSize = fxFaces[1].zw;
   mediump vec2 cheekSize = max(halfSize * vec2(0.24, 0.13), vec2(0.001));
@@ -249,9 +249,9 @@ void drgramBlushLips1(mediump vec2 p, inout mediump float blush, inout mediump f
 }
 
 vec4 beautifySample(vec4 base) {
-  // DrGram Fix 60: face beautification (smoothing, warps, teeth,
+  // LuxGram Fix 60: face beautification (smoothing, warps, teeth,
   // under-eye, blush/lips, brightening) removed on purpose — only the
-  // colour FX (drgramColorFx / glitch / glam / cartoon) remain. All
+  // colour FX (luxgramColorFx / glitch / glam / cartoon) remain. All
   // beauty uniforms stay declared so the Java wiring keeps its
   // guarded no-op paths.
   if (fxFx <= 0.001)
@@ -269,19 +269,19 @@ vec4 beautifySample(vec4 base) {
     C = texture2D(sTexture, p);
   }
   mediump vec3 rgb = C.rgb;
-  rgb = drgramColorFx(rgb, p);
+  rgb = luxgramColorFx(rgb, p);
   // Glam preset: same flat masks, slightly stronger cheek/lip tint.
   if (fxFx > 19.5 && fxFx < 20.5 && fxFaceCount > 0.5) {
     mediump float blush = 0.0;
     mediump float lips = 0.0;
-    drgramBlushLips0(p, blush, lips);
+    luxgramBlushLips0(p, blush, lips);
     if (fxFaceCount > 1.5) {
-      drgramBlushLips1(p, blush, lips);
+      luxgramBlushLips1(p, blush, lips);
     }
     rgb = mix(rgb, vec3(0.92, 0.36, 0.43), clamp(blush * 0.22, 0.0, 0.22));
     rgb = mix(rgb, vec3(0.72, 0.16, 0.28), clamp(lips * 0.18, 0.0, 0.18));
   }
-  rgb = drgramCartoon(rgb);
+  rgb = luxgramCartoon(rgb);
   return vec4(rgb, C.a);
 }
 

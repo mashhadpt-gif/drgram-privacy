@@ -1244,8 +1244,8 @@ public class StoryEntry {
             return;
         }
         if (!isVideo && (resultWidth > 720 || resultHeight > 1280)) {
-            // DrGram Fix 49: HD stories — allow 1080p for photo-to-video stories
-            float cap = org.telegram.messenger.DrGramMedia.storyHd() ? 1080f : 720f;
+            // LuxGram Fix 49: HD stories — allow 1080p for photo-to-video stories
+            float cap = org.telegram.messenger.LuxGramMedia.storyHd() ? 1080f : 720f;
             float s = cap / resultWidth;
             matrix.postScale(s, s, 0, 0);
             resultWidth = (int) cap;
@@ -1283,8 +1283,8 @@ public class StoryEntry {
                     info.bitrate = 2_500_000;
                     info.originalBitrate = -1;
                 } else {
-                    // DrGram Fix 49: HD stories — raise the bitrate ceiling to 6 Mbps
-                    int maxBitrate = org.telegram.messenger.DrGramMedia.storyHd() ? 6_000_000 : 3_000_000;
+                    // LuxGram Fix 49: HD stories — raise the bitrate ceiling to 6 Mbps
+                    int maxBitrate = org.telegram.messenger.LuxGramMedia.storyHd() ? 6_000_000 : 3_000_000;
                     info.bitrate = Utilities.clamp(info.originalBitrate, maxBitrate, 500_000);
                 }
                 FileLog.d("story bitrate, original = " + info.originalBitrate + " => " + info.bitrate);

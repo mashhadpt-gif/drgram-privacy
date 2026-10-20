@@ -4,7 +4,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'org.telegram.build-plugin'
 apply plugin: 'idea'
 
-// DrGram Fix 6: ABI set is configurable via -PAPP_ABIS (comma-separated). Default: all four.
+// LuxGram Fix 6: ABI set is configurable via -PAPP_ABIS (comma-separated). Default: all four.
 def GRAM_ABIS = (project.findProperty('APP_ABIS') ?: 'armeabi-v7a,arm64-v8a,x86,x86_64').split(',').collect { it.trim() }
 
 idea {
@@ -82,13 +82,13 @@ dependencies {
     implementation 'com.google.mlkit:face-detection:16.1.6'
     implementation 'com.google.mlkit:face-mesh-detection:16.0.0-beta3'
     implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.8'
-    // DrGram Fix 50: MediaPipe Face Landmarker — 478-point dense face mesh
+    // LuxGram Fix 50: MediaPipe Face Landmarker — 478-point dense face mesh
     // (468 landmarks + 10 iris) with VIDEO-mode temporal tracking. The same
     // dense-mesh + tracking architecture Instagram-class face filters use.
-    // DrGram Fix 63: 0.10.21 ships prebuilt libmediapipe_tasks_vision_jni.so with
+    // LuxGram Fix 63: 0.10.21 ships prebuilt libmediapipe_tasks_vision_jni.so with
     // 4KB ELF PT_LOAD alignment -> Google Play 16KB hard requirement fails.
     // 0.10.33 carries the native code in tasks-core as libmediapipe_tasks_jni.so,
-    // 16KB-aligned on all four ABIs; FaceLandmarker API used by DrGram is unchanged.
+    // 16KB-aligned on all four ABIs; FaceLandmarker API used by LuxGram is unchanged.
     implementation 'com.google.mediapipe:tasks-vision:0.10.33'
 
     implementation "androidx.credentials:credentials:1.6.0-alpha04"

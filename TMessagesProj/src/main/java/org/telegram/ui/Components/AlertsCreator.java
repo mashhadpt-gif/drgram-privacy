@@ -100,7 +100,7 @@ import org.telegram.messenger.SecretChatHelper;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.SvgHelper;
-import org.telegram.messenger.DrGramHiddenAccounts;
+import org.telegram.messenger.LuxGramHiddenAccounts;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
@@ -7700,7 +7700,7 @@ public class AlertsCreator {
     public static AlertDialog createAccountSelectDialog(Activity parentActivity, final AccountSelectDelegate delegate) {
         int visibleAccounts = 0;
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-            if (UserConfig.getInstance(a).isClientActivated() && !DrGramHiddenAccounts.isHidden(a)) {
+            if (UserConfig.getInstance(a).isClientActivated() && !LuxGramHiddenAccounts.isHidden(a)) {
                 visibleAccounts++;
             }
         }
@@ -7716,7 +7716,7 @@ public class AlertsCreator {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             TLRPC.User u = UserConfig.getInstance(a).getCurrentUser();
-            if (u != null && !DrGramHiddenAccounts.isHidden(a)) {
+            if (u != null && !LuxGramHiddenAccounts.isHidden(a)) {
                 AccountSelectCell cell = new AccountSelectCell(parentActivity, false);
                 cell.setAccount(a, false);
                 cell.setPadding(dp(14), 0, dp(14), 0);

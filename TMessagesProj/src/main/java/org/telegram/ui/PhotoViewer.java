@@ -2032,9 +2032,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private ImageLocation currentFileLocationVideo;
     private SecureDocument currentSecureDocument;
     private String[] currentFileNames = new String[3];
-    // DrGram: set when a save request starts a background download in the
+    // LuxGram: set when a save request starts a background download in the
     // Explore viewer; the save flow is re-run automatically once fileLoaded fires
-    private boolean drgramPendingSave;
+    private boolean luxgramPendingSave;
     private PlaceProviderObject currentPlaceObject;
     private String currentPathObject;
     private long currentPathVideoOffset;
@@ -4177,10 +4177,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     if (a == 0 && videoPlayer != null) {
                         currentVideoFinishedLoading = true;
                     }
-                    // DrGram: the file the user asked to save has finished
+                    // LuxGram: the file the user asked to save has finished
                     // downloading — run the save flow again so it lands in the gallery
-                    if (a == 0 && drgramPendingSave) {
-                        drgramPendingSave = false;
+                    if (a == 0 && luxgramPendingSave) {
+                        luxgramPendingSave = false;
                         AndroidUtilities.runOnUIThread(() -> {
                             if (parentActivity != null && actionBar != null && actionBar.getActionBarMenuOnItemClick() != null) {
                                 actionBar.getActionBarMenuOnItemClick().onItemClick(gallery_menu_save);
@@ -4610,12 +4610,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     /**
-     * DrGram: in chatless contexts (the Explore viewer) a save request for a
+     * LuxGram: in chatless contexts (the Explore viewer) a save request for a
      * not-yet-downloaded document/video starts the official FileLoader download
      * immediately and re-runs the save once the file arrives, instead of showing
      * a dead-end alert. Everything still rides Telegram's own servers.
      */
-    private boolean drgramCanAutoSave() {
+    private boolean luxgramCanAutoSave() {
         return currentMessageObject != null
                 && currentMessageObject.getDocument() != null
                 && parentChatActivity == null
@@ -4626,8 +4626,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     private void showDownloadAlert() {
-        if (drgramCanAutoSave()) {
-            drgramPendingSave = true;
+        if (luxgramCanAutoSave()) {
+            luxgramPendingSave = true;
             if (!FileLoader.getInstance(currentAccount).isLoadingFile(currentFileNames[0])) {
                 FileLoader.getInstance(currentAccount).loadFile(currentMessageObject.getDocument(), currentMessageObject, FileLoader.PRIORITY_NORMAL, 0);
             }
@@ -6301,23 +6301,23 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         };
         containerView.addView(pickerView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT));
 
-        // DrGram Fix 25: Instagram-Reels action rail (like / save / share) — shown in Explore mode
-        drgramRail = new LinearLayout(containerView.getContext());
-        drgramRail.setOrientation(LinearLayout.VERTICAL);
-        drgramRail.setGravity(Gravity.CENTER_HORIZONTAL);
-        drgramRail.setBackgroundResource(R.drawable.drgram_rail_bg);
-        drgramRail.setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(12), AndroidUtilities.dp(8), AndroidUtilities.dp(4));
-        drgramRail.setVisibility(View.GONE);
-        containerView.addView(drgramRail, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.RIGHT | Gravity.CENTER_VERTICAL, 0, 0, 10, 56));
-        drgramLikeBtn = drgramMakeRailButton(R.drawable.drgram_ic_reels_like, LocaleController.getString(R.string.DrGramReelsLike));
-        drgramLikeBtn.setOnClickListener(v -> drgramOnLikeClicked());
-        drgramRail.addView(drgramLikeBtn, LayoutHelper.createLinear(46, 46, 0, 0, 0, 10));
-        drgramSaveBtn = drgramMakeRailButton(R.drawable.drgram_ic_reels_save, LocaleController.getString(R.string.DrGramReelsSave));
-        drgramSaveBtn.setOnClickListener(v -> drgramOnSaveClicked());
-        drgramRail.addView(drgramSaveBtn, LayoutHelper.createLinear(46, 46, 0, 0, 0, 10));
-        drgramShareBtn = drgramMakeRailButton(R.drawable.drgram_ic_reels_share, LocaleController.getString(R.string.DrGramReelsShare));
-        drgramShareBtn.setOnClickListener(v -> drgramOnShareClicked());
-        drgramRail.addView(drgramShareBtn, LayoutHelper.createLinear(46, 46, 0, 0, 0, 0));
+        // LuxGram Fix 25: Instagram-Reels action rail (like / save / share) — shown in Explore mode
+        luxgramRail = new LinearLayout(containerView.getContext());
+        luxgramRail.setOrientation(LinearLayout.VERTICAL);
+        luxgramRail.setGravity(Gravity.CENTER_HORIZONTAL);
+        luxgramRail.setBackgroundResource(R.drawable.luxgram_rail_bg);
+        luxgramRail.setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(12), AndroidUtilities.dp(8), AndroidUtilities.dp(4));
+        luxgramRail.setVisibility(View.GONE);
+        containerView.addView(luxgramRail, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.RIGHT | Gravity.CENTER_VERTICAL, 0, 0, 10, 56));
+        luxgramLikeBtn = luxgramMakeRailButton(R.drawable.luxgram_ic_reels_like, LocaleController.getString(R.string.LuxGramReelsLike));
+        luxgramLikeBtn.setOnClickListener(v -> luxgramOnLikeClicked());
+        luxgramRail.addView(luxgramLikeBtn, LayoutHelper.createLinear(46, 46, 0, 0, 0, 10));
+        luxgramSaveBtn = luxgramMakeRailButton(R.drawable.luxgram_ic_reels_save, LocaleController.getString(R.string.LuxGramReelsSave));
+        luxgramSaveBtn.setOnClickListener(v -> luxgramOnSaveClicked());
+        luxgramRail.addView(luxgramSaveBtn, LayoutHelper.createLinear(46, 46, 0, 0, 0, 10));
+        luxgramShareBtn = luxgramMakeRailButton(R.drawable.luxgram_ic_reels_share, LocaleController.getString(R.string.LuxGramReelsShare));
+        luxgramShareBtn.setOnClickListener(v -> luxgramOnShareClicked());
+        luxgramRail.addView(luxgramShareBtn, LayoutHelper.createLinear(46, 46, 0, 0, 0, 0));
 
         docNameTextView = new TextView(containerView.getContext());
         docNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
@@ -10330,8 +10330,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         }
                         manuallyPaused = false;
                         cancelVideoPlayRunnable();
-                        if (drgramVerticalNav && sendPhotoType != SELECT_TYPE_AVATAR && currentEditMode == EDIT_MODE_NONE && switchingToMode <= 0) {
-                            playVideoOrWeb(); // DrGram Fix 19: loop videos Reels-style
+                        if (luxgramVerticalNav && sendPhotoType != SELECT_TYPE_AVATAR && currentEditMode == EDIT_MODE_NONE && switchingToMode <= 0) {
+                            playVideoOrWeb(); // LuxGram Fix 19: loop videos Reels-style
                         } else if (sendPhotoType != SELECT_TYPE_AVATAR && currentEditMode == EDIT_MODE_NONE && switchingToMode <= 0) {
                             pauseVideoOrWeb();
                         } else {
@@ -13965,7 +13965,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         openedFromProfile = false;
         needCaptionLayout = false;
         containerView.setTag(1);
-        containerView.post(() -> drgramUpdateRailState()); // DrGram Fix 25
+        containerView.post(() -> luxgramUpdateRailState()); // LuxGram Fix 25
         playerAutoStarted = false;
         isCurrentVideo = false;
         shownControlsByEnd = false;
@@ -15739,7 +15739,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (newMessageObject != null) {
                 newMessageObject.openedInViewer = true;
             }
-            drgramUpdateRailState(); // DrGram Fix 25: refresh like state on swipe
+            luxgramUpdateRailState(); // LuxGram Fix 25: refresh like state on swipe
             isLivePhoto = newMessageObject.isLivePhoto();
             isVideo = newMessageObject.isVideo();
             if (newMessageObject.isSponsored()) {
@@ -18121,10 +18121,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     public void closePhoto(boolean animated, boolean fromEditMode) {
-        drgramVerticalNav = false; // DrGram Fix 19: reset Reels navigation
-        drgramLikedLocal.clear(); // DrGram Fix 25: reset optimistic like cache
-        if (drgramRail != null) {
-            drgramRail.setVisibility(View.GONE);
+        luxgramVerticalNav = false; // LuxGram Fix 19: reset Reels navigation
+        luxgramLikedLocal.clear(); // LuxGram Fix 25: reset optimistic like cache
+        if (luxgramRail != null) {
+            luxgramRail.setVisibility(View.GONE);
         }
         if (stickerMakerView != null) {
             stickerMakerView.isThanosInProgress = false;
@@ -18960,48 +18960,48 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     float longPressX;
     Runnable longPressRunnable = this::onLongPress;
 
-    // DrGram Fix 19/27: Reels-style vertical navigation ---------------------
+    // LuxGram Fix 19/27: Reels-style vertical navigation ---------------------
     // When the viewer was opened from the Explore grid, vertical swipes must
     // scroll between posts instead of dismissing the viewer. We achieve this by
-    // rotating every touch event of the gesture by 90 degrees. DrGram Fix 27
+    // rotating every touch event of the gesture by 90 degrees. LuxGram Fix 27
     // flipped the mapping to match Instagram: an UPWARD swipe becomes a left
     // swipe (next post) and a downward swipe becomes a right swipe (previous
     // post). The swipe-to-dismiss path therefore never fires.
-    private boolean drgramVerticalNav;
-    private boolean drgramRotatingGesture;
+    private boolean luxgramVerticalNav;
+    private boolean luxgramRotatingGesture;
 
-    public void setDrgramVerticalNav(boolean enabled) {
-        drgramVerticalNav = enabled;
+    public void setLuxGramVerticalNav(boolean enabled) {
+        luxgramVerticalNav = enabled;
     }
 
-    // DrGram Fix 28: real vertical Reels paging ------------------------------
+    // LuxGram Fix 28: real vertical Reels paging ------------------------------
     // The Reels gesture rotates touches, so a vertical swipe drives the
     // internal X paging axis. When this returns true the RENDERING axis is
     // flipped as well: internal X offsets are drawn on screen Y, so the next
     // post slides in from the BOTTOM and the previous one from the TOP
     // (Instagram style). Horizontal swipes stay locked (no dismiss, no zoom).
-    private boolean drgramIsVerticalPaging() {
-        return drgramVerticalNav && currentEditMode == EDIT_MODE_NONE
+    private boolean luxgramIsVerticalPaging() {
+        return luxgramVerticalNav && currentEditMode == EDIT_MODE_NONE
                 && sendPhotoType != SELECT_TYPE_AVATAR && sendPhotoType != SELECT_TYPE_STICKER
                 && scale == 1f && !zoomAnimation && !zooming;
     }
 
-    private MotionEvent drgramMaybeRotateEvent(MotionEvent ev) {
+    private MotionEvent luxgramMaybeRotateEvent(MotionEvent ev) {
         int action = ev.getActionMasked();
-        if (action == MotionEvent.ACTION_DOWN && drgramRail != null) {
-            drgramUpdateRailState(); // DrGram Fix 25: keep rail in sync (edit modes, single posts)
+        if (action == MotionEvent.ACTION_DOWN && luxgramRail != null) {
+            luxgramUpdateRailState(); // LuxGram Fix 25: keep rail in sync (edit modes, single posts)
         }
-        if (drgramVerticalNav) {
+        if (luxgramVerticalNav) {
             if (action == MotionEvent.ACTION_DOWN && currentEditMode == EDIT_MODE_NONE
                     && sendPhotoType == 0 && scale == 1 && !zooming) {
-                drgramRotatingGesture = true;
+                luxgramRotatingGesture = true;
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-                drgramRotatingGesture = false;
+                luxgramRotatingGesture = false;
             }
         } else {
-            drgramRotatingGesture = false;
+            luxgramRotatingGesture = false;
         }
-        if (drgramRotatingGesture) {
+        if (luxgramRotatingGesture) {
             int pointerCount = ev.getPointerCount();
             MotionEvent.PointerProperties[] props = new MotionEvent.PointerProperties[pointerCount];
             MotionEvent.PointerCoords[] coords = new MotionEvent.PointerCoords[pointerCount];
@@ -19012,7 +19012,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 MotionEvent.PointerCoords c = new MotionEvent.PointerCoords();
                 ev.getPointerCoords(i, c);
                 float x = c.x, y = c.y;
-                c.x = y; // DrGram Fix 27: swipe UP = next post (Instagram direction)
+                c.x = y; // LuxGram Fix 27: swipe UP = next post (Instagram direction)
                 c.y = x;
                 coords[i] = c;
             }
@@ -19024,15 +19024,15 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return ev;
     }
 
-    //region DrGram Fix 25 — Instagram-Reels action rail (like = reaction · save = Saved Messages · share = advanced forward)
+    //region LuxGram Fix 25 — Instagram-Reels action rail (like = reaction · save = Saved Messages · share = advanced forward)
 
-    private LinearLayout drgramRail;
-    private ImageView drgramLikeBtn;
-    private ImageView drgramSaveBtn;
-    private ImageView drgramShareBtn;
-    private final ArrayList<Long> drgramLikedLocal = new ArrayList<>();
+    private LinearLayout luxgramRail;
+    private ImageView luxgramLikeBtn;
+    private ImageView luxgramSaveBtn;
+    private ImageView luxgramShareBtn;
+    private final ArrayList<Long> luxgramLikedLocal = new ArrayList<>();
 
-    private ImageView drgramMakeRailButton(int iconRes, String description) {
+    private ImageView luxgramMakeRailButton(int iconRes, String description) {
         ImageView btn = new ImageView(containerView.getContext());
         btn.setImageResource(iconRes);
         btn.setContentDescription(description);
@@ -19047,14 +19047,14 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return btn;
     }
 
-    private long drgramRailKey(MessageObject mo) {
+    private long luxgramRailKey(MessageObject mo) {
         if (mo == null || mo.messageOwner == null) {
             return 0;
         }
         return ((long) mo.messageOwner.id << 16) ^ mo.getDialogId();
     }
 
-    private boolean drgramIsLiked(MessageObject mo) {
+    private boolean luxgramIsLiked(MessageObject mo) {
         if (mo != null && mo.messageOwner != null && mo.messageOwner.reactions != null && mo.messageOwner.reactions.results != null) {
             for (int i = 0; i < mo.messageOwner.reactions.results.size(); i++) {
                 TLRPC.ReactionCount rc = mo.messageOwner.reactions.results.get(i);
@@ -19063,28 +19063,28 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 }
             }
         }
-        return drgramLikedLocal.contains(drgramRailKey(mo));
+        return luxgramLikedLocal.contains(luxgramRailKey(mo));
     }
 
-    private void drgramUpdateRailState() {
-        if (drgramRail == null) {
+    private void luxgramUpdateRailState() {
+        if (luxgramRail == null) {
             return;
         }
-        boolean show = drgramVerticalNav && sendPhotoType != SELECT_TYPE_AVATAR && currentEditMode == EDIT_MODE_NONE && currentMessageObject != null;
+        boolean show = luxgramVerticalNav && sendPhotoType != SELECT_TYPE_AVATAR && currentEditMode == EDIT_MODE_NONE && currentMessageObject != null;
         int wanted = show ? View.VISIBLE : View.GONE;
-        if (drgramRail.getVisibility() != wanted) {
-            drgramRail.setVisibility(wanted);
+        if (luxgramRail.getVisibility() != wanted) {
+            luxgramRail.setVisibility(wanted);
         }
         if (show) {
-            int tint = drgramIsLiked(currentMessageObject) ? 0xFFE63B52 : 0xFFFFFFFF;
-            if (drgramLikeBtn.getTag() == null || !((Integer) drgramLikeBtn.getTag()).equals(tint)) {
-                drgramLikeBtn.setColorFilter(tint);
-                drgramLikeBtn.setTag(tint);
+            int tint = luxgramIsLiked(currentMessageObject) ? 0xFFE63B52 : 0xFFFFFFFF;
+            if (luxgramLikeBtn.getTag() == null || !((Integer) luxgramLikeBtn.getTag()).equals(tint)) {
+                luxgramLikeBtn.setColorFilter(tint);
+                luxgramLikeBtn.setTag(tint);
             }
         }
     }
 
-    private void drgramRailBounce(View v) {
+    private void luxgramRailBounce(View v) {
         try {
             v.animate().scaleX(1.22f).scaleY(1.22f).setDuration(110).withEndAction(
                     () -> v.animate().scaleX(1f).scaleY(1f).setDuration(130).start()).start();
@@ -19093,48 +19093,48 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
     }
 
-    private void drgramOnLikeClicked() {
+    private void luxgramOnLikeClicked() {
         MessageObject mo = currentMessageObject;
         if (mo == null || mo.messageOwner == null || parentFragment == null) {
             return;
         }
-        long key = drgramRailKey(mo);
-        boolean liked = drgramIsLiked(mo);
-        drgramRailBounce(drgramLikeBtn);
+        long key = luxgramRailKey(mo);
+        boolean liked = luxgramIsLiked(mo);
+        luxgramRailBounce(luxgramLikeBtn);
         try {
             if (liked) {
-                drgramLikedLocal.remove(key);
+                luxgramLikedLocal.remove(key);
                 SendMessagesHelper.getInstance(currentAccount).sendReaction(mo, new ArrayList<>(), null, false, false, parentFragment, null);
             } else {
-                drgramLikedLocal.add(key);
+                luxgramLikedLocal.add(key);
                 SendMessagesHelper.getInstance(currentAccount).sendReaction(mo, null,
                         ReactionsLayoutInBubble.VisibleReaction.fromEmojicon("❤"), false, true, parentFragment, null);
             }
         } catch (Throwable t) {
             FileLog.e(t);
         }
-        drgramUpdateRailState();
+        luxgramUpdateRailState();
     }
 
-    private void drgramOnSaveClicked() {
+    private void luxgramOnSaveClicked() {
         MessageObject mo = currentMessageObject;
         if (mo == null || mo.messageOwner == null) {
             return;
         }
-        drgramRailBounce(drgramSaveBtn);
+        luxgramRailBounce(luxgramSaveBtn);
         try {
             ArrayList<MessageObject> single = new ArrayList<>();
             single.add(mo);
             SendMessagesHelper.getInstance(currentAccount).sendMessage(single, UserConfig.getInstance(currentAccount).clientUserId,
                     false, false, true, 0, null, -1, 0);
             BulletinFactory.of(containerView, resourcesProvider).createSimpleBulletin(
-                    R.raw.voip_invite, LocaleController.getString(R.string.DrGramReelsSaved)).show();
+                    R.raw.voip_invite, LocaleController.getString(R.string.LuxGramReelsSaved)).show();
         } catch (Throwable t) {
             FileLog.e(t);
         }
     }
 
-    private void drgramOnShareClicked() {
+    private void luxgramOnShareClicked() {
         MessageObject mo = currentMessageObject;
         if (mo == null || mo.messageOwner == null) {
             return;
@@ -19145,7 +19145,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
         ArrayList<MessageObject> single = new ArrayList<>();
         single.add(mo);
-        DrGramForwardEditor editor = new DrGramForwardEditor(single);
+        LuxGramForwardEditor editor = new LuxGramForwardEditor(single);
         try {
             if (parentActivity instanceof LaunchActivity) {
                 LaunchActivity launchActivity = (LaunchActivity) parentActivity;
@@ -19162,15 +19162,15 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     //endregion
 
     private boolean onTouchEvent(MotionEvent ev) {
-        MotionEvent drgramEvent = drgramMaybeRotateEvent(ev);
-        boolean drgramResult = drgramOnTouchEventInternal(drgramEvent);
-        if (drgramEvent != ev) {
-            drgramEvent.recycle();
+        MotionEvent luxgramEvent = luxgramMaybeRotateEvent(ev);
+        boolean luxgramResult = luxgramOnTouchEventInternal(luxgramEvent);
+        if (luxgramEvent != ev) {
+            luxgramEvent.recycle();
         }
-        return drgramResult;
+        return luxgramResult;
     }
 
-    private boolean drgramOnTouchEventInternal(MotionEvent ev) {
+    private boolean luxgramOnTouchEventInternal(MotionEvent ev) {
         lastX = ev.getX();
         if (currentEditMode == EDIT_MODE_PAINT && animationStartTime != 0 && (ev.getActionMasked() == MotionEvent.ACTION_DOWN || ev.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)) {
             if (ev.getPointerCount() >= 2) {
@@ -19233,7 +19233,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 scroller.abortAnimation();
             }
             if (!draggingDown && !changingPage) {
-                if (canZoom && !drgramVerticalNav && ev.getPointerCount() == 2) { // DrGram Fix 28: Reels never zooms
+                if (canZoom && !luxgramVerticalNav && ev.getPointerCount() == 2) { // LuxGram Fix 28: Reels never zooms
                     if (paintViewTouched == 1) {
                         MotionEvent event = MotionEvent.obtain(0, 0, MotionEvent.ACTION_CANCEL, 0, 0, 0);
                         photoPaintView.onTouch(event);
@@ -19370,7 +19370,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         return true;
                     }
                 }
-                if (placeProvider.canScrollAway() && !drgramVerticalNav && currentEditMode == EDIT_MODE_NONE && sendPhotoType != SELECT_TYPE_AVATAR && sendPhotoType != SELECT_TYPE_STICKER && canDragDown && !draggingDown && scale == 1 && dy >= dp(30) && dy / 2 > dx) { // DrGram Fix 28: horizontal swipes locked in Reels
+                if (placeProvider.canScrollAway() && !luxgramVerticalNav && currentEditMode == EDIT_MODE_NONE && sendPhotoType != SELECT_TYPE_AVATAR && sendPhotoType != SELECT_TYPE_STICKER && canDragDown && !draggingDown && scale == 1 && dy >= dp(30) && dy / 2 > dx) { // LuxGram Fix 28: horizontal swipes locked in Reels
                     draggingDown = true;
                     hidePressedDrawables();
                     moving = false;
@@ -19578,8 +19578,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             extra = (getContainerViewWidth() - centerImage.getImageWidth()) / 2 * scale;
         }
         switchImageAfterAnimation = 1;
-        float drgramTravel = drgramIsVerticalPaging() ? getContainerViewHeight() : getContainerViewWidth(); // DrGram Fix 28
-        animateTo(scale, minX - drgramTravel - extra - dp(30) / 2, translationY, false);
+        float luxgramTravel = luxgramIsVerticalPaging() ? getContainerViewHeight() : getContainerViewWidth(); // LuxGram Fix 28
+        animateTo(scale, minX - luxgramTravel - extra - dp(30) / 2, translationY, false);
     }
 
     private void goToPrev() {
@@ -19588,8 +19588,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             extra = (getContainerViewWidth() - centerImage.getImageWidth()) / 2 * scale;
         }
         switchImageAfterAnimation = 2;
-        float drgramTravel = drgramIsVerticalPaging() ? getContainerViewHeight() : getContainerViewWidth(); // DrGram Fix 28
-        animateTo(scale, maxX + drgramTravel + extra + dp(30) / 2, translationY, false);
+        float luxgramTravel = luxgramIsVerticalPaging() ? getContainerViewHeight() : getContainerViewWidth(); // LuxGram Fix 28
+        animateTo(scale, maxX + luxgramTravel + extra + dp(30) / 2, translationY, false);
     }
 
     private void cancelMoveZoomAnimation() {
@@ -19699,7 +19699,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     private boolean shouldMessageObjectAutoPlayed(MessageObject messageObject) {
-        return messageObject != null && messageObject.isVideo() && (messageObject.mediaExists || messageObject.attachPathExists || messageObject.hasVideoQualities() || messageObject.canStreamVideo() && SharedConfig.streamMedia) && (SharedConfig.isAutoplayVideo() || drgramVerticalNav); // DrGram Fix 19: Explore opens videos Reels-style
+        return messageObject != null && messageObject.isVideo() && (messageObject.mediaExists || messageObject.attachPathExists || messageObject.hasVideoQualities() || messageObject.canStreamVideo() && SharedConfig.streamMedia) && (SharedConfig.isAutoplayVideo() || luxgramVerticalNav); // LuxGram Fix 19: Explore opens videos Reels-style
     }
 
     private boolean shouldIndexAutoPlayed(int index) {
@@ -19989,17 +19989,17 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             changingPage = sideImage != null;
         }
 
-        boolean drgramVPage = drgramIsVerticalPaging(); // DrGram Fix 28: render paging axis on screen Y
+        boolean luxgramVPage = luxgramIsVerticalPaging(); // LuxGram Fix 28: render paging axis on screen Y
         for (int a = 0; a < 3; a++) {
             float offsetX;
             if (a == 1) {
                 offsetX = 0;
             } else if (a == 2) {
-                offsetX = -(drgramVPage ? containerView.getMeasuredHeight() : containerView.getMeasuredWidth()) - dp(15) + (currentTranslationX - maxX);
+                offsetX = -(luxgramVPage ? containerView.getMeasuredHeight() : containerView.getMeasuredWidth()) - dp(15) + (currentTranslationX - maxX);
             } else {
                 offsetX = currentTranslationX < minX ? (currentTranslationX - minX) : 0;
             }
-            if (drgramVPage) {
+            if (luxgramVPage) {
                 fullscreenButton[a].setTranslationX(containerView.getMeasuredWidth() - dp(48));
                 fullscreenButton[a].setTranslationY(offsetX);
             } else {
@@ -20013,16 +20013,16 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             float scaleDiff = 0;
             float alpha = 1;
             if (!zoomAnimation && translateX < minX) {
-                alpha = Math.min(1.0f, (minX - translateX) / (drgramVPage ? containerHeight : containerWidth)); // DrGram Fix 28
+                alpha = Math.min(1.0f, (minX - translateX) / (luxgramVPage ? containerHeight : containerWidth)); // LuxGram Fix 28
                 scaleDiff = (1.0f - alpha) * 0.3f;
-                translateX = -(drgramVPage ? containerHeight : containerWidth) - dp(30) / 2;
+                translateX = -(luxgramVPage ? containerHeight : containerWidth) - dp(30) / 2;
             }
 
             if (sideImage.hasBitmapImage()) {
                 canvas.save();
                 canvas.translate(containerWidth / 2, containerHeight / 2);
-                if (drgramVPage) {
-                    canvas.translate(0, containerHeight + dp(30) / 2 + translateX); // DrGram Fix 28: next post comes from the bottom
+                if (luxgramVPage) {
+                    canvas.translate(0, containerHeight + dp(30) / 2 + translateX); // LuxGram Fix 28: next post comes from the bottom
                 } else {
                     canvas.translate(containerWidth + dp(30) / 2 + translateX, 0);
                 }
@@ -20073,8 +20073,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
             if (seekSpeedDrawable == null || !seekSpeedDrawable.isShown()) {
                 canvas.save();
-                if (drgramVPage) {
-                    canvas.translate(0, translateX + containerHeight + dp(30) / 2); // DrGram Fix 28
+                if (luxgramVPage) {
+                    canvas.translate(0, translateX + containerHeight + dp(30) / 2); // LuxGram Fix 28
                 } else {
                     canvas.translate(translateX, currentTranslationY / currentScale);
                     canvas.translate((containerWidth * (scale + 1) + dp(30)) / 2, -currentTranslationY / currentScale);
@@ -20099,7 +20099,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         float scaleDiff = 0;
         float alpha = 1;
         if (!zoomAnimation && translateX > maxX && (currentEditMode == EDIT_MODE_NONE || currentEditMode == EDIT_MODE_STICKER_MASK) && sendPhotoType != SELECT_TYPE_AVATAR) {
-            alpha = Math.min(1.0f, (translateX - maxX) / (drgramVPage ? containerHeight : containerWidth)); // DrGram Fix 28
+            alpha = Math.min(1.0f, (translateX - maxX) / (luxgramVPage ? containerHeight : containerWidth)); // LuxGram Fix 28
             scaleDiff = alpha * 0.3f;
             alpha = 1.0f - alpha;
             translateX = maxX;
@@ -20155,8 +20155,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             canvas.save();
             canvas.translate(containerWidth / 2f + getAdditionX(currentEditMode), containerHeight / 2f + getAdditionY(currentEditMode));
             centerImageTransform.preTranslate(containerWidth / 2f + getAdditionX(currentEditMode), containerHeight / 2f + getAdditionY(currentEditMode));
-            if (drgramVPage) {
-                canvas.translate(currentTranslationY + (currentEditMode != EDIT_MODE_PAINT ? currentPanTranslationY : 0), translateX); // DrGram Fix 28: paging moves content vertically
+            if (luxgramVPage) {
+                canvas.translate(currentTranslationY + (currentEditMode != EDIT_MODE_PAINT ? currentPanTranslationY : 0), translateX); // LuxGram Fix 28: paging moves content vertically
                 centerImageTransform.preTranslate(currentTranslationY + (currentEditMode != EDIT_MODE_PAINT ? currentPanTranslationY : 0), translateX);
             } else {
                 canvas.translate(translateX, currentTranslationY + (currentEditMode != EDIT_MODE_PAINT ? currentPanTranslationY : 0));
@@ -20464,8 +20464,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (sideImage.hasBitmapImage()) {
                 canvas.save();
                 canvas.translate(containerWidth / 2, containerHeight / 2);
-                if (drgramVPage) {
-                    canvas.translate(0, -(containerHeight + dp(30) / 2) + currentTranslationX); // DrGram Fix 28: previous post comes from the top
+                if (luxgramVPage) {
+                    canvas.translate(0, -(containerHeight + dp(30) / 2) + currentTranslationX); // LuxGram Fix 28: previous post comes from the top
                 } else {
                     canvas.translate(-(containerWidth * (scale + 1) + dp(30)) / 2 + currentTranslationX, 0);
                 }
@@ -20514,8 +20514,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
             if (seekSpeedDrawable == null || !seekSpeedDrawable.isShown()) {
                 canvas.save();
-                if (drgramVPage) {
-                    canvas.translate(0, currentTranslationX - (containerHeight + dp(30) / 2)); // DrGram Fix 28
+                if (luxgramVPage) {
+                    canvas.translate(0, currentTranslationX - (containerHeight + dp(30) / 2)); // LuxGram Fix 28
                 } else {
                     canvas.translate(currentTranslationX, currentTranslationY / currentScale);
                     canvas.translate(-(containerWidth * (scale + 1) + dp(30)) / 2, -currentTranslationY / currentScale);
@@ -20714,8 +20714,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
             if (seekSpeedDrawable == null || !seekSpeedDrawable.isShown()) {
                 canvas.save();
-                boolean drgramVPage = drgramIsVerticalPaging(); // DrGram Fix 28
-                canvas.translate(drgramVPage ? ty : tx, drgramVPage ? tx : ty);
+                boolean luxgramVPage = luxgramIsVerticalPaging(); // LuxGram Fix 28
+                canvas.translate(luxgramVPage ? ty : tx, luxgramVPage ? tx : ty);
                 photoProgressViews[0].setScale(1.0f);
                 photoProgressViews[0].setAlpha(progressAlpha);
                 photoProgressViews[0].onDraw(canvas);
@@ -20729,8 +20729,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
         if (drawMiniProgress && !pipAnimationInProgress) {
             canvas.save();
-            if (drgramIsVerticalPaging()) {
-                canvas.translate(miniProgressView.getLeft() + currentTranslationY / currentScale, miniProgressView.getTop() + translateX); // DrGram Fix 28
+            if (luxgramIsVerticalPaging()) {
+                canvas.translate(miniProgressView.getLeft() + currentTranslationY / currentScale, miniProgressView.getTop() + translateX); // LuxGram Fix 28
             } else {
                 canvas.translate(miniProgressView.getLeft() + translateX, miniProgressView.getTop() + currentTranslationY / currentScale);
             }
@@ -21256,7 +21256,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 }
             }
         }
-        if (!canZoom || drgramVerticalNav || scale == 1.0f && (translationY != 0 || translationX != 0)) { // DrGram Fix 28
+        if (!canZoom || luxgramVerticalNav || scale == 1.0f && (translationY != 0 || translationX != 0)) { // LuxGram Fix 28
             return false;
         }
         if (animationStartTime != 0 || animationInProgress != 0) {

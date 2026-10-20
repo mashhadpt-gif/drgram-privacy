@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" tools:node="remove" />
 
-    <!-- DrGram Fix 50: MediaPipe tasks-vision declares a conservative minSdk 24
+    <!-- LuxGram Fix 50: MediaPipe tasks-vision declares a conservative minSdk 24
          (its Java layer prefers java.util.Optional), but the underlying TFLite
          runtime supports API 19+. The face-mesh tracker runs entirely inside a
          try/catch fail-safe that permanently falls back to the bundled ML Kit
@@ -19,12 +19,12 @@
 
     <application android:name="org.telegram.messenger.ApplicationLoaderImpl" tools:replace="name">
 
-        <!-- DrGram Fix 63: Play-flavor runtime gate. bundleAfat* flavors (Google Play
-             AAB) resolve drgramPlayMode=true and disable the anti-delete feature at
+        <!-- LuxGram Fix 63: Play-flavor runtime gate. bundleAfat* flavors (Google Play
+             AAB) resolve luxgramPlayMode=true and disable the anti-delete feature at
              runtime; direct-distribution afat builds keep it (false). -->
         <meta-data
-            android:name="drgram_play_mode"
-            android:value="${drgramPlayMode}" />
+            android:name="luxgram_play_mode"
+            android:value="${luxgramPlayMode}" />
         <service
             android:name="org.telegram.messenger.GoogleVoiceClientService"
             android:exported="true"

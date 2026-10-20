@@ -778,7 +778,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         sizeNotifierFrameLayout.addView(proxyButtonView, LayoutHelper.createFrame(32, 32, Gravity.RIGHT | Gravity.TOP, 16, 16, 16, 16));
         updateProxyButton(false, true);
 
-        //DrGram: language switcher on the login screen
+        //LuxGram: language switcher on the login screen
         languageButtonView = new ImageView(context);
         languageButtonView.setImageResource(R.drawable.msg_language);
         languageButtonView.setContentDescription(getString(R.string.Language));
@@ -3252,10 +3252,10 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                         } else if (error.code != -1000) {
                             AlertsCreator.processError(currentAccount, error, LoginActivity.this, req, phoneInputData.phoneNumber);
                         } else {
-                            // DrGram Fix 10: network failure (-1000) used to fail SILENTLY —
+                            // LuxGram Fix 10: network failure (-1000) used to fail SILENTLY —
                             // the user tapped Next and nothing happened. Always show a visible
                             // hint that connectivity (or VPN, where Telegram is filtered) is needed.
-                            needShowAlert(getString(R.string.AppName), getString(R.string.DrGramLoginNoConnection));
+                            needShowAlert(getString(R.string.AppName), getString(R.string.LuxGramLoginNoConnection));
                         }
                     }
                 }
@@ -8797,7 +8797,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         final boolean proxyEnabled = preferences.getBoolean("proxy_enabled", false) && !TextUtils.isEmpty(proxyAddress);
         final boolean connected = currentConnectionState == ConnectionsManager.ConnectionStateConnected || currentConnectionState == ConnectionsManager.ConnectionStateUpdating;
         final boolean connecting = currentConnectionState == ConnectionsManager.ConnectionStateConnecting || currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork || currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy;
-        // DrGram Fix 66: the proxy button is ALWAYS visible on the login screen.
+        // LuxGram Fix 66: the proxy button is ALWAYS visible on the login screen.
         // In Iran the connection is down exactly when the user needs it, and the
         // old show-conditions (a "connecting" flicker or the server-reported
         // blockedCountry flag — which stays false when the NETWORK blocks

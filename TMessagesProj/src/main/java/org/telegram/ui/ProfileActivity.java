@@ -582,10 +582,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private final static int view_discussion = 22;
     private final static int delete_topic = 23;
     private final static int report = 24;
-    // DrGram Fix 29: Telegraph-style special options
-    private final static int drgram_special_contact = 60;
-    private final static int drgram_share_username = 61;
-    private final static int drgram_copy_mention = 62;
+    // LuxGram Fix 29: Telegraph-style special options
+    private final static int luxgram_special_contact = 60;
+    private final static int luxgram_share_username = 61;
+    private final static int luxgram_copy_mention = 62;
 
     private final static int edit_info = 30;
     private final static int logout = 31;
@@ -2784,20 +2784,20 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     });
                     builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
                     showDialog(builder.create());
-                } else if (id == drgram_special_contact) {
-                    // DrGram Fix 29: set this chat as the special contact
+                } else if (id == luxgram_special_contact) {
+                    // LuxGram Fix 29: set this chat as the special contact
                     try {
                         if (getParentActivity() != null) {
-                            org.telegram.messenger.SharedConfig.setDrgramSpecialContact(getDialogId());
+                            org.telegram.messenger.SharedConfig.setLuxGramSpecialContact(getDialogId());
                             android.widget.Toast.makeText(getParentActivity(),
-                                    LocaleController.formatString("DrGramSpecialContactDone", R.string.DrGramSpecialContactDone, DialogObject.getName(getDialogId())),
+                                    LocaleController.formatString("LuxGramSpecialContactDone", R.string.LuxGramSpecialContactDone, DialogObject.getName(getDialogId())),
                                     android.widget.Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e) {
                         FileLog.e(e);
                     }
-                } else if (id == drgram_share_username) {
-                    // DrGram Fix 29: share the username link
+                } else if (id == luxgram_share_username) {
+                    // LuxGram Fix 29: share the username link
                     try {
                         TLRPC.User u = getMessagesController().getUser(userId);
                         if (u != null && !TextUtils.isEmpty(u.username) && getParentActivity() != null) {
@@ -2805,20 +2805,20 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_SEND);
                             intent.setType("text/plain");
                             intent.putExtra(android.content.Intent.EXTRA_TEXT, url);
-                            getParentActivity().startActivity(android.content.Intent.createChooser(intent, LocaleController.getString(R.string.DrGramShareUsername)));
+                            getParentActivity().startActivity(android.content.Intent.createChooser(intent, LocaleController.getString(R.string.LuxGramShareUsername)));
                         }
                     } catch (Exception e) {
                         FileLog.e(e);
                     }
-                } else if (id == drgram_copy_mention) {
-                    // DrGram Fix 29: copy mention id like Telegraph
+                } else if (id == luxgram_copy_mention) {
+                    // LuxGram Fix 29: copy mention id like Telegraph
                     try {
                         TLRPC.User u = getMessagesController().getUser(userId);
                         String mention = (u != null && !TextUtils.isEmpty(u.username)) ? ("@" + u.username) : ("tg://user?id=" + userId);
                         AndroidUtilities.addToClipboard(mention + " (ID: " + userId + ")");
                         if (getParentActivity() != null) {
                             android.widget.Toast.makeText(getParentActivity(),
-                                    LocaleController.getString(R.string.DrGramIdCopied),
+                                    LocaleController.getString(R.string.LuxGramIdCopied),
                                     android.widget.Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
@@ -12227,12 +12227,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                     otherItem.addSubItem(start_secret_chat, R.drawable.msg_secret, LocaleController.getString(R.string.StartEncryptedChat));
                     otherItem.setSubItemShown(start_secret_chat, DialogObject.isEmpty(getMessagesController().isUserContactBlocked(userId)));
-                    // DrGram Fix 29: Telegraph-style special options
-                    otherItem.addSubItem(drgram_special_contact, R.drawable.msg_contact_add, LocaleController.getString(R.string.DrGramAddSpecialContact));
+                    // LuxGram Fix 29: Telegraph-style special options
+                    otherItem.addSubItem(luxgram_special_contact, R.drawable.msg_contact_add, LocaleController.getString(R.string.LuxGramAddSpecialContact));
                     if (!TextUtils.isEmpty(user.username)) {
-                        otherItem.addSubItem(drgram_share_username, R.drawable.msg_link2, LocaleController.getString(R.string.DrGramShareUsername));
+                        otherItem.addSubItem(luxgram_share_username, R.drawable.msg_link2, LocaleController.getString(R.string.LuxGramShareUsername));
                     }
-                    otherItem.addSubItem(drgram_copy_mention, R.drawable.msg_copy, LocaleController.getString(R.string.DrGramCopyMentionId));
+                    otherItem.addSubItem(luxgram_copy_mention, R.drawable.msg_copy, LocaleController.getString(R.string.LuxGramCopyMentionId));
 
                     if (userInfo != null) {
                         otherItem.addSubItem(enable_no_forwards, R.drawable.menu_share_off_24, getString(R.string.DisableSharing));

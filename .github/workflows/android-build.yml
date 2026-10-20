@@ -1,4 +1,4 @@
-name: DrGram Android Build
+name: LuxGram Android Build
 
 on:
   push:
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   build-universal-apk:
-    name: Build DrGram universal APK
+    name: Build LuxGram universal APK
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
@@ -58,7 +58,7 @@ jobs:
             echo "APP_VERSION_CODE=$APP_VERSION_CODE"
             echo "APP_VERSION_NAME=$APP_VERSION_NAME"
           } >> "$GITHUB_ENV"
-          echo "Building DrGram v$APP_VERSION_NAME (code $APP_VERSION_CODE)"
+          echo "Building LuxGram v$APP_VERSION_NAME (code $APP_VERSION_CODE)"
 
       - name: Build universal APK
         run: ./gradlew --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxMetaspaceSize=1g" -PAPP_ABIS="$APP_ABIS" :TMessagesProj_App:assembleAfatRelease
@@ -76,10 +76,10 @@ jobs:
             echo "apk_path=TMessagesProj_App/build/outputs/apk/afat/release/app.apk"
           } > TMessagesProj_App/build/outputs/apk/afat/release/build-info.txt
 
-      - name: Upload versioned DrGram APK and build metadata
+      - name: Upload versioned LuxGram APK and build metadata
         uses: actions/upload-artifact@v4
         with:
-          name: DrGram-universal-APK
+          name: LuxGram-universal-APK
           path: |
             TMessagesProj_App/build/outputs/apk/afat/release/app.apk
             TMessagesProj_App/build/outputs/apk/afat/release/build-info.txt

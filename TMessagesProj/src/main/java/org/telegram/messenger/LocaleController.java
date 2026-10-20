@@ -602,7 +602,7 @@ public class LocaleController {
         languages.add(localeInfo);
         languagesDict.put(localeInfo.shortName, localeInfo);
 
-        // DrGram Fix 67: ship Persian as a BUILT-IN language. It used to be
+        // LuxGram Fix 67: ship Persian as a BUILT-IN language. It used to be
         // absent from this hardcoded list — the only list that exists offline —
         // so on a fresh install the constructor's getLanguageFromDict("fa")
         // returned null, the app started in English, and no language picker
@@ -2102,8 +2102,8 @@ public class LocaleController {
 
     public static String formatDateChat(long date, boolean checkYear) {
         try {
-            if (SharedConfig.drgramJalaliDates) { // DrGram Fix 21: solar dates
-                return DrGramJalaliDate.formatChat(date, checkYear);
+            if (SharedConfig.luxgramJalaliDates) { // LuxGram Fix 21: solar dates
+                return LuxGramJalaliDate.formatChat(date, checkYear);
             }
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
@@ -2126,8 +2126,8 @@ public class LocaleController {
     }
     public static String formatSmallDateChat(long date, boolean full) {
         try {
-            if (SharedConfig.drgramJalaliDates) { // DrGram Fix 21: solar dates
-                return DrGramJalaliDate.formatSmall(date, full);
+            if (SharedConfig.luxgramJalaliDates) { // LuxGram Fix 21: solar dates
+                return LuxGramJalaliDate.formatSmall(date, full);
             }
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
@@ -2150,8 +2150,8 @@ public class LocaleController {
     }
     public static String formatDate(long date, boolean withToday) {
         try {
-            if (SharedConfig.drgramJalaliDates) { // DrGram Fix 21: solar dates
-                return DrGramJalaliDate.formatDialog(date, withToday);
+            if (SharedConfig.luxgramJalaliDates) { // LuxGram Fix 21: solar dates
+                return LuxGramJalaliDate.formatDialog(date, withToday);
             }
             date *= 1000;
             Calendar rightNow = Calendar.getInstance();
@@ -4480,13 +4480,13 @@ public class LocaleController {
     }
 
 
-    // DrGram Fix 13: keys that must ALWAYS resolve from packaged resources so
+    // LuxGram Fix 13: keys that must ALWAYS resolve from packaged resources so
     // cloud language packs can never re-introduce Telegram branding.
     private static boolean isBrandProtectedKey(String key) {
         if (key == null) {
             return false;
         }
-        if (key.startsWith("DrGram")) {
+        if (key.startsWith("LuxGram")) {
             return true;
         }
         switch (key) {
@@ -4524,7 +4524,7 @@ public class LocaleController {
         final Context context = ApplicationLoader.applicationContext;
         String value;
 
-        // DrGram Fix 15: resId-only callers pass key == null, which slipped past the
+        // LuxGram Fix 15: resId-only callers pass key == null, which slipped past the
         // brand guard — the cloud pack then renamed the app back to "Telegram" in the
         // main dialogs header. Resolve the resource entry name so brand keys are
         // protected on every code path.
@@ -4537,7 +4537,7 @@ public class LocaleController {
             }
         }
         if (BuildVars.USE_CLOUD_STRINGS && !isBrandProtectedKey(effectiveKey)) {
-            // DrGram Fix 13: brand strings always resolve from packaged resources —
+            // LuxGram Fix 13: brand strings always resolve from packaged resources —
             // cloud translations must never rename the app back to Telegram.
             value = localizationExternal.getByResNameOrResId(context, key, stringRes);
             if (value != null) {

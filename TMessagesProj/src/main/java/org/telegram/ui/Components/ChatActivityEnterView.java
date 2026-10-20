@@ -3099,8 +3099,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                             CameraController.getInstance().cancelOnInitRunnable(onFinishInitCameraRunnable);
                             delegate.needStartRecordVideo(2, true, 0, 0, voiceOnce ? 0x7FFFFFFF : 0, effectId, 0);
                             sendButton.setEffect(effectId = 0);
-                        } else if (recordingAudioVideo && sendVoiceEnabled && org.telegram.messenger.DrGramSendGuard.voiceConfirmEnabled()) {
-                            // DrGram Fix 39: the finger drifted left a bit but a real take
+                        } else if (recordingAudioVideo && sendVoiceEnabled && org.telegram.messenger.LuxGramSendGuard.voiceConfirmEnabled()) {
+                            // LuxGram Fix 39: the finger drifted left a bit but a real take
                             // is in progress — never drop it silently on release. Pause it
                             // into the preview panel; the user decides there.
                             MediaController.getInstance().toggleRecordingPause(voiceOnce);
@@ -3163,8 +3163,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                                     AlertsCreator.createScheduleDatePickerDialog(parentActivity, parentFragment.getDialogId(), (notify, scheduleDate, scheduleRepeatPeriod) -> MediaController.getInstance().stopRecording(1, notify, scheduleDate, false, 0), () -> MediaController.getInstance().stopRecording(0, false, 0, false, 0), resourcesProvider);
                                 }
                                 delegate.needStartRecordAudio(0);
-                                if (org.telegram.messenger.DrGramSendGuard.voiceConfirmEnabled() && !isInScheduleMode()) {
-                                    // DrGram Fix 39: releasing the mic no longer sends blindly —
+                                if (org.telegram.messenger.LuxGramSendGuard.voiceConfirmEnabled() && !isInScheduleMode()) {
+                                    // LuxGram Fix 39: releasing the mic no longer sends blindly —
                                     // the take is paused into the native preview panel (play
                                     // button included). The user listens, then taps send to
                                     // confirm or the trash button to discard.
@@ -12362,8 +12362,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                             }
                         };
                         if (gif instanceof TLRPC.Document && entry == null) {
-                            // DrGram Fix 39: confirm before sending panel GIFs
-                            org.telegram.messenger.DrGramSendGuard.confirmDocument(parentActivity, resourcesProvider, (TLRPC.Document) gif, true, runnable);
+                            // LuxGram Fix 39: confirm before sending panel GIFs
+                            org.telegram.messenger.LuxGramSendGuard.confirmDocument(parentActivity, resourcesProvider, (TLRPC.Document) gif, true, runnable);
                         } else if (!showConfirmAlert(runnable)) {
                             runnable.run();
                         }
@@ -12638,8 +12638,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                     }
                     MediaDataController.getInstance(currentAccount).addRecentSticker(MediaDataController.TYPE_IMAGE, parent, sticker, (int) (System.currentTimeMillis() / 1000), false);
                 };
-                // DrGram Fix 39: confirm before sending stickers / GIFs
-                org.telegram.messenger.DrGramSendGuard.confirmDocument(parentActivity, resourcesProvider, sticker,
+                // LuxGram Fix 39: confirm before sending stickers / GIFs
+                org.telegram.messenger.LuxGramSendGuard.confirmDocument(parentActivity, resourcesProvider, sticker,
                         org.telegram.messenger.MessageObject.isGifDocument(sticker), runnable);
             });
         }

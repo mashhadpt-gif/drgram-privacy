@@ -56,87 +56,87 @@ public class CameraSession {
 
     public ArrayList<String> availableFlashModes = new ArrayList<>();
 
-    // DrGram Fix 41: latest Camera1 face-detection result, consumed by the
+    // LuxGram Fix 41: latest Camera1 face-detection result, consumed by the
     // CameraView shader (skin smoothing / nose slim / teeth whiten).
-    public volatile android.hardware.Camera.Face[] drgramFaces;
-    public volatile boolean drgramHwFacesStarted; // Fix 46: hardware detection actually started
-    public volatile long drgramHwFaceSeenAt;      // Fix 46: last time hardware reported >=1 face
-    public final android.hardware.Camera.FaceDetectionListener drgramFaceListener = (faces, cam) -> {
-        drgramFaces = faces;
+    public volatile android.hardware.Camera.Face[] luxgramFaces;
+    public volatile boolean luxgramHwFacesStarted; // Fix 46: hardware detection actually started
+    public volatile long luxgramHwFaceSeenAt;      // Fix 46: last time hardware reported >=1 face
+    public final android.hardware.Camera.FaceDetectionListener luxgramFaceListener = (faces, cam) -> {
+        luxgramFaces = faces;
         if (faces != null && faces.length > 0) {
-            drgramHwFaceSeenAt = android.os.SystemClock.elapsedRealtime();
+            luxgramHwFaceSeenAt = android.os.SystemClock.elapsedRealtime();
         }
     };
 
-    // ================= DrGram Fix 46: software face detection =================
+    // ================= LuxGram Fix 46: software face detection =================
     // Most phone front cameras expose no hardware face detection
     // (getMaxNumDetectedFaces() == 0), which left the live beauty warps dead
     // (only global skin smoothing worked). The bundled ML Kit detector now
     // covers that gap: one-shot NV21 preview frames are decoded on a tiny
     // executor and the result feeds the exact same uniform arrays the
     // hardware path produces. Zero extra cost while hardware detection works.
-    public volatile int drgramSoftCount;
-    public volatile float[] drgramSoftFaceData = new float[8];
-    public volatile float[] drgramSoftNoseData = new float[4];
-    public volatile float[] drgramSoftMouthData = new float[4];
-    public volatile float[] drgramSoftEyeLData = new float[4];
-    public volatile float[] drgramSoftEyeRData = new float[4];
-    // DrGram Fix 51: real organ rects from the mesh (vec4 per face: cx, cy,
+    public volatile int luxgramSoftCount;
+    public volatile float[] luxgramSoftFaceData = new float[8];
+    public volatile float[] luxgramSoftNoseData = new float[4];
+    public volatile float[] luxgramSoftMouthData = new float[4];
+    public volatile float[] luxgramSoftEyeLData = new float[4];
+    public volatile float[] luxgramSoftEyeRData = new float[4];
+    // LuxGram Fix 51: real organ rects from the mesh (vec4 per face: cx, cy,
     // halfW, halfH — frame-normalized). Zero halfW = not available.
-    public volatile float[] drgramSoftNoseRect = new float[8];
-    public volatile float[] drgramSoftMouthRect = new float[8];
-    public volatile float[] drgramSoftEyeLRect = new float[8];
-    public volatile float[] drgramSoftEyeRRect = new float[8];
-    // DrGram Fix 52: exact sampled contours from MediaPipe, normalized to source frame.
-    public volatile float[] drgramSoftFaceOval = new float[64]; // 16 points x 2 faces
-    public volatile float[] drgramSoftNosePoly = new float[48]; // 12 points x 2 faces
-    public volatile float[] drgramSoftLipOuter = new float[48]; // 12 points x 2 faces
-    public volatile float[] drgramSoftEyeLPoly = new float[32]; // 8 points x 2 faces
-    public volatile float[] drgramSoftEyeRPoly = new float[32];
-    public volatile long drgramSoftAt;
-    private volatile long drgramSoftLastArmAt;
-    private volatile boolean drgramSoftBusy;
-    // DrGram Fix 50: true when the last software result came from the MediaPipe
+    public volatile float[] luxgramSoftNoseRect = new float[8];
+    public volatile float[] luxgramSoftMouthRect = new float[8];
+    public volatile float[] luxgramSoftEyeLRect = new float[8];
+    public volatile float[] luxgramSoftEyeRRect = new float[8];
+    // LuxGram Fix 52: exact sampled contours from MediaPipe, normalized to source frame.
+    public volatile float[] luxgramSoftFaceOval = new float[64]; // 16 points x 2 faces
+    public volatile float[] luxgramSoftNosePoly = new float[48]; // 12 points x 2 faces
+    public volatile float[] luxgramSoftLipOuter = new float[48]; // 12 points x 2 faces
+    public volatile float[] luxgramSoftEyeLPoly = new float[32]; // 8 points x 2 faces
+    public volatile float[] luxgramSoftEyeRPoly = new float[32];
+    public volatile long luxgramSoftAt;
+    private volatile long luxgramSoftLastArmAt;
+    private volatile boolean luxgramSoftBusy;
+    // LuxGram Fix 50: true when the last software result came from the MediaPipe
     // mesh tracker (iris-grade anchors) rather than the ML Kit box detector.
-    private volatile boolean drgramSoftMeshPrecise;
-    // DrGram Fix 48: tracking state — ROI-guided re-detection, reacquire
+    private volatile boolean luxgramSoftMeshPrecise;
+    // LuxGram Fix 48: tracking state — ROI-guided re-detection, reacquire
     // pacing and an outlier gate against wild landmark jumps.
-    private final float[] drgramSoftRoi = new float[4];   // cx, cy, halfW, halfH (normalized)
-    private volatile long drgramSoftRoiAt;
-    private volatile boolean drgramSoftHadFaces;
-    private final float[] drgramSoftLastCenter = new float[2];
-    private volatile boolean drgramSoftHasLastCenter;
-    private volatile int drgramSoftSkipStreak;
+    private final float[] luxgramSoftRoi = new float[4];   // cx, cy, halfW, halfH (normalized)
+    private volatile long luxgramSoftRoiAt;
+    private volatile boolean luxgramSoftHadFaces;
+    private final float[] luxgramSoftLastCenter = new float[2];
+    private volatile boolean luxgramSoftHasLastCenter;
+    private volatile int luxgramSoftSkipStreak;
 
-    private static final java.util.concurrent.Executor drgramSoftExecutor =
+    private static final java.util.concurrent.Executor luxgramSoftExecutor =
             java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
-                Thread t = new Thread(r, "DrGramSoftFace");
+                Thread t = new Thread(r, "LuxGramSoftFace");
                 t.setPriority(Thread.MIN_PRIORITY);
                 t.setDaemon(true);
                 return t;
             });
 
-    private static final long DRGRAM_SOFT_MIN_INTERVAL_MS = 150;   // while tracking (Fix 50: mesh tracker is fast)
-    private static final long DRGRAM_SOFT_REACQUIRE_MS = 200;      // Fix 50: fast reacquire
-    private static final long DRGRAM_SOFT_RESULT_TTL_MS = 2600;
-    private static final long DRGRAM_HW_STALE_MS = 1200;
-    private static final long DRGRAM_SOFT_ROI_TTL_MS = 1600;       // Fix 48: ROI freshness
-    private static final long DRGRAM_SOFT_OUTLIER_MS = 1200;       // Fix 48: gate window
+    private static final long LUXGRAM_SOFT_MIN_INTERVAL_MS = 150;   // while tracking (Fix 50: mesh tracker is fast)
+    private static final long LUXGRAM_SOFT_REACQUIRE_MS = 200;      // Fix 50: fast reacquire
+    private static final long LUXGRAM_SOFT_RESULT_TTL_MS = 2600;
+    private static final long LUXGRAM_HW_STALE_MS = 1200;
+    private static final long LUXGRAM_SOFT_ROI_TTL_MS = 1600;       // Fix 48: ROI freshness
+    private static final long LUXGRAM_SOFT_OUTLIER_MS = 1200;       // Fix 48: gate window
 
     /**
      * Called once per rendered frame from the GL thread. Arms a one-shot
      * preview callback when the live beauty needs face anchors, then re-arms
      * itself until faces come back or the user turns the face effects off.
      *
-     * DrGram Fix 50: the MediaPipe mesh tracker runs REGARDLESS of hardware
+     * LuxGram Fix 50: the MediaPipe mesh tracker runs REGARDLESS of hardware
      * detection — its 478-point temporal result is strictly better than the
      * coarse hardware boxes (which were the source of the jumping face
      * centre). Hardware landmarks remain the fallback when the tracker is
      * unavailable.
      */
-    public void drgramSoftwareDetectTick(android.hardware.Camera.Face[] hwFaces) {
+    public void luxgramSoftwareDetectTick(android.hardware.Camera.Face[] hwFaces) {
         try {
-            if (destroyed || !org.telegram.messenger.DrGramMedia.cameraBeautyNeedsFaces()) {
+            if (destroyed || !org.telegram.messenger.LuxGramMedia.cameraBeautyNeedsFaces()) {
                 return;
             }
             android.hardware.Camera camera = cameraInfo == null ? null : cameraInfo.camera;
@@ -144,14 +144,14 @@ public class CameraSession {
                 return;
             }
             long now = android.os.SystemClock.elapsedRealtime();
-            if (drgramSoftBusy
-                    || now - drgramSoftLastArmAt < (drgramSoftHadFaces
-                            ? DRGRAM_SOFT_MIN_INTERVAL_MS : DRGRAM_SOFT_REACQUIRE_MS)) {
+            if (luxgramSoftBusy
+                    || now - luxgramSoftLastArmAt < (luxgramSoftHadFaces
+                            ? LUXGRAM_SOFT_MIN_INTERVAL_MS : LUXGRAM_SOFT_REACQUIRE_MS)) {
                 return;
             }
-            drgramSoftLastArmAt = now;
+            luxgramSoftLastArmAt = now;
             try {
-                camera.setOneShotPreviewCallback(this::drgramOnSoftFrame);
+                camera.setOneShotPreviewCallback(this::luxgramOnSoftFrame);
             } catch (Throwable t) {
                 FileLog.e(t);
             }
@@ -169,9 +169,9 @@ public class CameraSession {
         return sessionStartedAt;
     }
 
-    private void drgramOnSoftFrame(byte[] data, android.hardware.Camera camera) {
-        drgramSoftBusy = true;
-        drgramSoftExecutor.execute(() -> {
+    private void luxgramOnSoftFrame(byte[] data, android.hardware.Camera camera) {
+        luxgramSoftBusy = true;
+        luxgramSoftExecutor.execute(() -> {
             try {
                 int w, h;
                 try {
@@ -185,11 +185,11 @@ public class CameraSession {
                     return;
                 }
                 long now = android.os.SystemClock.elapsedRealtime();
-                // DrGram Fix 48: when a recent face is known, decode only the
+                // LuxGram Fix 48: when a recent face is known, decode only the
                 // ROI crop at a much higher effective resolution; full frame
                 // otherwise (probe bumped 384 -> 448).
-                float[] roi = drgramSoftRoi;
-                boolean roiFresh = now - drgramSoftRoiAt < DRGRAM_SOFT_ROI_TTL_MS
+                float[] roi = luxgramSoftRoi;
+                boolean roiFresh = now - luxgramSoftRoiAt < LUXGRAM_SOFT_ROI_TTL_MS
                         && roi[2] > 0.01f && roi[3] > 0.01f;
                 android.graphics.Bitmap probe;
                 float originX, originY, scaleX, scaleY;
@@ -204,37 +204,37 @@ public class CameraSession {
                     ch = (Math.min(h, pcy + phh) - y0) & ~1;
                 }
                 if (roiFresh && cw >= 64 && ch >= 64) {
-                    probe = drgramNv21CropToBitmap(data, w, h, x0, y0, cw, ch, 320);
+                    probe = luxgramNv21CropToBitmap(data, w, h, x0, y0, cw, ch, 320);
                     if (probe != null) {
                         originX = x0 / (float) w;
                         originY = y0 / (float) h;
                         scaleX = cw / (float) (probe.getWidth() * w);
                         scaleY = ch / (float) (probe.getHeight() * h);
                     } else {
-                        probe = drgramNv21ToBitmap(data, w, h, 448);
+                        probe = luxgramNv21ToBitmap(data, w, h, 448);
                         originX = originY = 0f;
                         scaleX = probe == null ? 1f : 1f / probe.getWidth();
                         scaleY = probe == null ? 1f : 1f / probe.getHeight();
                     }
                 } else {
-                    probe = drgramNv21ToBitmap(data, w, h, 448);
+                    probe = luxgramNv21ToBitmap(data, w, h, 448);
                     originX = originY = 0f;
                     scaleX = probe == null ? 1f : 1f / probe.getWidth();
                     scaleY = probe == null ? 1f : 1f / probe.getHeight();
                 }
                 float[] f = new float[8], n = new float[4], m = new float[4], el = new float[4], er = new float[4];
-                // DrGram Fix 51: organ rect scratch (vec4 per face).
+                // LuxGram Fix 51: organ rect scratch (vec4 per face).
                 float[] nRect = new float[8], mRect = new float[8], elRect = new float[8], erRect = new float[8];
                 float[] faceOval = new float[64], nosePoly = new float[48], lipOuter = new float[48], eyeLPoly = new float[32], eyeRPoly = new float[32];
                 int cnt = 0;
                 boolean meshPrecise = false;
 
-                // DrGram Fix 50: MediaPipe 478-point mesh tracking first —
+                // LuxGram Fix 50: MediaPipe 478-point mesh tracking first —
                 // temporal tracking keeps the face centre stable and iris
                 // points give exact eye anchors. null = engine unavailable.
                 if (probe != null) {
-                    org.telegram.messenger.DrGramFaceMeshTracker.TrackResult tr =
-                            org.telegram.messenger.DrGramFaceMeshTracker.track(probe, now);
+                    org.telegram.messenger.LuxGramFaceMeshTracker.TrackResult tr =
+                            org.telegram.messenger.LuxGramFaceMeshTracker.track(probe, now);
                     if (tr != null && tr.count > 0) {
                         // probe-normalized -> frame-normalized factors.
                         float mapNX = probe.getWidth() * scaleX;
@@ -252,7 +252,7 @@ public class CameraSession {
                             el[cnt * 2 + 1] = originY + tr.eyeLData[cnt * 2 + 1] * mapNY;
                             er[cnt * 2] = originX + tr.eyeRData[cnt * 2] * mapNX;
                             er[cnt * 2 + 1] = originY + tr.eyeRData[cnt * 2 + 1] * mapNY;
-                            // DrGram Fix 51: real organ rects — centres map like
+                            // LuxGram Fix 51: real organ rects — centres map like
                             // positions, half-extents map like sizes.
                             nRect[cnt * 4] = originX + tr.noseRect[cnt * 4] * mapNX;
                             nRect[cnt * 4 + 1] = originY + tr.noseRect[cnt * 4 + 1] * mapNY;
@@ -295,16 +295,16 @@ public class CameraSession {
                 }
 
                 if (cnt == 0) {
-                    // DrGram Fix 45/46: bundled ML Kit fallback — accurate face
+                    // LuxGram Fix 45/46: bundled ML Kit fallback — accurate face
                     // rects with real nose/eye/mouth landmarks, fully offline.
-                    ArrayList<org.telegram.messenger.DrGramFaceEngine.FaceResult> found =
-                            probe == null ? null : org.telegram.messenger.DrGramFaceEngine.detectBlocking(probe, 1500);
+                    ArrayList<org.telegram.messenger.LuxGramFaceEngine.FaceResult> found =
+                            probe == null ? null : org.telegram.messenger.LuxGramFaceEngine.detectBlocking(probe, 1500);
                     if (found != null && !found.isEmpty()) {
-                        // DrGram Fix 48: stable left-to-right ordering so two-face
+                        // LuxGram Fix 48: stable left-to-right ordering so two-face
                         // slots can't flip between frames.
                         java.util.Collections.sort(found, (a, b) -> Float.compare(a.cx, b.cx));
                         for (int i = 0; i < found.size() && cnt < 2; i++) {
-                            org.telegram.messenger.DrGramFaceEngine.FaceResult r = found.get(i);
+                            org.telegram.messenger.LuxGramFaceEngine.FaceResult r = found.get(i);
                             if (r == null) continue;
                             f[cnt * 4] = originX + r.cx * scaleX;
                             f[cnt * 4 + 1] = originY + r.cy * scaleY;
@@ -335,68 +335,68 @@ public class CameraSession {
                 }
 
                 if (cnt == 0) {
-                    drgramSoftCount = 0;
-                    drgramSoftHadFaces = false;
-                    drgramSoftHasLastCenter = false;
-                    drgramSoftMeshPrecise = false;
+                    luxgramSoftCount = 0;
+                    luxgramSoftHadFaces = false;
+                    luxgramSoftHasLastCenter = false;
+                    luxgramSoftMeshPrecise = false;
                 } else {
-                    // DrGram Fix 48: outlier gate — a single-face result that
+                    // LuxGram Fix 48: outlier gate — a single-face result that
                     // teleports while the previous one is still fresh is almost
                     // always a detector hiccup; keep the old anchors for up to
                     // 3 consecutive skips, then accept reality. (The mesh
                     // tracker already smooths, so this stays as a last resort.)
-                    if (cnt == 1 && drgramSoftCount == 1 && drgramSoftHasLastCenter
-                            && now - drgramSoftAt < DRGRAM_SOFT_OUTLIER_MS
-                            && drgramSoftSkipStreak < 3) {
+                    if (cnt == 1 && luxgramSoftCount == 1 && luxgramSoftHasLastCenter
+                            && now - luxgramSoftAt < LUXGRAM_SOFT_OUTLIER_MS
+                            && luxgramSoftSkipStreak < 3) {
                         float jump = (float) Math.hypot(
-                                f[0] - drgramSoftLastCenter[0],
-                                f[1] - drgramSoftLastCenter[1]);
+                                f[0] - luxgramSoftLastCenter[0],
+                                f[1] - luxgramSoftLastCenter[1]);
                         if (jump > 0.45f) {
-                            drgramSoftSkipStreak++;
-                            drgramSoftHadFaces = true;
+                            luxgramSoftSkipStreak++;
+                            luxgramSoftHadFaces = true;
                             return;
                         }
                     }
                     if (cnt > 0) {
-                        drgramSoftLastCenter[0] = f[0];
-                        drgramSoftLastCenter[1] = f[1];
-                        drgramSoftHasLastCenter = true;
-                        drgramSoftSkipStreak = 0;
-                        drgramSoftRoi[0] = f[0];
-                        drgramSoftRoi[1] = f[1];
-                        drgramSoftRoi[2] = f[2];
-                        drgramSoftRoi[3] = f[3];
-                        drgramSoftRoiAt = now;
+                        luxgramSoftLastCenter[0] = f[0];
+                        luxgramSoftLastCenter[1] = f[1];
+                        luxgramSoftHasLastCenter = true;
+                        luxgramSoftSkipStreak = 0;
+                        luxgramSoftRoi[0] = f[0];
+                        luxgramSoftRoi[1] = f[1];
+                        luxgramSoftRoi[2] = f[2];
+                        luxgramSoftRoi[3] = f[3];
+                        luxgramSoftRoiAt = now;
                     }
-                    drgramSoftFaceData = f;
-                    drgramSoftNoseData = n;
-                    drgramSoftMouthData = m;
-                    drgramSoftEyeLData = el;
-                    drgramSoftEyeRData = er;
-                    drgramSoftNoseRect = nRect;   // DrGram Fix 51
-                    drgramSoftMouthRect = mRect;
-                    drgramSoftEyeLRect = elRect;
-                    drgramSoftEyeRRect = erRect;
-                    drgramSoftFaceOval = faceOval;
-                    drgramSoftNosePoly = nosePoly;
-                    drgramSoftLipOuter = lipOuter;
-                    drgramSoftEyeLPoly = eyeLPoly;
-                    drgramSoftEyeRPoly = eyeRPoly;
-                    drgramSoftCount = cnt;
-                    drgramSoftAt = now;
-                    drgramSoftHadFaces = cnt > 0;
-                    drgramSoftMeshPrecise = meshPrecise;
+                    luxgramSoftFaceData = f;
+                    luxgramSoftNoseData = n;
+                    luxgramSoftMouthData = m;
+                    luxgramSoftEyeLData = el;
+                    luxgramSoftEyeRData = er;
+                    luxgramSoftNoseRect = nRect;   // LuxGram Fix 51
+                    luxgramSoftMouthRect = mRect;
+                    luxgramSoftEyeLRect = elRect;
+                    luxgramSoftEyeRRect = erRect;
+                    luxgramSoftFaceOval = faceOval;
+                    luxgramSoftNosePoly = nosePoly;
+                    luxgramSoftLipOuter = lipOuter;
+                    luxgramSoftEyeLPoly = eyeLPoly;
+                    luxgramSoftEyeRPoly = eyeRPoly;
+                    luxgramSoftCount = cnt;
+                    luxgramSoftAt = now;
+                    luxgramSoftHadFaces = cnt > 0;
+                    luxgramSoftMeshPrecise = meshPrecise;
                 }
             } catch (Throwable t) {
                 FileLog.e(t);
             } finally {
-                drgramSoftBusy = false;
+                luxgramSoftBusy = false;
             }
         });
     }
 
-    /** DrGram Fix 48: NV21 crop + downscale — ROI re-detection at high effective resolution. */
-    private static android.graphics.Bitmap drgramNv21CropToBitmap(byte[] nv21, int w, int h,
+    /** LuxGram Fix 48: NV21 crop + downscale — ROI re-detection at high effective resolution. */
+    private static android.graphics.Bitmap luxgramNv21CropToBitmap(byte[] nv21, int w, int h,
                                                                   int x0, int y0, int cw, int ch, int maxSide) {
         try {
             if (x0 < 0 || y0 < 0 || cw <= 0 || ch <= 0 || x0 + cw > w || y0 + ch > h) {
@@ -435,7 +435,7 @@ public class CameraSession {
     }
 
     /** Nearest-neighbour NV21 -> RGB conversion, downscaled to keep ML Kit cheap. */
-    private static android.graphics.Bitmap drgramNv21ToBitmap(byte[] nv21, int w, int h, int maxSide) {
+    private static android.graphics.Bitmap luxgramNv21ToBitmap(byte[] nv21, int w, int h, int maxSide) {
         try {
             int stride = Math.max(1, Math.max(w, h) / maxSide);
             int dw = w / stride, dh = h / stride;
@@ -470,39 +470,39 @@ public class CameraSession {
     }
 
     /** Fresh software detection result (null when stale/empty). */
-    public boolean drgramSoftFacesFresh(float[] faceOut, float[] noseOut, float[] mouthOut, float[] eyeLOut, float[] eyeROut) {
-        int count = drgramSoftCount;
+    public boolean luxgramSoftFacesFresh(float[] faceOut, float[] noseOut, float[] mouthOut, float[] eyeLOut, float[] eyeROut) {
+        int count = luxgramSoftCount;
         if (count <= 0) {
             return false;
         }
         long now = android.os.SystemClock.elapsedRealtime();
-        if (now - drgramSoftAt > DRGRAM_SOFT_RESULT_TTL_MS) {
+        if (now - luxgramSoftAt > LUXGRAM_SOFT_RESULT_TTL_MS) {
             return false;
         }
-        System.arraycopy(drgramSoftFaceData, 0, faceOut, 0, faceOut.length);
-        System.arraycopy(drgramSoftNoseData, 0, noseOut, 0, noseOut.length);
-        System.arraycopy(drgramSoftMouthData, 0, mouthOut, 0, mouthOut.length);
-        System.arraycopy(drgramSoftEyeLData, 0, eyeLOut, 0, eyeLOut.length);
-        System.arraycopy(drgramSoftEyeRData, 0, eyeROut, 0, eyeROut.length);
+        System.arraycopy(luxgramSoftFaceData, 0, faceOut, 0, faceOut.length);
+        System.arraycopy(luxgramSoftNoseData, 0, noseOut, 0, noseOut.length);
+        System.arraycopy(luxgramSoftMouthData, 0, mouthOut, 0, mouthOut.length);
+        System.arraycopy(luxgramSoftEyeLData, 0, eyeLOut, 0, eyeLOut.length);
+        System.arraycopy(luxgramSoftEyeRData, 0, eyeROut, 0, eyeROut.length);
         return true;
     }
 
     /**
-     * DrGram Fix 51: real organ rectangles accompanying a fresh software
+     * LuxGram Fix 51: real organ rectangles accompanying a fresh software
      * result (false = caller must keep its geometric estimates).
      */
-    public boolean drgramSoftOrganRectsFresh(float[] noseRectOut, float[] mouthRectOut,
+    public boolean luxgramSoftOrganRectsFresh(float[] noseRectOut, float[] mouthRectOut,
                                              float[] eyeLRectOut, float[] eyeRRectOut) {
-        int count = drgramSoftCount;
+        int count = luxgramSoftCount;
         if (count <= 0) {
             return false;
         }
         long now = android.os.SystemClock.elapsedRealtime();
-        if (now - drgramSoftAt > DRGRAM_SOFT_RESULT_TTL_MS) {
+        if (now - luxgramSoftAt > LUXGRAM_SOFT_RESULT_TTL_MS) {
             return false;
         }
-        float[] nr = drgramSoftNoseRect, mr = drgramSoftMouthRect;
-        float[] elr = drgramSoftEyeLRect, err = drgramSoftEyeRRect;
+        float[] nr = luxgramSoftNoseRect, mr = luxgramSoftMouthRect;
+        float[] elr = luxgramSoftEyeLRect, err = luxgramSoftEyeRRect;
         if (nr == null || nr.length < 8 || mr == null || mr.length < 8) {
             return false;
         }
@@ -514,12 +514,12 @@ public class CameraSession {
     }
 
     /** Exact mesh contours for shader masks; false on ML Kit/hardware fallback. */
-    public boolean drgramSoftPolygonsFresh(float[] faceOvalOut, float[] nosePolyOut, float[] lipOuterOut,
+    public boolean luxgramSoftPolygonsFresh(float[] faceOvalOut, float[] nosePolyOut, float[] lipOuterOut,
                                            float[] eyeLPolyOut, float[] eyeRPolyOut) {
-        if (!drgramSoftMeshPrecise || drgramSoftCount <= 0) return false;
-        if (android.os.SystemClock.elapsedRealtime() - drgramSoftAt > DRGRAM_SOFT_RESULT_TTL_MS) return false;
-        float[] oval = drgramSoftFaceOval, nose = drgramSoftNosePoly, lips = drgramSoftLipOuter;
-        float[] left = drgramSoftEyeLPoly, right = drgramSoftEyeRPoly;
+        if (!luxgramSoftMeshPrecise || luxgramSoftCount <= 0) return false;
+        if (android.os.SystemClock.elapsedRealtime() - luxgramSoftAt > LUXGRAM_SOFT_RESULT_TTL_MS) return false;
+        float[] oval = luxgramSoftFaceOval, nose = luxgramSoftNosePoly, lips = luxgramSoftLipOuter;
+        float[] left = luxgramSoftEyeLPoly, right = luxgramSoftEyeRPoly;
         if (oval == null || oval.length < 64 || nose == null || nose.length < 48 || lips == null || lips.length < 48
                 || left == null || left.length < 32 || right == null || right.length < 32) return false;
         System.arraycopy(oval, 0, faceOvalOut, 0, faceOvalOut.length);
@@ -531,14 +531,14 @@ public class CameraSession {
     }
 
     /**
-     * DrGram Fix 50: true when a fresh, mesh-precise (MediaPipe) software
+     * LuxGram Fix 50: true when a fresh, mesh-precise (MediaPipe) software
      * result should LEAD the shader feed instead of the coarse hardware
      * boxes. Hardware detection keeps the quality it always had; the mesh
      * simply raises the ceiling whenever it can see a face.
      */
-    public boolean drgramSoftwarePreferred() {
-        return drgramSoftMeshPrecise && drgramSoftCount > 0
-                && (android.os.SystemClock.elapsedRealtime() - drgramSoftAt) < 400;
+    public boolean luxgramSoftwarePreferred() {
+        return luxgramSoftMeshPrecise && luxgramSoftCount > 0
+                && (android.os.SystemClock.elapsedRealtime() - luxgramSoftAt) < 400;
     }
 
     // ================= end Fix 46 software face detection =================
@@ -546,139 +546,139 @@ public class CameraSession {
     // Low-cost temporal stabilization for live beauty masks. Camera face callbacks
     // can jitter between frames; an EMA dampens that movement without adding a
     // per-frame ML inference workload.
-    private final float[] drgramSmoothFaceData = new float[8];
-    private final float[] drgramSmoothNoseData = new float[4];
-    private final float[] drgramSmoothMouthData = new float[4];
-    private final float[] drgramSmoothEyeLData = new float[4]; // DrGram Fix 46
-    private final float[] drgramSmoothEyeRData = new float[4]; // DrGram Fix 46
-    private final float[] drgramSmoothNoseRect = new float[8]; // DrGram Fix 51
-    private final float[] drgramSmoothMouthRect = new float[8];
-    private final float[] drgramSmoothEyeLRect = new float[8];
-    private final float[] drgramSmoothEyeRRect = new float[8];
-    private final float[] drgramSmoothFaceOval = new float[64]; // DrGram Fix 52
-    private final float[] drgramSmoothNosePoly = new float[48]; // exact nose contour
-    private final float[] drgramSmoothLipOuter = new float[48];
-    private final float[] drgramSmoothEyeLPoly = new float[32];
-    private final float[] drgramSmoothEyeRPoly = new float[32];
-    private int drgramSmoothPolygonCount = -1;
-    private int drgramSmoothOrganCount = -1; // DrGram Fix 51
-    private int drgramSmoothFaceCount = -1;
+    private final float[] luxgramSmoothFaceData = new float[8];
+    private final float[] luxgramSmoothNoseData = new float[4];
+    private final float[] luxgramSmoothMouthData = new float[4];
+    private final float[] luxgramSmoothEyeLData = new float[4]; // LuxGram Fix 46
+    private final float[] luxgramSmoothEyeRData = new float[4]; // LuxGram Fix 46
+    private final float[] luxgramSmoothNoseRect = new float[8]; // LuxGram Fix 51
+    private final float[] luxgramSmoothMouthRect = new float[8];
+    private final float[] luxgramSmoothEyeLRect = new float[8];
+    private final float[] luxgramSmoothEyeRRect = new float[8];
+    private final float[] luxgramSmoothFaceOval = new float[64]; // LuxGram Fix 52
+    private final float[] luxgramSmoothNosePoly = new float[48]; // exact nose contour
+    private final float[] luxgramSmoothLipOuter = new float[48];
+    private final float[] luxgramSmoothEyeLPoly = new float[32];
+    private final float[] luxgramSmoothEyeRPoly = new float[32];
+    private int luxgramSmoothPolygonCount = -1;
+    private int luxgramSmoothOrganCount = -1; // LuxGram Fix 51
+    private int luxgramSmoothFaceCount = -1;
 
-    public synchronized void smoothDrgramBeautyLandmarks(float[] faceData, float[] noseData, float[] mouthData,
+    public synchronized void smoothLuxGramBeautyLandmarks(float[] faceData, float[] noseData, float[] mouthData,
                                                          float[] eyeLData, float[] eyeRData, int count) {
         if (count <= 0) {
-            drgramSmoothFaceCount = 0;
-            java.util.Arrays.fill(drgramSmoothFaceData, 0f);
-            java.util.Arrays.fill(drgramSmoothNoseData, 0f);
-            java.util.Arrays.fill(drgramSmoothMouthData, 0f);
-            java.util.Arrays.fill(drgramSmoothEyeLData, 0f);
-            java.util.Arrays.fill(drgramSmoothEyeRData, 0f);
+            luxgramSmoothFaceCount = 0;
+            java.util.Arrays.fill(luxgramSmoothFaceData, 0f);
+            java.util.Arrays.fill(luxgramSmoothNoseData, 0f);
+            java.util.Arrays.fill(luxgramSmoothMouthData, 0f);
+            java.util.Arrays.fill(luxgramSmoothEyeLData, 0f);
+            java.util.Arrays.fill(luxgramSmoothEyeRData, 0f);
             return;
         }
         count = Math.min(2, count);
-        if (drgramSmoothFaceCount != count) {
-            System.arraycopy(faceData, 0, drgramSmoothFaceData, 0, faceData.length);
-            System.arraycopy(noseData, 0, drgramSmoothNoseData, 0, noseData.length);
-            System.arraycopy(mouthData, 0, drgramSmoothMouthData, 0, mouthData.length);
-            System.arraycopy(eyeLData, 0, drgramSmoothEyeLData, 0, eyeLData.length);
-            System.arraycopy(eyeRData, 0, drgramSmoothEyeRData, 0, eyeRData.length);
-            drgramSmoothFaceCount = count;
+        if (luxgramSmoothFaceCount != count) {
+            System.arraycopy(faceData, 0, luxgramSmoothFaceData, 0, faceData.length);
+            System.arraycopy(noseData, 0, luxgramSmoothNoseData, 0, noseData.length);
+            System.arraycopy(mouthData, 0, luxgramSmoothMouthData, 0, mouthData.length);
+            System.arraycopy(eyeLData, 0, luxgramSmoothEyeLData, 0, eyeLData.length);
+            System.arraycopy(eyeRData, 0, luxgramSmoothEyeRData, 0, eyeRData.length);
+            luxgramSmoothFaceCount = count;
             return;
         }
         final float newWeight = 0.42f;
         for (int i = 0; i < faceData.length; i++) {
-            drgramSmoothFaceData[i] += (faceData[i] - drgramSmoothFaceData[i]) * newWeight;
-            faceData[i] = drgramSmoothFaceData[i];
+            luxgramSmoothFaceData[i] += (faceData[i] - luxgramSmoothFaceData[i]) * newWeight;
+            faceData[i] = luxgramSmoothFaceData[i];
         }
         for (int i = 0; i < noseData.length; i++) {
-            drgramSmoothNoseData[i] += (noseData[i] - drgramSmoothNoseData[i]) * newWeight;
-            noseData[i] = drgramSmoothNoseData[i];
+            luxgramSmoothNoseData[i] += (noseData[i] - luxgramSmoothNoseData[i]) * newWeight;
+            noseData[i] = luxgramSmoothNoseData[i];
         }
         for (int i = 0; i < mouthData.length; i++) {
-            drgramSmoothMouthData[i] += (mouthData[i] - drgramSmoothMouthData[i]) * newWeight;
-            mouthData[i] = drgramSmoothMouthData[i];
+            luxgramSmoothMouthData[i] += (mouthData[i] - luxgramSmoothMouthData[i]) * newWeight;
+            mouthData[i] = luxgramSmoothMouthData[i];
         }
         for (int i = 0; i < eyeLData.length; i++) {
-            drgramSmoothEyeLData[i] += (eyeLData[i] - drgramSmoothEyeLData[i]) * newWeight;
-            eyeLData[i] = drgramSmoothEyeLData[i];
+            luxgramSmoothEyeLData[i] += (eyeLData[i] - luxgramSmoothEyeLData[i]) * newWeight;
+            eyeLData[i] = luxgramSmoothEyeLData[i];
         }
         for (int i = 0; i < eyeRData.length; i++) {
-            drgramSmoothEyeRData[i] += (eyeRData[i] - drgramSmoothEyeRData[i]) * newWeight;
-            eyeRData[i] = drgramSmoothEyeRData[i];
+            luxgramSmoothEyeRData[i] += (eyeRData[i] - luxgramSmoothEyeRData[i]) * newWeight;
+            eyeRData[i] = luxgramSmoothEyeRData[i];
         }
     }
 
     /**
-     * DrGram Fix 51: EMA smoothing for the organ rects, same cadence as the
+     * LuxGram Fix 51: EMA smoothing for the organ rects, same cadence as the
      * anchor smoothing. Rect centres and half-extents are smoothed as one
      * 4-vector so the region never leads/lags its own anchor.
      */
     /** Temporal EMA for mesh contour points, preventing makeup-mask shimmer in video. */
-    public synchronized void smoothDrgramBeautyPolygons(float[] faceOval, float[] nosePoly, float[] lipOuter,
+    public synchronized void smoothLuxGramBeautyPolygons(float[] faceOval, float[] nosePoly, float[] lipOuter,
                                                           float[] eyeLPoly, float[] eyeRPoly, int count) {
         if (count <= 0) {
-            drgramSmoothPolygonCount = 0;
-            java.util.Arrays.fill(drgramSmoothFaceOval, 0f);
-            java.util.Arrays.fill(drgramSmoothNosePoly, 0f);
-            java.util.Arrays.fill(drgramSmoothLipOuter, 0f);
-            java.util.Arrays.fill(drgramSmoothEyeLPoly, 0f);
-            java.util.Arrays.fill(drgramSmoothEyeRPoly, 0f);
+            luxgramSmoothPolygonCount = 0;
+            java.util.Arrays.fill(luxgramSmoothFaceOval, 0f);
+            java.util.Arrays.fill(luxgramSmoothNosePoly, 0f);
+            java.util.Arrays.fill(luxgramSmoothLipOuter, 0f);
+            java.util.Arrays.fill(luxgramSmoothEyeLPoly, 0f);
+            java.util.Arrays.fill(luxgramSmoothEyeRPoly, 0f);
             return;
         }
         count = Math.min(2, count);
-        if (drgramSmoothPolygonCount != count) {
-            System.arraycopy(faceOval, 0, drgramSmoothFaceOval, 0, faceOval.length);
-            System.arraycopy(nosePoly, 0, drgramSmoothNosePoly, 0, nosePoly.length);
-            System.arraycopy(lipOuter, 0, drgramSmoothLipOuter, 0, lipOuter.length);
-            System.arraycopy(eyeLPoly, 0, drgramSmoothEyeLPoly, 0, eyeLPoly.length);
-            System.arraycopy(eyeRPoly, 0, drgramSmoothEyeRPoly, 0, eyeRPoly.length);
-            drgramSmoothPolygonCount = count;
+        if (luxgramSmoothPolygonCount != count) {
+            System.arraycopy(faceOval, 0, luxgramSmoothFaceOval, 0, faceOval.length);
+            System.arraycopy(nosePoly, 0, luxgramSmoothNosePoly, 0, nosePoly.length);
+            System.arraycopy(lipOuter, 0, luxgramSmoothLipOuter, 0, lipOuter.length);
+            System.arraycopy(eyeLPoly, 0, luxgramSmoothEyeLPoly, 0, eyeLPoly.length);
+            System.arraycopy(eyeRPoly, 0, luxgramSmoothEyeRPoly, 0, eyeRPoly.length);
+            luxgramSmoothPolygonCount = count;
             return;
         }
         final float weight = 0.42f;
         for (int i = 0; i < faceOval.length; i++) {
-            drgramSmoothFaceOval[i] += (faceOval[i] - drgramSmoothFaceOval[i]) * weight;
-            faceOval[i] = drgramSmoothFaceOval[i];
+            luxgramSmoothFaceOval[i] += (faceOval[i] - luxgramSmoothFaceOval[i]) * weight;
+            faceOval[i] = luxgramSmoothFaceOval[i];
         }
         for (int i = 0; i < nosePoly.length; i++) {
-            drgramSmoothNosePoly[i] += (nosePoly[i] - drgramSmoothNosePoly[i]) * weight;
-            nosePoly[i] = drgramSmoothNosePoly[i];
+            luxgramSmoothNosePoly[i] += (nosePoly[i] - luxgramSmoothNosePoly[i]) * weight;
+            nosePoly[i] = luxgramSmoothNosePoly[i];
         }
         for (int i = 0; i < lipOuter.length; i++) {
-            drgramSmoothLipOuter[i] += (lipOuter[i] - drgramSmoothLipOuter[i]) * weight;
-            lipOuter[i] = drgramSmoothLipOuter[i];
+            luxgramSmoothLipOuter[i] += (lipOuter[i] - luxgramSmoothLipOuter[i]) * weight;
+            lipOuter[i] = luxgramSmoothLipOuter[i];
         }
         for (int i = 0; i < eyeLPoly.length; i++) {
-            drgramSmoothEyeLPoly[i] += (eyeLPoly[i] - drgramSmoothEyeLPoly[i]) * weight;
-            eyeLPoly[i] = drgramSmoothEyeLPoly[i];
+            luxgramSmoothEyeLPoly[i] += (eyeLPoly[i] - luxgramSmoothEyeLPoly[i]) * weight;
+            eyeLPoly[i] = luxgramSmoothEyeLPoly[i];
         }
         for (int i = 0; i < eyeRPoly.length; i++) {
-            drgramSmoothEyeRPoly[i] += (eyeRPoly[i] - drgramSmoothEyeRPoly[i]) * weight;
-            eyeRPoly[i] = drgramSmoothEyeRPoly[i];
+            luxgramSmoothEyeRPoly[i] += (eyeRPoly[i] - luxgramSmoothEyeRPoly[i]) * weight;
+            eyeRPoly[i] = luxgramSmoothEyeRPoly[i];
         }
     }
 
-    public synchronized void smoothDrgramOrganRects(float[] noseRect, float[] mouthRect,
+    public synchronized void smoothLuxGramOrganRects(float[] noseRect, float[] mouthRect,
                                                     float[] eyeLRect, float[] eyeRRect, int count) {
         if (count <= 0) {
-            java.util.Arrays.fill(drgramSmoothNoseRect, 0f);
-            java.util.Arrays.fill(drgramSmoothMouthRect, 0f);
-            java.util.Arrays.fill(drgramSmoothEyeLRect, 0f);
-            java.util.Arrays.fill(drgramSmoothEyeRRect, 0f);
-            drgramSmoothOrganCount = 0;
+            java.util.Arrays.fill(luxgramSmoothNoseRect, 0f);
+            java.util.Arrays.fill(luxgramSmoothMouthRect, 0f);
+            java.util.Arrays.fill(luxgramSmoothEyeLRect, 0f);
+            java.util.Arrays.fill(luxgramSmoothEyeRRect, 0f);
+            luxgramSmoothOrganCount = 0;
             return;
         }
-        if (drgramSmoothOrganCount != count) {
-            System.arraycopy(noseRect, 0, drgramSmoothNoseRect, 0, noseRect.length);
-            System.arraycopy(mouthRect, 0, drgramSmoothMouthRect, 0, mouthRect.length);
-            System.arraycopy(eyeLRect, 0, drgramSmoothEyeLRect, 0, eyeLRect.length);
-            System.arraycopy(eyeRRect, 0, drgramSmoothEyeRRect, 0, eyeRRect.length);
-            drgramSmoothOrganCount = count;
+        if (luxgramSmoothOrganCount != count) {
+            System.arraycopy(noseRect, 0, luxgramSmoothNoseRect, 0, noseRect.length);
+            System.arraycopy(mouthRect, 0, luxgramSmoothMouthRect, 0, mouthRect.length);
+            System.arraycopy(eyeLRect, 0, luxgramSmoothEyeLRect, 0, eyeLRect.length);
+            System.arraycopy(eyeRRect, 0, luxgramSmoothEyeRRect, 0, eyeRRect.length);
+            luxgramSmoothOrganCount = count;
             return;
         }
         final float w = 0.42f;
         float[][] all = {noseRect, mouthRect, eyeLRect, eyeRRect};
-        float[][] state = {drgramSmoothNoseRect, drgramSmoothMouthRect, drgramSmoothEyeLRect, drgramSmoothEyeRRect};
+        float[][] state = {luxgramSmoothNoseRect, luxgramSmoothMouthRect, luxgramSmoothEyeLRect, luxgramSmoothEyeRRect};
         for (int a = 0; a < all.length; a++) {
             for (int i = 0; i < all[a].length; i++) {
                 state[a][i] += (all[a][i] - state[a][i]) * w;

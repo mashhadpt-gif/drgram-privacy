@@ -82,7 +82,7 @@ abstract class TelegramStringsTask : DefaultTask() {
         )
 
         // The app default localization combines standard Telegram strings and
-        // DrGram feature strings from both the library and application modules.
+        // LuxGram feature strings from both the library and application modules.
         val defaultLocalizationFiles = stringsXml.files.toList()
 
 

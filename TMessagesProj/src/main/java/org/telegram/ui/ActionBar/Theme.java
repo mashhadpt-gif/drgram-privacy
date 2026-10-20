@@ -1772,7 +1772,7 @@ public class Theme {
                     themeAccent.patternSlug = patternSlugs[a];
                 }
 
-                //DrGram default themes override
+                //LuxGram default themes override
                 if (isHome(themeAccent) && name.equals("Red")) {
                     themeAccent.myMessagesAccentColor = 0xffE63B52;
                     themeAccent.myMessagesGradientAccentColor1 = 0xff7e1626;
@@ -1782,8 +1782,8 @@ public class Theme {
                     themeAccent.backgroundGradientOverrideColor1 = 0xff170b0c;
                     themeAccent.backgroundGradientOverrideColor2 = 0xff2e1012;
                     themeAccent.backgroundGradientOverrideColor3 = 0xff0f0809;
-                } else if (isHome(themeAccent) && name.equals("Gold") && SharedConfig.drgramGoldChat) {
-                    // DrGram: black-gold metallic default chat wallpaper for the default theme
+                } else if (isHome(themeAccent) && name.equals("Gold") && SharedConfig.luxgramGoldChat) {
+                    // LuxGram: black-gold metallic default chat wallpaper for the default theme
                     themeAccent.myMessagesAccentColor = 0xffF5B90D;
                     themeAccent.myMessagesGradientAccentColor1 = 0xff9c6800;
                     themeAccent.myMessagesGradientAccentColor2 = 0xfff5b90d;
@@ -8006,13 +8006,13 @@ public class Theme {
         synchronized (sync) {
             if (chat_msgTextPaint == null) {
                 chat_msgTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-                // DrGram Fix 38: cover plain message body text with Vazir too —
+                // LuxGram Fix 38: cover plain message body text with Vazir too —
                 // previously only bold/medium chrome fonts were remapped, so chat
                 // text stayed in Roboto and looked inconsistent next to the UI.
-                if (SharedConfig.drgramVazirFont) {
-                    Typeface drgramVazir = AndroidUtilities.getTypeface("fonts/vazirmatn_regular.ttf");
-                    if (drgramVazir != null) {
-                        chat_msgTextPaint.setTypeface(drgramVazir);
+                if (SharedConfig.luxgramVazirFont) {
+                    Typeface luxgramVazir = AndroidUtilities.getTypeface("fonts/vazirmatn_regular.ttf");
+                    if (luxgramVazir != null) {
+                        chat_msgTextPaint.setTypeface(luxgramVazir);
                     }
                 }
                 chat_msgGameTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);

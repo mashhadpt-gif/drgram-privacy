@@ -1,12 +1,12 @@
-name: DrGram APK Build (CI/CD)
+name: LuxGram APK Build (CI/CD)
 
-# DrGram — automated APK builds.
+# LuxGram — automated APK builds.
 # - Manual run (workflow_dispatch) with a build-type selector.
 # - Automatic release APK on every version tag (v*).
 #
 # Signed in CI with the rotated keystore delivered via Actions secrets
 # (RELEASE_KEYSTORE_B64); local builds fall back to the committed keystore.
-# Output artifacts: DrGram-<version>-afat-<type>.apk + DrGram-<version>-play-release.aab
+# Output artifacts: LuxGram-<version>-afat-<type>.apk + LuxGram-<version>-play-release.aab
 
 on:
   workflow_dispatch:
@@ -34,7 +34,7 @@ on:
       - 'v*'
 
 concurrency:
-  group: drgram-apk-${{ github.ref }}
+  group: luxgram-apk-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -42,11 +42,11 @@ permissions:
 
 jobs:
   build-apk:
-    name: Build DrGram APK + Play AAB
+    name: Build LuxGram APK + Play AAB
     runs-on: ubuntu-latest
     timeout-minutes: 300
 
-    # DrGram Fix 63: rotated signing key — the committed keystore burned when the
+    # LuxGram Fix 63: rotated signing key — the committed keystore burned when the
     # repo was briefly public. RELEASE_KEYSTORE_B64 = base64 of the new keystore;
     # falls back to the committed keystore when the secrets are absent.
     env:
@@ -129,7 +129,7 @@ jobs:
             ABIS="arm64-v8a"
           fi
           echo "abis=$ABIS" >> "$GITHUB_OUTPUT"
-          echo "Building DrGram v${VERSION_NAME} (${VERSION_CODE}) — ${BUILD_TYPE} — task: assembleAfat${TASK_SUFFIX} — ABIs: $ABIS"
+          echo "Building LuxGram v${VERSION_NAME} (${VERSION_CODE}) — ${BUILD_TYPE} — task: assembleAfat${TASK_SUFFIX} — ABIs: $ABIS"
 
       - name: Gradle wrapper validation
         uses: gradle/actions/wrapper-validation@v4
@@ -170,12 +170,12 @@ jobs:
             echo "APK not found at $SRC — searching build outputs..."
             SRC=$(ls -1 TMessagesProj_App/build/outputs/apk/*/*/*.apk | head -n 1)
           fi
-          DEST="DrGram-v${{ steps.params.outputs.version_name }}-afat-${{ steps.params.outputs.build_type }}.apk"
+          DEST="LuxGram-v${{ steps.params.outputs.version_name }}-afat-${{ steps.params.outputs.build_type }}.apk"
           cp "$SRC" "$DEST"
           echo "file=$DEST" >> "$GITHUB_OUTPUT"
           SIZE_MB=$(du -m "$DEST" | cut -f1)
           echo "size_mb=$SIZE_MB" >> "$GITHUB_OUTPUT"
-          echo "DrGram APK ready: $DEST (${SIZE_MB} MB)"
+          echo "LuxGram APK ready: $DEST (${SIZE_MB} MB)"
 
       - name: Collect Play AAB (bundleAfat)
         if: steps.params.outputs.build_type == 'release'
@@ -187,12 +187,12 @@ jobs:
             echo "AAB not found at $SRC — searching build outputs..."
             SRC=$(find TMessagesProj_App/build/outputs/bundle -name "*.aab" | head -n 1)
           fi
-          DEST="DrGram-v${{ steps.params.outputs.version_name }}-play-release.aab"
+          DEST="LuxGram-v${{ steps.params.outputs.version_name }}-play-release.aab"
           cp "$SRC" "$DEST"
           echo "file=$DEST" >> "$GITHUB_OUTPUT"
           SIZE_MB=$(du -m "$DEST" | cut -f1)
           echo "size_mb=$SIZE_MB" >> "$GITHUB_OUTPUT"
-          echo "DrGram Play AAB ready: $DEST (${SIZE_MB} MB)"
+          echo "LuxGram Play AAB ready: $DEST (${SIZE_MB} MB)"
 
       - name: Verify 16KB ELF alignment (Play hard requirement)
         if: steps.params.outputs.build_type == 'release'
@@ -241,7 +241,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DrGram-v${{ steps.params.outputs.version_name }}-afat-${{ steps.params.outputs.build_type }}
+          name: LuxGram-v${{ steps.params.outputs.version_name }}-afat-${{ steps.params.outputs.build_type }}
           path: ${{ steps.apk.outputs.file }}
           if-no-files-found: error
           compression-level: 0
@@ -250,7 +250,7 @@ jobs:
         if: steps.params.outputs.build_type == 'release'
         uses: actions/upload-artifact@v4
         with:
-          name: DrGram-v${{ steps.params.outputs.version_name }}-play-release
+          name: LuxGram-v${{ steps.params.outputs.version_name }}-play-release
           path: ${{ steps.aab.outputs.file }}
           if-no-files-found: error
           compression-level: 0
@@ -260,9 +260,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: DrGram v${{ steps.params.outputs.version_name }}
+          name: LuxGram v${{ steps.params.outputs.version_name }}
           body: |
-            ## DrGram v${{ steps.params.outputs.version_name }} (build ${{ steps.params.outputs.version_code }})
+            ## LuxGram v${{ steps.params.outputs.version_name }} (build ${{ steps.params.outputs.version_code }})
 
             Automated black-gold premium build.
 
@@ -274,7 +274,7 @@ jobs:
             ### Highlights
             - Black-gold default theme (Red secondary) with metallic gradients
             - Gold default chat wallpaper
-            - Premium sparks on send, reactions and story likes (Settings → DrGram Premium)
+            - Premium sparks on send, reactions and story likes (Settings → LuxGram Premium)
             - Gold spark burst on avatar touch (emoji-interaction style)
             - Native Explore tab — latest channel media, Instagram-style grid (official MTProto only)
             - Save to Gallery in the media viewer with auto-download
